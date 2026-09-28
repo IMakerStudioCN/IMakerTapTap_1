@@ -1,7 +1,11 @@
 # IMakerTapTap_1
 用于爱美客第三届TapTap聚光灯创作者挑战赛
 
-# Git LFS 资源后缀规范与检查流程
+[TOC]
+
+# 资源提交流程
+
+## Git LFS 资源后缀规范与检查流程
 
 > 面向：美术、策划、TA、程序等全体成员
 > 目的：让大体积/二进制资源走 Git LFS，避免仓库体积膨胀、提交卡顿、拉取超时。
@@ -219,3 +223,173 @@ LFS 文件在 Git 里显示为一个「指针」小文件，体积通常只有�
          ↓
        正常提交，绝对不要加 LFS！
 ```
+
+# 程序提交GitHub Flow
+
+1. **禁止直接 push main** —— 所有改动必须走 Pull Request
+2. **功能分支存活不超过 2 天** —— 大功能拆小，写完就合
+3. **PR 24小时内必须 Review** —— 看到 @ 立刻看，别等
+
+------
+
+## 分支模型
+
+只用两类分支，不要搞 develop/release/hotfix：
+
+| 分支类型 | 命名规则           | 说明                         |
+| -------- | ------------------ | ---------------------------- |
+| `main`   | 固定名称           | 主分支，永远保持可部署状态   |
+| 功能分支 | `feature/简短描述` | 短期开发分支，合并后立即删除 |
+
+### 分支命名示例
+
+```
+feature/login-page
+feature/user-api
+fix/login-crash
+refactor/auth-module
+docs/readme-update
+```
+
+------
+
+## 18天节奏
+
+| 阶段          | 天数 | 重点                            |
+| ------------- | ---- | ------------------------------- |
+| **第1天**     | 1天  | 搭框架、定接口、保护 main、分工 |
+| **第2-15天**  | 14天 | 功能开发，每天合并到 main       |
+| **第16-17天** | 2天  | 联调、修 Bug、**冻结新功能**    |
+| **第18天**    | 1天  | 最终测试、打包、交付            |
+
+> ️ **第16天起任何人不得再加新功能**，只修 Bug。谁加谁背锅。
+
+------
+
+## 日志可以写在飞书
+
+日志：
+
+1. 昨天做了什么
+2. 今天做什么
+3. 有没有卡住的地方
+
+发现有人分支冲突了，立刻帮解决，**别拖到下午**。
+
+### 每天开发时
+
+```bash
+# 开工前，先拉最新 main
+git checkout main
+git pull origin main
+
+# 从最新 main 切分支
+git checkout -b feature/your-feature-name
+```
+
+### 开发提交
+
+遵循**原子提交**，每个 commit 只做一件事：
+
+```bash
+git add .
+git commit -m "feat: add login form validation"
+git push origin feature/your-feature-name
+```
+
+**Commit 格式：**
+
+```
+类型: 简短描述
+```
+
+| 类型       | 说明      |
+| ---------- | --------- |
+| `feat`     | 新功能    |
+| `fix`      | Bug 修复  |
+| `refactor` | 重构      |
+| `docs`     | 文档      |
+| `chore`    | 配置/依赖 |
+
+### 提 PR
+
+功能写完**当天就提 PR**，不要攒：
+
+1. GitHub 上创建 PR，base 选 `main`
+2. PR 描述写清楚：改了什么、怎么测试
+3. @ 至少 1 位同事 Review
+
+### Review 规则
+
+- 被 @ 的人 **24小时内必须看**
+- 小问题直接评论，大问题语音/当面沟通
+- 审查通过点 **Approve**
+- 作者改完继续 push 到同一分支，PR 自动更新
+
+### 合并
+
+使用 **Squash and merge**，保持 main 历史干净。
+
+合并后删除分支：
+
+```bash
+git checkout main
+git pull origin main
+git branch -d feature/your-feature-name
+```
+
+------
+
+## 避坑要点
+
+- **PR 不超过 400 行** —— 大了没人愿意审，容易漏 Bug
+- **别攒代码** —— 每天至少合并一次到 main，不要写完一大坨再提交
+- **别在分支上改别人代码** —— 看到问题通过 PR 评论沟通
+- **分支超过 1 天记得同步 main**：`git pull origin main` 到功能分支，提前解决冲突
+- **第16天起冻结新功能** —— 最后两天只修 Bug
+
+------
+
+## 紧急情况
+
+| 问题          | 处理                                            |
+| ------------- | ----------------------------------------------- |
+| 合并冲突      | 拉最新 main 到本地解决，解决不了立刻喊人        |
+| main 被搞坏了 | `git revert <commit-hash>` 回滚，**禁止 reset** |
+| 有人请假/失联 | 他的分支超过 2 天没动，立刻拉人接手             |
+| PR 没人审     | 群里直接 @，别不好意思                          |
+
+------
+
+## 常用命令速查
+
+```bash
+# 拉最新 main
+git checkout main && git pull origin main
+
+# 新建功能分支
+git checkout -b feature/xxx
+
+# 提交推送
+git add . && git commit -m "feat: xxx"
+git push origin feature/xxx
+
+# 同步 main 到当前分支
+git pull origin main
+
+# 删除已合并的本地分支
+git branch -d feature/xxx
+
+# 查看状态
+git status
+git log --oneline -5
+```
+
+------
+
+## 一句话总结
+
+> **每天从 main 拉分支 → 当天写完当天提 PR → PR 不过夜 → 最后两天只修 Bug。**
+
+------
+
