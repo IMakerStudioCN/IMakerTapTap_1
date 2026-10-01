@@ -368,7 +368,7 @@ git branch -d feature/your-feature-name
 git checkout main && git pull origin main
 
 # 新建功能分支
-git checkout -b feature/xxx
+git checkout -b feature/xxx 
 
 # 提交推送
 git add . && git commit -m "feat: xxx"
