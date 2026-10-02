@@ -26,7 +26,6 @@ namespace TapTapFirst
             #region 添加要纯C#的数据
             save.Add<TagListSaveData>();
             save.Add<NewsTemplateModel>();
-            #region 添加要纯当的数据
             #endregion
 
 
