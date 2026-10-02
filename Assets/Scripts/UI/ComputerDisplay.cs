@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using QFramework;
 
-namespace QFramework.Example
+namespace TapTapFirst
 {
 	public class ComputerDisplayData : UIPanelData
 	{
@@ -13,19 +13,32 @@ namespace QFramework.Example
 		{
 			mData = uiData as ComputerDisplayData ?? new ComputerDisplayData();
 			// please add init code here
-			Menu.onClick.AddListener(() =>
+			Menu.onValueChanged.AddListener((value) =>
 			{
-				UIKit.OpenPanel<ComputerMenuPanel>(UILevel.PopUI);
-            });
-			PlayStatus.onClick.AddListener(() =>
-			{
-				
+				if (value)
+				{
+					UIKit.OpenPanel<ComputerMenuPanel>();
+                }
+				else
+				{
+					UIKit.ClosePanel<ComputerMenuPanel>();
+                }
 			});
+			PlayStatuMenu.onValueChanged.AddListener((value) =>
+			{
+				if(value)
+				{
+					UIKit.OpenPanel<PlayStatusMenu>();
+				}
+				else
+				{
+					UIKit.ClosePanel<PlayStatusMenu>();
+                }
+            } );
         }
 		
 		protected override void OnOpen(IUIData uiData = null)
 		{
-
 		}
 		
 		protected override void OnShow()

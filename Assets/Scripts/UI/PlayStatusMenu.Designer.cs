@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using QFramework;
 
-namespace QFramework.Example
+namespace TapTapFirst
 {
 	// Generate Id:b94d4539-1cff-4e53-a2ea-8343f54c327c
 	public partial class PlayStatusMenu

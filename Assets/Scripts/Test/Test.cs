@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using QFramework;
-using QFramework.Example;
 
 namespace TapTapFirst
 {

@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using QFramework;
 
-namespace QFramework.Example
+namespace TapTapFirst
 {
-	// Generate Id:45edf20a-4c82-4b32-9f3a-6470c7e93773
+	// Generate Id:5d0f709e-d091-4759-8029-08dae3e30013
 	public partial class ComputerDisplay
 	{
 		public const string Name = "ComputerDisplay";
@@ -13,17 +13,17 @@ namespace QFramework.Example
 		[SerializeField]
 		public UnityEngine.UI.Image Image;
 		[SerializeField]
-		public UnityEngine.UI.Button Menu;
+		public UnityEngine.UI.Toggle PlayStatuMenu;
 		[SerializeField]
-		public UnityEngine.UI.Button PlayStatus;
+		public UnityEngine.UI.Toggle Menu;
 		
 		private ComputerDisplayData mPrivateData = null;
 		
 		protected override void ClearUIComponents()
 		{
 			Image = null;
+			PlayStatuMenu = null;
 			Menu = null;
-			PlayStatus = null;
 			
 			mData = null;
 		}

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using QFramework;
 
-namespace QFramework.Example
+namespace TapTapFirst
 {
 	public class PlayStatusMenuData : UIPanelData
 	{

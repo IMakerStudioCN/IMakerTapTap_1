@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using QFramework;
 
-namespace QFramework.Example
+namespace TapTapFirst
 {
 	// Generate Id:753b3ce9-d122-4742-b77c-63842351887a
 	public partial class ComputerMenuPanel
