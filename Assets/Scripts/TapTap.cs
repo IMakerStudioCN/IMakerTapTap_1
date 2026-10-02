@@ -6,9 +6,20 @@ namespace TapTapFirst
     {
         protected override void Init()
         {
-            #region 注册模块
-            RegisterUtility<IJsonSaveUtility>(new JsonSaveUtility());
+
+            var save = new JsonSaveUtility();
+            this.RegisterUtility<IJsonSaveUtility>(save);
+
+            // 游戏开始：提前把要保存的纯 C# 类放进字典 ，不要在Controller里用Add和Remove
+            #region 添加要纯当的数据
+            
             #endregion
+
+
+            // 一键读取：有存档就原地灌回上面这些实例。
+            //下面这行代码是测试留下的，后面大概率要改
+            //不过我认为现在没写完游戏的加载和存储的功能所有保留
+            save.Load();                       
         }
     }
 }
