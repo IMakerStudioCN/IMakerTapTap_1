@@ -1,4 +1,6 @@
 ﻿using QFramework;
+using System.IO;
+using UnityEngine;
 
 namespace TapTapFirst
 {
@@ -7,20 +9,35 @@ namespace TapTapFirst
     public interface IJsonSaveUtility : IUtility
     {
         // TODO: 在这里声明模块对外 API（属性/方法）
-        public void SaveToJson<T>(string filePath, T data);
-        public void LoadFromJson<T>(string filePath, out T data);
+        public void SaveToJson<T>(string fileName, T data);
+        public void LoadFromJson<T>(string fileName, out T data);
     }
 
     public class JsonSaveUtility : IJsonSaveUtility
     {
-        void IJsonSaveUtility.LoadFromJson<T>(string filePath, out T data)
+        //写到最前面：如果后期有Dictionary这类哈希表要保存是要加代码的
+        //保存API
+        void IJsonSaveUtility.SaveToJson<T>(string fileName, T data)
         {
-            throw new System.NotImplementedException();
+            string path = Path.Combine(Application.persistentDataPath, fileName + ".json");
+            string jsonString = JsonUtility.ToJson(data);
+            File.WriteAllText(path, jsonString);
+        }
+        //读取API
+        void IJsonSaveUtility.LoadFromJson<T>(string fileName, out T data)
+        {
+            string path = Path.Combine(Application.persistentDataPath, fileName + ".json");
+            if (File.Exists(path))
+            {
+                string jsonString = File.ReadAllText(path);
+                data = JsonUtility.FromJson<T>(jsonString);
+            }
+            else
+            {
+                data = default(T);
+            }
         }
 
-        void IJsonSaveUtility.SaveToJson<T>(string filePath, T data)
-        {
-            throw new System.NotImplementedException();
-        }
+        
     }
 }
