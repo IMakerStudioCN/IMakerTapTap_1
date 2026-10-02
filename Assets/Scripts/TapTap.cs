@@ -8,11 +8,16 @@ namespace TapTapFirst
         {
 
             var save = new JsonSaveUtility();
+            #region 注册表
+            //工具注册
             this.RegisterUtility<IJsonSaveUtility>(save);
+            //Model注册
+
+            #endregion
+
 
             // 游戏开始：提前把要保存的纯 C# 类放进字典 ，不要在Controller里用Add和Remove
             #region 添加要纯当的数据
-            
             #endregion
 
 
