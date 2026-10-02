@@ -20,7 +20,7 @@ namespace TapTapFirst
 
             // 游戏开始：提前把要保存的纯 C# 类放进字典 ，不要在Controller里用Add和Remove
             #region 添加要纯C#的数据
-            save.Add<TagModel>();
+            save.Add<TagListSaveData>();
             save.Add<NewsTemplateModel>();
             #endregion
 

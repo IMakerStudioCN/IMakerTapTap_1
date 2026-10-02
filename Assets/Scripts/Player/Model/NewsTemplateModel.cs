@@ -1,7 +1,6 @@
 using QFramework;
 using System.Collections.Generic;
-using System.Diagnostics;
-
+using UnityEngine;
 namespace TapTapFirst
 {
     // 已生成模块接口 INewsTemplateModel，请在 Architecture.Init() 中按接口类型注册：
@@ -45,7 +44,7 @@ namespace TapTapFirst
         {
             // 初始化newsList
             //newsList = Resources.Load<NewsTemplateList_SO>("NewsTemplateList");
-            Debug.WriteLine("记得初始化新闻列表，传入Resources获取位置");
+            Debug.LogError("记得初始化新闻列表，传入Resources获取位置");
         }
     }
     public class NewsTemplateSaveData

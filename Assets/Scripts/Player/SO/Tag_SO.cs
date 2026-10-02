@@ -36,12 +36,13 @@ namespace TapTapFirst
         /// 写入 tag 的种类的中文内容
         /// </summary>
         [SerializeField]
-        public Dictionary<int,string> theTypeToContent = new Dictionary<int, string>()
+        [Tooltip("Tag 的种类的中文内容:0是形容词,1是名词,2是量词,3是胡扯")]
+        public List<string> theTypeToContent = new List<string>()
         {
-            {0,"形容词"},
-            {1,"名词"},
-            {2,"量词"},
-            {3,"胡扯"}
+            "形容词",
+            "名词",
+            "量词",
+            "胡扯"
         };
         /// <summary>
         /// 获取 tag 的种类的中文内容

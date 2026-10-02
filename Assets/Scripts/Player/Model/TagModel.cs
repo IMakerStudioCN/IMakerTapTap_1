@@ -1,17 +1,18 @@
 using QFramework;
 using System.Collections.Generic;
-using System.Diagnostics;
+using UnityEngine;
 
 namespace TapTapFirst
 {
     public class TagModel : AbstractModel,ITagModel
     {
+        private ResLoader mResLoader = ResLoader.Allocate();
         JsonSaveUtility saveUtility => this.GetUtility<IJsonSaveUtility>() as JsonSaveUtility;
         #region 字段
         /// <summary>
         /// 用于存储所有的tag配置
         /// </summary>
-        private TagList_SO taglist;
+        private TagList_SO taglist = new TagList_SO();
         /// <summary>
         ///用于存储已经获得的tag
         /// </summary>
@@ -68,9 +69,10 @@ namespace TapTapFirst
 
         protected override void OnInit()
         {
+            //ResKit.Init();
             //获取设定好的含全部tag的列表
-            //taglist = resources.Load<TagList_SO>("路径");
-            Debug.WriteLine("记得初始化tag列表，传入Resources获取位置");
+            //taglist = mResLoader.LoadSync<TagList_SO>("TagList");
+            Debug.LogError("记得初始化tag列表，传入Resources获取位置");
 
         }
     }
@@ -78,9 +80,9 @@ namespace TapTapFirst
     {
         //public TagList_SO tagList;
 
-        public  List<Tag_SO> palyerAcquired;
+        public  List<Tag_SO> palyerAcquired = new List<Tag_SO>();
         
-        public  HashSet<int> palyerAcquiredIds;
+        public  HashSet<int> palyerAcquiredIds = new HashSet<int>();
 
     }
 }
