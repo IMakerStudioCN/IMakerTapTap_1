@@ -8,8 +8,8 @@ namespace TapTapFirst
 	{
 	}
 	public partial class ComputerDisplay : UIPanel
-	{
-		protected override void OnInit(IUIData uiData = null)
+	{ 
+        protected override void OnInit(IUIData uiData = null)
 		{
 			mData = uiData as ComputerDisplayData ?? new ComputerDisplayData();
 			// please add init code here
@@ -35,6 +35,8 @@ namespace TapTapFirst
 					UIKit.ClosePanel<PlayStatusMenu>();
                 }
             } );
+			
+
         }
 		
 		protected override void OnOpen(IUIData uiData = null)

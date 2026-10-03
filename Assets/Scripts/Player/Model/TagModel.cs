@@ -8,50 +8,50 @@ namespace TapTapFirst
     {
         private ResLoader mResLoader = ResLoader.Allocate();
         JsonSaveUtility saveUtility => this.GetUtility<IJsonSaveUtility>() as JsonSaveUtility;
-        #region 字段
+        #region �ֶ�
         /// <summary>
-        /// 用于存储所有的tag配置
+        /// ���ڴ洢���е�tag����
         /// </summary>
         private TagList_SO taglist = new TagList_SO();
         /// <summary>
-        ///用于存储已经获得的tag
+        ///���ڴ洢�Ѿ���õ�tag
         /// </summary>
         private readonly List<Tag_SO> mAcquired1 = new List<Tag_SO>();
         /// <summary>
-        /// 用于快速判断是否已经获得了该tag
+        /// ���ڿ����ж��Ƿ��Ѿ�����˸�tag
         /// </summary>
         private readonly HashSet<int> mAcquiredIds1 = new HashSet<int>();
         /// <summary>
-        /// 这是一个只读属性，返回已经获得的tag列表
+        /// ����һ��ֻ�����ԣ������Ѿ���õ�tag�б�
         /// </summary>
         public IReadOnlyList<Tag_SO> AcquriedTags => saveUtility.Get<TagListSaveData>("TagListSaveData").palyerAcquired;
         #endregion
         /// <summary>
-        /// 获取tag的配置，传入tagId，返回对应的Tag_SO对象，使用时配合CanUse方法判断是否已经获得了该tag
+        /// ��ȡtag�����ã�����tagId�����ض�Ӧ��Tag_SO����ʹ��ʱ���CanUse�����ж��Ƿ��Ѿ�����˸�tag
         /// </summary>
         /// <param name="tagId"></param>
         /// <returns></returns>
         public Tag_SO GetConfig(int tagId) => taglist.GetTagById(tagId);
-        //使用方法
+        //ʹ�÷���
         //if(CanUse(tagId))=>GetConfig(tagId)
         //
 
 
         /// <summary>
-        /// 这个不用调用，直接调CanUse就行了，判断是否已经获得了该tag
+        /// ������õ��ã�ֱ�ӵ�CanUse�����ˣ��ж��Ƿ��Ѿ�����˸�tag
         /// </summary>
         /// <param name="tagId"></param>
         /// <returns></returns>
         public bool IsAcquired(int tagId) => saveUtility.Get<TagListSaveData>("TagListSaveData").palyerAcquiredIds.Contains(tagId);
         /// <summary>
-        /// 看看是否可以使用该tag，实际上就是判断是否已经获得了该tag
+        /// �����Ƿ����ʹ�ø�tag��ʵ���Ͼ����ж��Ƿ��Ѿ�����˸�tag
         /// </summary>
         /// <param name="tagId"></param>
         /// <returns></returns>
         public bool CanUse(int tagId) => IsAcquired(tagId);
 
         /// <summary>
-        /// 玩家获取tag，传入tagId，如果已经获得了该tag，则不做任何操作，否则将该tag添加到已获得的列表中
+        /// ��һ�ȡtag������tagId������Ѿ�����˸�tag�������κβ��������򽫸�tag��ӵ��ѻ�õ��б���
         /// </summary>
         /// <param name="tagId"></param>
         public void Acquire(int tagId)
@@ -70,7 +70,7 @@ namespace TapTapFirst
         protected override void OnInit()
         {
             //ResKit.Init();
-            //获取设定好的含全部tag的列表
+            //��ȡ�趨�õĺ�ȫ��tag���б�
             //taglist = mResLoader.LoadSync<TagList_SO>("TagList");
             Debug.LogWarning("记得初始化tag列表，传入Resources获取位置");
 

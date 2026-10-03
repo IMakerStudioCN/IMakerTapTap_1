@@ -12,9 +12,9 @@ namespace TapTapFirst
             // 注册工具类
             this.RegisterUtility<IJsonSaveUtility>(save);
             // 注册模型类
-            RegisterModel<PlayerModel>(new PlayerModel());
-            RegisterModel<TagModel>(new TagModel());
-            RegisterModel<NewsTemplateModel>(new NewsTemplateModel());
+            RegisterModel<IPlayerModel>(new PlayerModel());
+            RegisterModel<ITagModel>(new TagModel());
+            RegisterModel<INewsTemplateModel>(new NewsTemplateModel());
             RegisterModel<ITimeModel>(new TimeModel());
             //工具注册
             this.RegisterUtility<IJsonSaveUtility>(save);
