@@ -1,8 +1,14 @@
-using QFramework;
+﻿using QFramework;
 
 namespace TapTapFirst
 {
-    public class PlayerModel : AbstractModel
+    public interface IPlayerModel : IModel
+    {
+        int FundsValue { get; set; }
+        int EvilValue { get; set; }
+        int CredibilityValue { get; set; }
+    }
+    public class PlayerModel : AbstractModel, IPlayerModel
     {
         public int FundsValue { get; set; } = 0;
         public int EvilValue { get; set; } = 0;
