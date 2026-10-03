@@ -50,15 +50,22 @@ namespace TapTapFirst
             //这是真打开网页了，孩子们不要用
             //Application.OpenURL($"https://www.taptap.com/webview/{softwareData.webID}");
             this.SendCommand(new SoftwareClickedCommand(softwareData.webID));
-
-
+            this.softwareData.haveNewMessage = false;
+            HaveOrNotNewMessage();
         }
-        
+        /// <summary>
+        /// 设置红标状态
+        /// </summary>
+        public void HaveOrNotNewMessage()
+        {
+            this.haveNewMessage?.SetActive(softwareData.haveNewMessage);
+        }
         /// <summary>
         /// 去掉红点标记
         /// </summary>
         public void UpdateNewMessageStatus()
         {
+
             if (this.softwareModel == null)
                 Debug.LogWarning("softwareModel是空的");
             if(this.haveNewMessage == null)
@@ -71,7 +78,7 @@ namespace TapTapFirst
                 softwareModel.haveNewMessage.Add(this.softwareData.webID, this.softwareData.haveNewMessage);
             }
             this.softwareData.haveNewMessage = softwareModel.haveNewMessage[this.softwareData.webID];
-            this.haveNewMessage.SetActive(this.softwareData.haveNewMessage);
+            HaveOrNotNewMessage();
             //this.SendCommand(new HaveNewMessageCommand(softwareData, false));
         }
 
