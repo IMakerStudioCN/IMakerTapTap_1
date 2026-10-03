@@ -1,9 +1,54 @@
+using System;
 using QFramework;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace TapTapFirst
 {
+    /// <summary>
+    /// 全局设置入口。任意界面都可以调用 GlobalSettingsUI.Open() 打开同一个设置面板。
+    /// </summary>
+    public static class GlobalSettingsUI
+    {
+        private const string PrefabName = "Resources/UI/SettingsPanel";
+
+        public static bool Open(Action onClosed = null)
+        {
+            ResKit.Init();
+            if (!(UIKit.Config.PanelLoaderPool is ResKitPanelLoaderPool))
+            {
+                UIKit.Config.PanelLoaderPool = new ResKitPanelLoaderPool();
+            }
+
+            SettingsPanelView panel = UIKit.OpenPanel<SettingsPanelView>(
+                UILevel.PopUI,
+                prefabName: PrefabName);
+
+            if (panel == null)
+            {
+                Debug.LogError("[GlobalSettingsUI] 设置面板加载失败");
+                return false;
+            }
+
+            if (onClosed != null) panel.OnClosed(onClosed);
+            return true;
+        }
+    }
+
+    public static class GameApplication
+    {
+        public static void Quit()
+        {
+            PlayerPrefs.Save();
+
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+    }
+
     public sealed class SettingsPanelView : UIPanel
     {
         public Slider SoundSlider;
@@ -45,13 +90,7 @@ namespace TapTapFirst
 
         private void ExitGame()
         {
-            PlayerPrefs.Save();
-
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
+            GameApplication.Quit();
         }
 
         protected override void OnClose()

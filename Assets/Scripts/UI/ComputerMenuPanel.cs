@@ -12,7 +12,12 @@ namespace TapTapFirst
 		protected override void OnInit(IUIData uiData = null)
 		{
 			mData = uiData as ComputerMenuPanelData ?? new ComputerMenuPanelData();
-			// please add init code here
+			Setting.onClick.AddListener(OpenGlobalSettings);
+		}
+
+		private void OpenGlobalSettings()
+		{
+			GlobalSettingsUI.Open();
 		}
 		
 		protected override void OnOpen(IUIData uiData = null)
@@ -29,6 +34,12 @@ namespace TapTapFirst
 		
 		protected override void OnClose()
 		{
+		}
+
+		protected override void OnBeforeDestroy()
+		{
+			Setting?.onClick.RemoveListener(OpenGlobalSettings);
+			base.OnBeforeDestroy();
 		}
 	}
 }

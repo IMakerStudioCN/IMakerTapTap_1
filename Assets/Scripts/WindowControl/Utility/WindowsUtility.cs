@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using QFramework;
@@ -19,12 +20,20 @@ namespace TapTapFirst
         Rect GetRectInParent(RectTransform rt);
         Rect RectLerp(Rect a, Rect b, float t);
         RectTransform FindPanelRoot(RectTransform frame);
+        RectTransform FindChildByName(RectTransform root, string childName);
+        WindowEdge GetEdgeFromPoint(RectTransform frame, Vector2 localPoint, float border);
+        Rect MoveRect(RectTransform frame, Rect startRect, Vector2 delta,
+            float taskbarHeight = WindowsUtility.DefaultTaskbarHeight, Vector2 minSize = default);
+        Rect ResizeRect(RectTransform frame, Rect startRect, Vector2 delta, WindowEdge edges,
+            float taskbarHeight = WindowsUtility.DefaultTaskbarHeight, Vector2 minSize = default);
         Rect GetDesktopRect(RectTransform frame, float taskbarHeight = WindowsUtility.DefaultTaskbarHeight);
         Rect GetFullScreenRect(RectTransform frame, float taskbarHeight = WindowsUtility.DefaultTaskbarHeight);
         Rect GetTargetRect(RectTransform frame, WindowFrameState state, bool full,
             float taskbarHeight = WindowsUtility.DefaultTaskbarHeight, Vector2 minSize = default);
         Rect ClampToDesktop(RectTransform frame, Rect rect,
             float taskbarHeight = WindowsUtility.DefaultTaskbarHeight, Vector2 minSize = default);
+        Rect CenterRect(Rect desktop, Vector2 size, Vector2 offset = default);
+        Rect ResizeToSize(Rect rect, Vector2 size, bool keepCenter = true);
 
         // ---- 应用 ----
         void ApplyRect(RectTransform rt, Rect rect);
@@ -49,6 +58,8 @@ namespace TapTapFirst
         void StretchBox(RectTransform child, float left = 0f, float bottom = 0f, float right = 0f, float top = 0f);
         void AutoFit(RectTransform child, bool horizontal, bool vertical);
         void PinCorner(RectTransform child, WindowCorner corner, float dx = 0f, float dy = 0f);
+        void AutoPinCorner(RectTransform child);
+        void AutoPinCorner(RectTransform child, WindowCorner corner);
     }
 
     public enum WindowCorner
@@ -57,6 +68,16 @@ namespace TapTapFirst
         TopRight,
         BottomLeft,
         BottomRight
+    }
+
+    [Flags]
+    public enum WindowEdge
+    {
+        None = 0,
+        Left = 1,
+        Right = 2,
+        Bottom = 4,
+        Top = 8
     }
 
     // 一个窗口实例自己的几何状态：由外部持有（每个面板一个），工具类本身不存状态
@@ -128,6 +149,69 @@ namespace TapTapFirst
             return root;
         }
 
+        // 递归找一个同名子物体（自动装配 Bar / ContentBox / Exit / Mini / Full 用）
+        public static RectTransform FindChildByName(RectTransform root, string childName)
+        {
+            if (root == null || string.IsNullOrEmpty(childName)) return null;
+
+            for (var i = 0; i < root.childCount; i++)
+            {
+                if (!(root.GetChild(i) is RectTransform child)) continue;
+                if (child.name == childName) return child;
+
+                var found = FindChildByName(child, childName);
+                if (found != null) return found;
+            }
+
+            return null;
+        }
+
+        // localPoint 用 RectTransformUtility.ScreenPointToLocalPointInRectangle(frame, ...) 取
+        // 返回指针落在窗口的哪几条边上（border 内算命中），None 表示不在边缘
+        public static WindowEdge GetEdgeFromPoint(RectTransform frame, Vector2 localPoint, float border)
+        {
+            if (frame == null || border <= 0f) return WindowEdge.None;
+
+            var rect = frame.rect;
+            var edge = WindowEdge.None;
+            if (localPoint.x - rect.xMin <= border) edge |= WindowEdge.Left;
+            if (rect.xMax - localPoint.x <= border) edge |= WindowEdge.Right;
+            if (localPoint.y - rect.yMin <= border) edge |= WindowEdge.Bottom;
+            if (rect.yMax - localPoint.y <= border) edge |= WindowEdge.Top;
+            return edge;
+        }
+
+        // 拖动：整块平移，尺寸不变，自动夹回桌面区
+        public static Rect MoveRect(RectTransform frame, Rect startRect, Vector2 delta,
+            float taskbarHeight = DefaultTaskbarHeight, Vector2 minSize = default)
+        {
+            return ClampToDesktop(frame, new Rect(startRect.position + delta, startRect.size), taskbarHeight, minSize);
+        }
+
+        // 缩放：只动被拖的那几条边，保持不小于 minSize，并夹在桌面区内
+        public static Rect ResizeRect(RectTransform frame, Rect startRect, Vector2 delta, WindowEdge edges,
+            float taskbarHeight = DefaultTaskbarHeight, Vector2 minSize = default)
+        {
+            if (edges == WindowEdge.None) return startRect;
+            if (minSize.x <= 0f || minSize.y <= 0f) minSize = DefaultMinSize;
+
+            var desktop = GetDesktopRect(frame, taskbarHeight);
+            var min = startRect.min;
+            var max = startRect.max;
+
+            if ((edges & WindowEdge.Left) != 0) min.x = Mathf.Min(min.x + delta.x, max.x - minSize.x);
+            if ((edges & WindowEdge.Right) != 0) max.x = Mathf.Max(max.x + delta.x, min.x + minSize.x);
+            if ((edges & WindowEdge.Bottom) != 0) min.y = Mathf.Min(min.y + delta.y, max.y - minSize.y);
+            if ((edges & WindowEdge.Top) != 0) max.y = Mathf.Max(max.y + delta.y, min.y + minSize.y);
+
+            if ((edges & WindowEdge.Left) != 0) min.x = Mathf.Max(min.x, desktop.xMin);
+            if ((edges & WindowEdge.Right) != 0) max.x = Mathf.Min(max.x, desktop.xMax);
+            if ((edges & WindowEdge.Bottom) != 0) min.y = Mathf.Max(min.y, desktop.yMin);
+            if ((edges & WindowEdge.Top) != 0) max.y = Mathf.Min(max.y, desktop.yMax);
+
+            return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+        }
+
         #endregion
 
         #region 桌面区 / 目标矩形
@@ -146,6 +230,26 @@ namespace TapTapFirst
         public static Rect GetFullScreenRect(RectTransform frame, float taskbarHeight = DefaultTaskbarHeight)
         {
             return GetDesktopRect(frame, taskbarHeight);
+        }
+
+        // 在桌面区里居中放一个指定尺寸的矩形（offset 是相对中心的偏移）
+        public static Rect CenterRect(Rect desktop, Vector2 size, Vector2 offset = default)
+        {
+            size = new Vector2(Mathf.Max(size.x, 1f), Mathf.Max(size.y, 1f));
+            var pos = new Vector2(
+                desktop.xMin + (desktop.width - size.x) * 0.5f + offset.x,
+                desktop.yMin + (desktop.height - size.y) * 0.5f + offset.y);
+            return new Rect(pos, size);
+        }
+
+        // 改矩形尺寸，keepCenter = 保持中心不动
+        public static Rect ResizeToSize(Rect rect, Vector2 size, bool keepCenter = true)
+        {
+            size = new Vector2(Mathf.Max(size.x, 1f), Mathf.Max(size.y, 1f));
+            if (!keepCenter) return new Rect(rect.position, size);
+
+            var center = rect.center;
+            return new Rect(center.x - size.x * 0.5f, center.y - size.y * 0.5f, size.x, size.y);
         }
 
         public static Rect ClampToDesktop(RectTransform frame, Rect rect,
@@ -382,6 +486,41 @@ namespace TapTapFirst
             child.anchoredPosition = pivotPoint - anchorPoint;
         }
 
+        // 不改数值，只把现在摆的位置翻译成 钉在最近的那个角
+        public static void AutoPinCorner(RectTransform child)
+        {
+            if (child == null || !(child.parent is RectTransform parent)) return;
+
+            var rect = GetRectInParent(child);
+            var parentRect = parent.rect;
+            var left = rect.xMin - parentRect.xMin;
+            var right = parentRect.xMax - rect.xMax;
+            var bottom = rect.yMin - parentRect.yMin;
+            var top = parentRect.yMax - rect.yMax;
+
+            var corner = bottom <= top
+                ? (left <= right ? WindowCorner.BottomLeft : WindowCorner.BottomRight)
+                : (left <= right ? WindowCorner.TopLeft : WindowCorner.TopRight);
+
+            PinCorner(child, corner, left <= right ? left : right, bottom <= top ? bottom : top);
+        }
+
+        public static void AutoPinCorner(RectTransform child, WindowCorner corner)
+        {
+            if (child == null || !(child.parent is RectTransform parent)) return;
+
+            var rect = GetRectInParent(child);
+            var parentRect = parent.rect;
+            var dx = corner == WindowCorner.TopLeft || corner == WindowCorner.BottomLeft
+                ? rect.xMin - parentRect.xMin
+                : parentRect.xMax - rect.xMax;
+            var dy = corner == WindowCorner.BottomLeft || corner == WindowCorner.BottomRight
+                ? rect.yMin - parentRect.yMin
+                : parentRect.yMax - rect.yMax;
+
+            PinCorner(child, corner, dx, dy);
+        }
+
         #endregion
 
         #region IWindowsUtility 显式实现（转发到上面的静态方法，两种调用方式都能用）
@@ -416,6 +555,12 @@ namespace TapTapFirst
         Rect IWindowsUtility.ClampToDesktop(RectTransform frame, Rect rect, float taskbarHeight, Vector2 minSize)
             => ClampToDesktop(frame, rect, taskbarHeight, minSize);
 
+        Rect IWindowsUtility.CenterRect(Rect desktop, Vector2 size, Vector2 offset)
+            => CenterRect(desktop, size, offset);
+
+        Rect IWindowsUtility.ResizeToSize(Rect rect, Vector2 size, bool keepCenter)
+            => ResizeToSize(rect, size, keepCenter);
+
         void IWindowsUtility.ApplyRect(RectTransform rt, Rect rect) => ApplyRect(rt, rect);
 
         void IWindowsUtility.BringToFront(RectTransform frame) => BringToFront(frame);
@@ -447,6 +592,22 @@ namespace TapTapFirst
 
         void IWindowsUtility.PinCorner(RectTransform child, WindowCorner corner, float dx, float dy)
             => PinCorner(child, corner, dx, dy);
+
+        void IWindowsUtility.AutoPinCorner(RectTransform child) => AutoPinCorner(child);
+
+        void IWindowsUtility.AutoPinCorner(RectTransform child, WindowCorner corner) => AutoPinCorner(child, corner);
+
+        RectTransform IWindowsUtility.FindChildByName(RectTransform root, string childName)
+            => FindChildByName(root, childName);
+
+        WindowEdge IWindowsUtility.GetEdgeFromPoint(RectTransform frame, Vector2 localPoint, float border)
+            => GetEdgeFromPoint(frame, localPoint, border);
+
+        Rect IWindowsUtility.MoveRect(RectTransform frame, Rect startRect, Vector2 delta,
+            float taskbarHeight, Vector2 minSize) => MoveRect(frame, startRect, delta, taskbarHeight, minSize);
+
+        Rect IWindowsUtility.ResizeRect(RectTransform frame, Rect startRect, Vector2 delta, WindowEdge edges,
+            float taskbarHeight, Vector2 minSize) => ResizeRect(frame, startRect, delta, edges, taskbarHeight, minSize);
 
         #endregion
     }

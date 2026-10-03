@@ -9,7 +9,6 @@ namespace TapTapFirst
     {
         [SerializeField]
         public Software_SO softwareData;//SO文件
-        public WindowsSO windowsSO;//对应的窗口SO文件
         [SerializeField]
         private Button button;//软件用按钮实现
         [SerializeField]
@@ -52,7 +51,7 @@ namespace TapTapFirst
         {
             //这是真打开网页了，孩子们不要用
             //Application.OpenURL($"https://www.taptap.com/webview/{softwareData.webID}");
-            this.SendCommand(new SoftwareClickedCommand(windowsSO));
+            WindowKit.Open(softwareData.softwareName);
             //调用system
             this.softwareData.haveNewMessage = softwareSystem.updateSO(softwareData.webID);
             HaveOrNotNewMessage();

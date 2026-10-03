@@ -13,7 +13,6 @@ namespace TapTapFirst
     public partial class StartPanel : UIPanel
     {
         private const string GameSceneName = "GamePlay";
-        private const string SettingsPrefabName = "Resources/UI/SettingsPanel";
         private const string SaveSlotsPrefabName = "Resources/UI/SaveSlotPanel";
 
         private ResLoader mResLoader;
@@ -36,6 +35,7 @@ namespace TapTapFirst
             Btn_Start.onClick.AddListener(StartGame);
             Btn_Archive.onClick.AddListener(OpenSaveSlots);
             Btn_Setting.onClick.AddListener(OpenSettings);
+            Btn_Exit.onClick.AddListener(GameApplication.Quit);
         }
 
         private void StartGame()
@@ -46,18 +46,10 @@ namespace TapTapFirst
         private void OpenSettings()
         {
             SetMainButtonsInteractable(false);
-            SettingsPanelView panel = UIKit.OpenPanel<SettingsPanelView>(
-                UILevel.PopUI,
-                prefabName: SettingsPrefabName);
-
-            if (panel == null)
+            if (!GlobalSettingsUI.Open(() => SetMainButtonsInteractable(true)))
             {
-                Debug.LogError("[StartPanel] 设置面板加载失败");
                 SetMainButtonsInteractable(true);
-                return;
             }
-
-            panel.OnClosed(() => SetMainButtonsInteractable(true));
         }
 
         private void OpenSaveSlots()
@@ -98,6 +90,7 @@ namespace TapTapFirst
             Btn_Start.interactable = interactable;
             Btn_Archive.interactable = interactable;
             Btn_Setting.interactable = interactable;
+            Btn_Exit.interactable = interactable;
         }
 
         protected override void OnClose()
@@ -111,6 +104,7 @@ namespace TapTapFirst
                 Btn_Start?.onClick.RemoveListener(StartGame);
                 Btn_Archive?.onClick.RemoveListener(OpenSaveSlots);
                 Btn_Setting?.onClick.RemoveListener(OpenSettings);
+                Btn_Exit?.onClick.RemoveListener(GameApplication.Quit);
                 mResLoader?.Recycle2Cache();
                 mResLoader = null;
             }

@@ -4,23 +4,6 @@ using static UnityEditor.PlayerSettings;
 
 namespace TapTapFirst
 {
-    public class SoftwareClickedCommand : AbstractCommand
-    {
-        WindowsSO windowsSO;
-        private IWindowsSystem mWindowsSystem ;
-        public SoftwareClickedCommand(WindowsSO windowsSO)
-        {
-            this.windowsSO = windowsSO;
-        }
-
-        protected override void OnExecute()
-        {
-            mWindowsSystem = this.GetSystem<IWindowsSystem>();
-            //接入WindowsSystem，获取软件对应的窗口信息，打开窗口
-            mWindowsSystem.RegisterWindows(windowsSO.windowName, windowsSO);
-            mWindowsSystem.OpenWindows(windowsSO.windowName);
-        }
-    }
     /// <summary>
     /// 传入一个软件对象，设置其haveNewMessage属性为true或false
     /// </summary>
