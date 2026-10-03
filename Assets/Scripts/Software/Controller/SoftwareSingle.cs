@@ -16,10 +16,10 @@ namespace TapTapFirst
         [SerializeField]
         private GameObject haveNewMessage;//红点标记
 
-        private ISoftwareModel softwareModel;
+        private ISoftwareSystem softwareSystem;
         private void Start()
         {
-            softwareModel = this.GetModel<ISoftwareModel>();
+            softwareSystem = this.GetSystem<ISoftwareSystem>();
             this.button = this.GetComponent<Button>();
             //this.haveNewMessage = GameObject.Find
             this.buttonText = this.GetComponentInChildren<TextMeshProUGUI>();
@@ -27,11 +27,12 @@ namespace TapTapFirst
             this.buttonText.text = softwareData.softwareName;
             this.button.image.sprite = softwareData.softwareIcon;
             //this.haveNewMessage = GameObject.Find("HaveNewMessage").GetComponent<Image>();
-
+            
+            //点击软件，然后发送command
             button.onClick.AddListener(() =>
             {
+                softwareSystem.clickSoftware(softwareData.webID);
                 clickSoftware();
-                this.SendCommand(new HaveNewMessageCommand(softwareData.webID, false));
             });
 
 
@@ -41,7 +42,8 @@ namespace TapTapFirst
                 {
                     return;
                 }
-                UpdateNewMessageStatus();
+                softwareSystem.setDicisTrue(softwareData.webID);
+                HaveOrNotNewMessage();
             }).UnRegisterWhenGameObjectDestroyed(this.gameObject);
         }
 
@@ -50,7 +52,8 @@ namespace TapTapFirst
             //这是真打开网页了，孩子们不要用
             //Application.OpenURL($"https://www.taptap.com/webview/{softwareData.webID}");
             this.SendCommand(new SoftwareClickedCommand(softwareData.webID));
-            this.softwareData.haveNewMessage = false;
+            //调用system
+            this.softwareData.haveNewMessage = softwareSystem.updateSO(softwareData.webID);
             HaveOrNotNewMessage();
         }
         /// <summary>
@@ -60,27 +63,7 @@ namespace TapTapFirst
         {
             this.haveNewMessage?.SetActive(softwareData.haveNewMessage);
         }
-        /// <summary>
-        /// 去掉红点标记
-        /// </summary>
-        public void UpdateNewMessageStatus()
-        {
 
-            if (this.softwareModel == null)
-                Debug.LogWarning("softwareModel是空的");
-            if(this.haveNewMessage == null)
-            {
-                Debug.Log("红点是空的");
-                return;
-            }
-            if (!softwareModel.haveNewMessage.ContainsKey(this.softwareData.webID))
-            {
-                softwareModel.haveNewMessage.Add(this.softwareData.webID, this.softwareData.haveNewMessage);
-            }
-            this.softwareData.haveNewMessage = softwareModel.haveNewMessage[this.softwareData.webID];
-            HaveOrNotNewMessage();
-            //this.SendCommand(new HaveNewMessageCommand(softwareData, false));
-        }
 
         IArchitecture IBelongToArchitecture.GetArchitecture()
         {

@@ -11,11 +11,12 @@ namespace TapTapFirst
             #region 注册表
             // 注册工具类
             this.RegisterUtility<IJsonSaveUtility>(save);
+            //注册系统类
+            RegisterSystem<ISoftwareSystem>(new SoftwareSystem());
             // 注册模型类
             RegisterModel<IPlayerModel>(new PlayerModel());
             RegisterModel<ITagModel>(new TagModel());
             RegisterModel<INewsTemplateModel>(new NewsTemplateModel());
-            RegisterModel<ISoftwareModel>(new SoftwareModel());
             RegisterModel<ITimeModel>(new TimeModel());
             //工具注册
             this.RegisterUtility<IJsonSaveUtility>(save);
@@ -29,7 +30,7 @@ namespace TapTapFirst
             save.Add<NewsTemplateModel>();
             save.Add<TimeModelData>();
             #endregion
-
+            
 
             // 一键读取：有存档就原地灌回上面这些实例。
             //下面这行代码是测试留下的，后面大概率要改
