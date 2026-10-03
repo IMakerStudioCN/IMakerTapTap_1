@@ -21,6 +21,7 @@ namespace TapTapFirst
             RegisterModel<ITimeModel>(new TimeModel());
             //工具注册
             this.RegisterUtility<IJsonSaveUtility>(save);
+            this.RegisterUtility<IWindowsUtility>(new WindowsUtility());
             
 
             #endregion
