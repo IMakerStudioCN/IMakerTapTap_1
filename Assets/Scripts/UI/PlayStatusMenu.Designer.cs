@@ -5,7 +5,7 @@ using QFramework;
 
 namespace TapTapFirst
 {
-	// Generate Id:b94d4539-1cff-4e53-a2ea-8343f54c327c
+	// Generate Id:8fdfa135-8ed5-4602-9ef7-b4b4da7aa1eb
 	public partial class PlayStatusMenu
 	{
 		public const string Name = "PlayStatusMenu";
@@ -16,8 +16,6 @@ namespace TapTapFirst
 		public UnityEngine.UI.Slider EvilValue;
 		[SerializeField]
 		public UnityEngine.UI.Slider CredibilityValue;
-		[SerializeField]
-		public TMPro.TextMeshProUGUI NowDays;
 		
 		private PlayStatusMenuData mPrivateData = null;
 		
@@ -26,7 +24,6 @@ namespace TapTapFirst
 			FundsValue = null;
 			EvilValue = null;
 			CredibilityValue = null;
-			NowDays = null;
 			
 			mData = null;
 		}

@@ -32,8 +32,9 @@ namespace TapTapFirst
         }
         protected override void OnExecute()
         {
+            this.GetModel<ISoftwareModel>().haveNewMessage[webID] = haveNewMessage;
             this.SendEvent(new HaveNewMessageEvent { webID = this.webID });
-            Debug.Log("网站ID为：" + this.webID + "的软件的红点状态为：" + this.GetModel<SoftwareModel>().haveNewMessage[this.webID]);
+            Debug.Log("网站ID为：" + this.webID + "的软件的红点状态为：" + this.GetModel<ISoftwareModel>().haveNewMessage[this.webID]);
         }
     }
 

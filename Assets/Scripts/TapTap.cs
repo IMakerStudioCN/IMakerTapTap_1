@@ -15,10 +15,11 @@ namespace TapTapFirst
             RegisterModel<IPlayerModel>(new PlayerModel());
             RegisterModel<ITagModel>(new TagModel());
             RegisterModel<INewsTemplateModel>(new NewsTemplateModel());
+            RegisterModel<ISoftwareModel>(new SoftwareModel());
+            RegisterModel<ITimeModel>(new TimeModel());
             //工具注册
             this.RegisterUtility<IJsonSaveUtility>(save);
-            //Model注册
-
+            
             #endregion
 
 
@@ -26,6 +27,7 @@ namespace TapTapFirst
             #region 添加要纯C#的数据
             save.Add<TagListSaveData>();
             save.Add<NewsTemplateModel>();
+            save.Add<TimeModelData>();
             #endregion
 
 

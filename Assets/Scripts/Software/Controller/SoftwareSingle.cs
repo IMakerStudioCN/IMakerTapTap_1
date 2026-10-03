@@ -14,14 +14,14 @@ namespace TapTapFirst
         [SerializeField]
         private TextMeshProUGUI buttonText;//软件名称
         [SerializeField]
-        private Image haveNewMessage;//红点标记
+        private GameObject haveNewMessage;//红点标记
 
-        private SoftwareModel softwareModel;
+        private ISoftwareModel softwareModel;
         private void Start()
         {
-            softwareModel = this.GetModel<SoftwareModel>();
+            softwareModel = this.GetModel<ISoftwareModel>();
             this.button = this.GetComponent<Button>();
-            this.haveNewMessage = this.GetComponentInChildren<Image>();
+            //this.haveNewMessage = GameObject.Find
             this.buttonText = this.GetComponentInChildren<TextMeshProUGUI>();
 
             this.buttonText.text = softwareData.softwareName;
@@ -60,13 +60,18 @@ namespace TapTapFirst
         public void UpdateNewMessageStatus()
         {
             if (this.softwareModel == null)
-                Debug.Log("Model是空的");
+                Debug.LogWarning("softwareModel是空的");
+            if(this.haveNewMessage == null)
+            {
+                Debug.Log("红点是空的");
+                return;
+            }
             if (!softwareModel.haveNewMessage.ContainsKey(this.softwareData.webID))
             {
                 softwareModel.haveNewMessage.Add(this.softwareData.webID, this.softwareData.haveNewMessage);
             }
             this.softwareData.haveNewMessage = softwareModel.haveNewMessage[this.softwareData.webID];
-            this.haveNewMessage.gameObject.SetActive(softwareData.haveNewMessage);
+            this.haveNewMessage.SetActive(this.softwareData.haveNewMessage);
             //this.SendCommand(new HaveNewMessageCommand(softwareData, false));
         }
 
