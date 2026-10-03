@@ -13,6 +13,9 @@ namespace TapTapFirst
     public struct EvilValueChangeEvent
     {
     }
+    public struct TargetFundsValueChangeEvent
+    {
+    }
     public struct TagAcquiredEvent
     {
     }

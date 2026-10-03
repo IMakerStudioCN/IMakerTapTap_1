@@ -56,6 +56,22 @@ namespace TapTapFirst
         }
     }
     /// <summary>
+    /// TargetFundsValueCommand 使用记得传入int数来+-目标资金值
+    /// </summary>
+    public class TargetFundsValueCommand : AbstractCommand
+    {
+        private int targetFundsValue;
+        public TargetFundsValueCommand(int targetFundsValue)
+        {
+            this.targetFundsValue = targetFundsValue;
+        }
+        protected override void OnExecute()
+        {
+            this.GetModel<IPlayerModel>().TargetFundsValue += targetFundsValue;
+            this.SendEvent(new TargetFundsValueChangeEvent());
+        }
+    }
+    /// <summary>
     /// AddTagCommand 使用记得传入int数来添加标签
     /// </summary>
     public class AddTagCommand : AbstractCommand
