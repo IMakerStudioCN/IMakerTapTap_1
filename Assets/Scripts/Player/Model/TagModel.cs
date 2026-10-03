@@ -69,10 +69,11 @@ namespace TapTapFirst
 
         protected override void OnInit()
         {
-            //ResKit.Init();
-            //��ȡ�趨�õĺ�ȫ��tag���б�
-            //taglist = mResLoader.LoadSync<TagList_SO>("TagList");
-            Debug.LogWarning("记得初始化tag列表，传入Resources获取位置");
+
+            //Debug.Log("记得初始化tag列表，传入Resources获取位置");
+
+            //Debug.LogWarning("记得初始化tag列表，传入Resources获取位置");
+
 
         }
     }

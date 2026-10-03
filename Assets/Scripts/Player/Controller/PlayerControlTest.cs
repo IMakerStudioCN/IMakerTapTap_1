@@ -8,36 +8,36 @@ namespace TapTapFirst
 {
     public class PlayerControlTest : MonoBehaviour,IController
     {
-        private PlayerModel playerModel;
+        private IPlayerModel playerModel;
         
-        private TagModel tagModel;
+        //private TagModel tagModel;
         [SerializeField]
-        private Text fundsText;
+        private Slider fundsSlider;
         [SerializeField]
-        private Text evilText;
+        private Slider evilSlider;
         [SerializeField]
-        private Text credibilityText;
+        private Slider credibilitySlider;
         [SerializeField]
         private Button plusButton;
 
         
         void Start()
         {
-            playerModel = this.GetModel<PlayerModel>();
-            tagModel = this.GetModel<TagModel>();
+            playerModel = this.GetModel<IPlayerModel>();
+            //tagModel = this.GetModel<TagModel>();
 
-            fundsText = GameObject.Find("FundsValue").GetComponent<Text>();
-            evilText = GameObject.Find("EvilValue").GetComponent<Text>();
-            credibilityText = GameObject.Find("CredibilityValue").GetComponent<Text>();
-            plusButton = GameObject.Find("PlusButton").GetComponent<Button>();
+            fundsSlider = GameObject.Find("FundsValue").GetComponent<Slider>();
+            evilSlider = GameObject.Find("EvilValue").GetComponent<Slider>();
+            credibilitySlider = GameObject.Find("CredibilityValue").GetComponent<Slider>();
+            plusButton = GameObject.Find("3ValuePuls").GetComponent<Button>();
 
             plusButton.onClick.AddListener(() =>
             {
-                
+                //the value of plus
                 this.SendCommand(new FundsValueCommand(1));
                 this.SendCommand(new EvilValueCommand(1));
                 this.SendCommand(new CredibilityValueCommand(1));
-                this.SendCommand(new AddTagCommand(1));
+                //this.SendCommand(new AddTagCommand(1));
                 UpdatePlayerStats();
 
             });
@@ -46,10 +46,10 @@ namespace TapTapFirst
 
         public void UpdatePlayerStats()
         {
-            fundsText.text = "Funds: " + playerModel.FundsValue.ToString();
-            evilText.text = "Evil: " + playerModel.EvilValue.ToString();
-            credibilityText.text = "Credibility: " + playerModel.CredibilityValue.ToString();
-            Debug .Log("Acquired Tags: " + string.Join(", ", tagModel.AcquriedTags[0].tagName));
+            fundsSlider.value = playerModel.FundsValue;
+            evilSlider.value = playerModel.EvilValue;
+            credibilitySlider.value =  playerModel.CredibilityValue;
+            //Debug .Log("Acquired Tags: " + string.Join(", ", tagModel.AcquriedTags[0].tagName));
         }
 
         public IArchitecture GetArchitecture()
