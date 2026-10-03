@@ -44,7 +44,7 @@ namespace TapTapFirst
         {
             // 初始化newsList
             //newsList = Resources.Load<NewsTemplateList_SO>("NewsTemplateList");
-            Debug.LogError("记得初始化新闻列表，传入Resources获取位置");
+            Debug.Log("记得初始化新闻列表，传入Resources获取位置");
         }
     }
     public class NewsTemplateSaveData

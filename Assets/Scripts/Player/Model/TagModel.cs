@@ -72,7 +72,7 @@ namespace TapTapFirst
             //ResKit.Init();
             //获取设定好的含全部tag的列表
             //taglist = mResLoader.LoadSync<TagList_SO>("TagList");
-            Debug.LogError("记得初始化tag列表，传入Resources获取位置");
+            Debug.Log("记得初始化tag列表，传入Resources获取位置");
 
         }
     }
