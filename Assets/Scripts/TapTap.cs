@@ -12,8 +12,10 @@ namespace TapTapFirst
             // 注册工具类
             this.RegisterUtility<IJsonSaveUtility>(save);
             //注册系统类
+            RegisterSystem<IGlobalManagerSystem>(new GlobalManagerSystem());
             RegisterSystem<ISoftwareSystem>(new SoftwareSystem());
             // 注册模型类
+            RegisterModel<IGlobalManagerModel>(new GlobalManagerModel());
             RegisterModel<IPlayerModel>(new PlayerModel());
             RegisterModel<ITagModel>(new TagModel());
             RegisterModel<INewsTemplateModel>(new NewsTemplateModel());
