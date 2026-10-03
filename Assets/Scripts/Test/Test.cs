@@ -8,6 +8,7 @@ namespace TapTapFirst
 		void Start()
 		{
 			UIKit.OpenPanel<ComputerDisplay>();
+            UIKit.OpenPanel<WindowsSample>();
         }
         private void OnGUI()
         {
