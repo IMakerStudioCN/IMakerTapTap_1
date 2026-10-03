@@ -8,4 +8,5 @@ public class WindowsSO : ScriptableObject
     [Header("窗口基本属性")]
     public int windowID;
     public string windowName;
+    public bool isFullScreen;
 }

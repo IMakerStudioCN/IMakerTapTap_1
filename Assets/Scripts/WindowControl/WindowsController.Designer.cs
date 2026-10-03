@@ -1,4 +1,4 @@
-﻿// Generate Id:fb552e98-3a66-4f07-ae99-c1cc5a0b40bc
+// Generate Id:93665136-c925-4140-8b45-bf1bfeb15f82
 using UnityEngine;
 
 namespace TapTapFirst
@@ -7,11 +7,9 @@ namespace TapTapFirst
 	{
 		public UnityEngine.UI.Button Exit;
 		
-		public UnityEngine.UI.Button Full;
-		
 		public UnityEngine.UI.Button Mini;
-
-		public WindowsSO windowsSO;
+		
+		public UnityEngine.UI.Toggle Full;
 		
 	}
 }

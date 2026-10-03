@@ -5,8 +5,11 @@ namespace TapTapFirst
 {
 	public partial class WindowsController : ViewController,IController
 	{
-		private WindowsSystem mWindowsSystem;
+		public string windowName;
+
+        private IWindowsSystem mWindowsSystem;
 		private RectTransform mRectTransform;
+		private WindowsSO windowsSO;
 
         public IArchitecture GetArchitecture()
         {
@@ -15,7 +18,14 @@ namespace TapTapFirst
 
         void Start()
 		{
-			mWindowsSystem = this.GetSystem<WindowsSystem>();
+			if(windowName == null || windowName == "")
+			{
+				Debug.LogError("窗口名称不能为空,请检查预制体");
+				return;
+            }
+            mWindowsSystem = this.GetSystem<IWindowsSystem>();
+			mRectTransform = this.GetComponent<RectTransform>();
+			windowsSO = mWindowsSystem.GetInfo(windowName);
             Exit.onClick.AddListener(() =>
 			{
 				UIKit.ClosePanel(windowsSO.windowName);
@@ -25,16 +35,10 @@ namespace TapTapFirst
 			{ 
 				UIKit.HidePanel(windowsSO.windowName);
 			});
-			Full.onClick.AddListener(() =>
+			Full.onValueChanged.AddListener((isFull) =>
 			{
-                //Windows系统做全屏操作
-				mRectTransform = this.GetComponent<RectTransform>();
-				mRectTransform.anchorMin = new Vector2(0, 0);
-				mRectTransform.anchorMax = new Vector2(1, 1);
-				mRectTransform.offsetMin = new Vector2(0, 0);
-				mRectTransform.offsetMax = new Vector2(0, 0);
+                
             });
-
         }
 	}
 }

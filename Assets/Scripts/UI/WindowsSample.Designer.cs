@@ -5,7 +5,7 @@ using QFramework;
 
 namespace TapTapFirst
 {
-	// Generate Id:a082fcd7-d04f-4e86-a373-1607afe1f50f
+	// Generate Id:f4ffe03e-d9ac-4898-bf5d-dcb0009dc04e
 	public partial class WindowsSample
 	{
 		public const string Name = "WindowsSample";

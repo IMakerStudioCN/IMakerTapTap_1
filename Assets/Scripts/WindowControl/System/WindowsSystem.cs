@@ -8,20 +8,31 @@ namespace TapTapFirst
     public interface IWindowsSystem : ISystem
     {
         // TODO: 在这里声明模块对外 API（属性/方法）
-        
+        public void OpenWindows(string windowsName);
+        public void RegisterWindows(string windowsName, WindowsSO windowsSO);
+        public WindowsSO GetInfo(string windowsName);
+
     }
     public class WindowsSystem : AbstractSystem, IWindowsSystem
     {
-        Dictionary<string,WindowsInfo> windowsRegister = new Dictionary<string, WindowsInfo>();
+        Dictionary<string,WindowsSO> windowsRegister = new Dictionary<string, WindowsSO>();
         protected override void OnInit()
         {
         }
-
-        public void RegisterWindows(string windowsName, WindowsInfo windowsInfo)
+        public void OpenWindows(string windowsName)
+        {
+            if (windowsRegister.ContainsKey(windowsName))
+            {
+                WindowsSO windowsSO = windowsRegister[windowsName];
+                //打开窗口的逻辑
+                UIKit.OpenPanel(windowsSO.windowName);
+            }
+        }
+        public void RegisterWindows(string windowsName, WindowsSO windowsSO)
         {
             if (!windowsRegister.ContainsKey(windowsName))
             {
-                windowsRegister.Add(windowsName, windowsInfo);
+                windowsRegister.Add(windowsName, windowsSO);
             }
         }
         public void UnRegisterWindows(string windowsName)
@@ -31,7 +42,7 @@ namespace TapTapFirst
                 windowsRegister.Remove(windowsName);
             }
         }
-        public WindowsInfo GetInfo(string windowsName)
+        public WindowsSO GetInfo(string windowsName)
         {
             if (windowsRegister.ContainsKey(windowsName))
             {
@@ -39,5 +50,6 @@ namespace TapTapFirst
             }
             return null;
         }
+
     }
 }

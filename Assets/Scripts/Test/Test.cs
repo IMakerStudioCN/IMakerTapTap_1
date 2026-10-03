@@ -8,14 +8,14 @@ namespace TapTapFirst
 		void Start()
 		{
 			UIKit.OpenPanel<ComputerDisplay>();
-            UIKit.OpenPanel<WindowsSample>();
+            //UIKit.OpenPanel<WindowsSample>();
         }
         private void OnGUI()
         {
-            if (GUI.Button(new Rect(20, 40, 100, 60), "天数增加"))
-            {
-                this.SendCommand(new DaysAddCommand());    
-            }
+            //if (GUI.Button(new Rect(20, 40, 100, 60), "天数增加"))
+            //{
+            //    this.SendCommand(new DaysAddCommand());    
+            //}
         }
 
         public IArchitecture GetArchitecture()

@@ -16,7 +16,7 @@ namespace TapTapFirst
 
         protected override void OnExecute()
         {
-            this.GetModel<PlayerModel>().EvilValue += evilValue;
+            this.GetModel<IPlayerModel>().EvilValue += evilValue;
             //发送事件通知
             this.SendEvent(new EvilValueChangeEvent());
         }
@@ -33,7 +33,7 @@ namespace TapTapFirst
         }
         protected override void OnExecute()
         {
-            this.GetModel<PlayerModel>().CredibilityValue += credibilityValue;
+            this.GetModel<IPlayerModel>().CredibilityValue += credibilityValue;
             //发送事件通知
             this.SendEvent(new CredibilityValueChangeEvent());
         }
@@ -50,7 +50,7 @@ namespace TapTapFirst
         }
         protected override void OnExecute()
         {
-            this.GetModel<PlayerModel>().FundsValue += fundsValue;
+            this.GetModel<IPlayerModel>().FundsValue += fundsValue;
             //发送事件通知
             this.SendEvent(new FundsValueChangeEvent());
         }
@@ -67,7 +67,7 @@ namespace TapTapFirst
         }
         protected override void OnExecute()
         {
-            var tagModel = this.GetModel<TagModel>();
+            var tagModel = this.GetModel<ITagModel>();
             if (!tagModel.IsAcquired(tagId))
             {
                 tagModel.Acquire(tagId);
@@ -86,7 +86,7 @@ namespace TapTapFirst
         }
         protected override void OnExecute()
         {
-            var newsModel = this.GetModel<NewsTemplateModel>();
+            var newsModel = this.GetModel<INewsTemplateModel>();
             if (!newsModel.IsAcquired(newsId))
             {
                 newsModel.Acquire(newsId);
