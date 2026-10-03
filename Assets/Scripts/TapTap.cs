@@ -14,6 +14,7 @@ namespace TapTapFirst
             //注册系统类
             RegisterSystem<IGlobalManagerSystem>(new GlobalManagerSystem());
             RegisterSystem<ISoftwareSystem>(new SoftwareSystem());
+            RegisterSystem<IWindowsSystem>(new WindowsSystem());
             // 注册模型类
             RegisterModel<IGlobalManagerModel>(new GlobalManagerModel());
             RegisterModel<IPlayerModel>(new PlayerModel());
@@ -22,7 +23,9 @@ namespace TapTapFirst
             RegisterModel<ITimeModel>(new TimeModel());
             //工具注册
             this.RegisterUtility<IJsonSaveUtility>(save);
+            this.RegisterUtility<IWindowsUtility>(new WindowsUtility());
             
+
             #endregion
 
 

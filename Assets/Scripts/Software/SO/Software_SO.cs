@@ -1,4 +1,4 @@
-using System.Collections;
+锘縰sing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace TapTapFirst
@@ -6,14 +6,13 @@ namespace TapTapFirst
     [CreateAssetMenu(fileName = "Software_SO", menuName = "ScriptableObjects/Software_SO", order = 1)]
     public class Software_SO : ScriptableObject
     {
-        [Header("软件名称")]
+        [Header("杞欢鍚嶇О")]
         public string softwareName;
-        [Header("软件图标")]
+        [Header("杞欢鍥炬爣")]
         public Sprite softwareIcon;
-        [Header("跳转网页的ID")]
+        [Header("璺宠浆缃戦〉鐨処D")]
         public int webID;
-        [Header("是否有新消息")]
+        [Header("鏄惁鏈夋柊娑堟伅")]
         public bool haveNewMessage;
-
     }
 }

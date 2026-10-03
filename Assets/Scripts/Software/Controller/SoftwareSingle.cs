@@ -1,4 +1,4 @@
-using QFramework;
+ï»¿using QFramework;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,13 +8,13 @@ namespace TapTapFirst
     public class SoftwareSingle : MonoBehaviour, IController
     {
         [SerializeField]
-        public Software_SO softwareData;//SOÎÄ¼ş
+        public Software_SO softwareData;//SOæ–‡ä»¶
         [SerializeField]
-        private Button button;//Èí¼şÓÃ°´Å¥ÊµÏÖ
+        private Button button;//è½¯ä»¶ç”¨æŒ‰é’®å®ç°
         [SerializeField]
-        private TextMeshProUGUI buttonText;//Èí¼şÃû³Æ
+        private TextMeshProUGUI buttonText;//è½¯ä»¶åç§°
         [SerializeField]
-        private GameObject haveNewMessage;//ºìµã±ê¼Ç
+        private GameObject haveNewMessage;//çº¢ç‚¹æ ‡è®°
 
         private ISoftwareSystem softwareSystem;
         private void Start()
@@ -28,7 +28,7 @@ namespace TapTapFirst
             this.button.image.sprite = softwareData.softwareIcon;
             //this.haveNewMessage = GameObject.Find("HaveNewMessage").GetComponent<Image>();
             
-            //µã»÷Èí¼ş£¬È»ºó·¢ËÍcommand
+            //ç‚¹å‡»è½¯ä»¶ï¼Œç„¶åå‘é€command
             button.onClick.AddListener(() =>
             {
                 softwareSystem.clickSoftware(softwareData.webID);
@@ -49,15 +49,15 @@ namespace TapTapFirst
 
         public void clickSoftware()
         {
-            //ÕâÊÇÕæ´ò¿ªÍøÒ³ÁË£¬º¢×ÓÃÇ²»ÒªÓÃ
+            //è¿™æ˜¯çœŸæ‰“å¼€ç½‘é¡µäº†ï¼Œå­©å­ä»¬ä¸è¦ç”¨
             //Application.OpenURL($"https://www.taptap.com/webview/{softwareData.webID}");
-            this.SendCommand(new SoftwareClickedCommand(softwareData.webID));
-            //µ÷ÓÃsystem
+            WindowKit.Open(softwareData.softwareName);
+            //è°ƒç”¨system
             this.softwareData.haveNewMessage = softwareSystem.updateSO(softwareData.webID);
             HaveOrNotNewMessage();
         }
         /// <summary>
-        /// ÉèÖÃºì±ê×´Ì¬
+        /// è®¾ç½®çº¢æ ‡çŠ¶æ€
         /// </summary>
         public void HaveOrNotNewMessage()
         {

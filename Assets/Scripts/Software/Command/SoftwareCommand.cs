@@ -1,25 +1,11 @@
-using QFramework;
+ï»¿using QFramework;
 using UnityEngine;
 using static UnityEditor.PlayerSettings;
 
 namespace TapTapFirst
 {
-    public class SoftwareClickedCommand : AbstractCommand
-    {
-        int webID;
-        public SoftwareClickedCommand(int webID)
-        {
-            this.webID = webID;
-        }
-
-        protected override void OnExecute()
-        {
-            this.SendEvent(new SoftwareClickedEvent { webID = webID });
-            Debug.Log("´ò¿ªµÄÍøÒ³IDÎª£º" + webID);
-        }
-    }
     /// <summary>
-    /// ´«ÈëÒ»¸öÈí¼ş¶ÔÏó£¬ÉèÖÃÆähaveNewMessageÊôĞÔÎªtrue»òfalse
+    /// ä¼ å…¥ä¸€ä¸ªè½¯ä»¶å¯¹è±¡ï¼Œè®¾ç½®å…¶haveNewMessageå±æ€§ä¸ºtrueæˆ–false
     /// </summary>
     public class HaveNewMessageCommand : AbstractCommand
     {
@@ -33,7 +19,7 @@ namespace TapTapFirst
         protected override void OnExecute()
         {
             this.SendEvent(new HaveNewMessageEvent { webID = this.webID });
-            Debug.Log("ÍøÕ¾IDÎª£º" + this.webID + "µÄÈí¼şµÄºìµã×´Ì¬Îª£º" + this.GetSystem<ISoftwareSystem>().getDic()[webID]);
+            Debug.Log("ç½‘ç«™IDä¸ºï¼š" + this.webID + "çš„è½¯ä»¶çš„çº¢ç‚¹çŠ¶æ€ä¸ºï¼š" + this.GetSystem<ISoftwareSystem>().getDic()[webID]);
         }
     }
 
