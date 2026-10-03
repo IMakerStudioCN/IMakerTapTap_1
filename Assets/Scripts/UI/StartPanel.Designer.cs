@@ -10,6 +10,8 @@ namespace TapTapFirst
 		public UnityEngine.UI.Button Btn_Archive;
 		
 		public UnityEngine.UI.Button Btn_Setting;
+
+		public UnityEngine.UI.Button Btn_Exit;
 		
 	}
 }
