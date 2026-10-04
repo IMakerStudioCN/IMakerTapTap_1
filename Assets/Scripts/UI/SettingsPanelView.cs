@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using QFramework;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,19 +10,16 @@ namespace TapTapFirst
     /// </summary>
     public static class GlobalSettingsUI
     {
-        // ResKit 按 AB 表里的资源名查（= prefab 文件名，小写比较），只能填资源名，不能带路径
+        private const string AssetBundleName = "settingspanel_prefab";
         private const string PrefabName = "SettingsPanel";
 
         public static bool Open(Action onClosed = null)
         {
-            ResKit.Init();
-            if (!(UIKit.Config.PanelLoaderPool is ResKitPanelLoaderPool))
-            {
-                UIKit.Config.PanelLoaderPool = new ResKitPanelLoaderPool();
-            }
+            
 
             SettingsPanelView panel = UIKit.OpenPanel<SettingsPanelView>(
                 UILevel.PopUI,
+                assetBundleName: AssetBundleName,
                 prefabName: PrefabName);
 
             if (panel == null)
