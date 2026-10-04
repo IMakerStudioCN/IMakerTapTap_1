@@ -14,11 +14,7 @@ namespace TapTapFirst
 
         public static bool Open(Action onClosed = null)
         {
-            //ResKit.Init();
-            //if (!(UIKit.Config.PanelLoaderPool is ResKitPanelLoaderPool))
-            //{
-            //    UIKit.Config.PanelLoaderPool = new ResKitPanelLoaderPool();
-            //}
+            
 
             SettingsPanelView panel = UIKit.OpenPanel<SettingsPanelView>(
                 UILevel.PopUI,
