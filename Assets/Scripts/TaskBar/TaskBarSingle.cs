@@ -55,11 +55,12 @@ namespace TapTapFirst
         public void RefreshStyle()
         {
             var window = WindowKit.Get(mWindowName);
-
+            var image = button.GetComponent<Image>();
             bool focused = window != null && WindowKit.IsFocused(window);
             bool minimized = window != null && window.KitState == WindowKitState.Minimized;
             if(textMeshPro != null) textMeshPro.fontStyle =focused ? FontStyles.Bold : FontStyles.Normal;
             //美术需求：比如修改按钮颜色，最小化状态为灰色，其他状态为白色什么的
+            if(image != null) image.color = minimized ? Color.gray : Color.white;
         }
         private void OnClick()
         {
