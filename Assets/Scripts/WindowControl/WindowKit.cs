@@ -30,6 +30,9 @@ namespace TapTapFirst
 
         // ---------------- 事件（任务栏 / 存档 / 统计都可以订阅） ----------------
 
+        // 契约：四个事件只在"窗口已打开且初始化完成"（WindowsBasic.IsReady == true）之后广播，
+        // 回调里可以放心读 WindowName / State；没就绪就销毁的窗口不会广播 OnOpened，也不会广播 OnClosed（成对缺席）。
+        // 单个订阅者抛异常不影响其它订阅者（见 SafeTrigger）。
         public static readonly EasyEvent<WindowsBasic> OnOpened = new EasyEvent<WindowsBasic>();
         public static readonly EasyEvent<WindowsBasic> OnClosed = new EasyEvent<WindowsBasic>();
         public static readonly EasyEvent<WindowsBasic> OnFocused = new EasyEvent<WindowsBasic>();
@@ -37,6 +40,29 @@ namespace TapTapFirst
 
         private static readonly List<WindowsBasic> sStack = new List<WindowsBasic>();                          // 底 -> 顶
         private static readonly Dictionary<string, WindowsBasic> sOpened = new Dictionary<string, WindowsBasic>();
+
+        // 关掉 Domain Reload 时静态状态会跨会话残留（上一局的已销毁窗口还留在栈里），每次启动子系统时清一遍
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            sStack.Clear();
+            sOpened.Clear();
+            WindowsBasic.ResetStatics();
+        }
+
+        // EasyEvent 是多播委托：一个订阅者抛异常会中断整条订阅链，后面的系统会静默收不到事件。
+        // 这里把广播包起来，异常照旧打日志，但不再影响别人。
+        private static void SafeTrigger(EasyEvent<WindowsBasic> evt, WindowsBasic window)
+        {
+            try
+            {
+                evt.Trigger(window);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
 
         // ---------------- 查询 ----------------
 
@@ -225,8 +251,11 @@ namespace TapTapFirst
 
             sStack.Add(window);
             window.RaisePanel();
+
+            if (!window.OpenedNotified) return;      // 还没广播过打开（窗口尚未初始化完成）就不发聚焦
+
             window.NotifyFocused();
-            OnFocused.Trigger(window);
+            SafeTrigger(OnFocused, window);
         }
 
         public static void Focus(string windowName)
@@ -277,16 +306,22 @@ namespace TapTapFirst
 
             if (!string.IsNullOrEmpty(window.WindowName)) sOpened[window.WindowName] = window;
 
-            var alreadyOpened = sStack.Contains(window);      // 面板 Start 之前可能已经被 WindowKit.Open 登记过一次
-
             sStack.Remove(window);
             sStack.Add(window);
             window.RaisePanel();
 
-            if (!alreadyOpened) OnOpened.Trigger(window);
+            // 面板会被注册两次：UIKit.OpenPanel 当帧一次（此时还没 Start，WindowName / State 都没就绪），
+            // 窗口 InitWindow 末尾再一次。只有就绪后的那一次才对外广播，订阅者拿到的窗口一定可用。
+            if (!window.IsReady) return window;
+
+            if (!window.OpenedNotified)
+            {
+                window.OpenedNotified = true;
+                SafeTrigger(OnOpened, window);
+            }
 
             window.NotifyFocused();
-            OnFocused.Trigger(window);
+            SafeTrigger(OnFocused, window);
 
             return window;
         }
@@ -303,7 +338,13 @@ namespace TapTapFirst
                 if (sOpened.TryGetValue(window.WindowName, out current) && current == window) sOpened.Remove(window.WindowName);
             }
 
-            OnClosed.Trigger(window);
+            // 没广播过打开的窗口也不广播关闭，保证 OnOpened / OnClosed 成对
+            if (window.OpenedNotified)
+            {
+                window.OpenedNotified = false;
+                SafeTrigger(OnClosed, window);
+            }
+
             FocusTopVisible();
         }
 
@@ -311,7 +352,7 @@ namespace TapTapFirst
         {
             if (window == null) return;
 
-            OnStateChanged.Trigger(window);
+            if (window.OpenedNotified) SafeTrigger(OnStateChanged, window);
 
             if (window.KitState == WindowKitState.Minimized) FocusTopVisible();
         }

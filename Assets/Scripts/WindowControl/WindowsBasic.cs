@@ -61,6 +61,11 @@ namespace TapTapFirst
 
         private static readonly Dictionary<string, SavedState> SavedStates = new Dictionary<string, SavedState>();
 
+        internal static void ResetStatics()
+        {
+            SavedStates.Clear();
+        }
+
         private IWindowsUtility mUtility;
         private PointerMode mPointerMode;
         private WindowEdge mResizeEdges;
@@ -73,6 +78,12 @@ namespace TapTapFirst
         public WindowFrameState State { get; private set; }
 
         public string WindowName { get; private set; }
+
+        // 窗口是否已初始化完成（WindowName / State 可用）。WindowKit 只对就绪的窗口广播事件。
+        public bool IsReady => mInitialized;
+
+        // WindowKit 内部用：这个窗口是否已经对外广播过"打开"
+        internal bool OpenedNotified { get; set; }
 
         public bool IsFullScreen => State != null && State.IsFullScreen;
 
