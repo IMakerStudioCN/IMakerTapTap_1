@@ -12,24 +12,28 @@ namespace TapTapFirst
         [SerializeField]
         private TextMeshProUGUI textMeshPro;
 
-        private Toggle toggle;
+        private Button button;
         public TaskBarSingle Init(string name)
         {
             textMeshPro.text = name;
-            toggle = GetComponent<Toggle>();
-
-            toggle.onValueChanged.AddListener((isOn) =>
+            button = GetComponent<Button>();
+            //获得窗口对象
+            var w = WindowKit.Get(name);
+            button.onClick.AddListener(() =>
             {
-                if (isOn)
+                if(w == null)
                 {
-                    // Open the corresponding window
+                    WindowKit.Open(name);
+                }
+                if(!w.gameObject.activeInHierarchy || w.KitState == WindowKitState.Minimized)
+                {
                     WindowKit.Open(name);
                 }
                 else
                 {
-                    // Close the corresponding window
-                    WindowKit.Close(name);
+                    WindowKit.Minimize(name);
                 }
+
             });
             return this;
         }
