@@ -42,11 +42,11 @@ namespace TapTapFirst
         {
             PlayerPrefs.Save();
 
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
-#else
+            #else
             Application.Quit();
-#endif
+            #endif
         }
     }
 
@@ -91,7 +91,7 @@ namespace TapTapFirst
 
         private void ExitGame()
         {
-            GameApplication.Quit();
+            GlobalExitConfirmUI.Open();
         }
 
         protected override void OnClose()
