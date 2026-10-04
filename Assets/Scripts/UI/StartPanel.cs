@@ -13,7 +13,8 @@ namespace TapTapFirst
     public partial class StartPanel : UIPanel
     {
         private const string GameSceneName = "GamePlay";
-        private const string SaveSlotsPrefabName = "Resources/UI/SaveSlotPanel";
+        // ResKit 按 AB 表里的资源名查（= prefab 文件名，小写比较），只能填资源名，不能带路径
+        private const string SaveSlotsPrefabName = "SaveSlotPanel";
 
         private ResLoader mResLoader;
         private bool mInitialized;

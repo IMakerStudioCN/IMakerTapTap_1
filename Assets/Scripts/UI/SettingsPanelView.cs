@@ -10,7 +10,8 @@ namespace TapTapFirst
     /// </summary>
     public static class GlobalSettingsUI
     {
-        private const string PrefabName = "Resources/UI/SettingsPanel";
+        // ResKit 按 AB 表里的资源名查（= prefab 文件名，小写比较），只能填资源名，不能带路径
+        private const string PrefabName = "SettingsPanel";
 
         public static bool Open(Action onClosed = null)
         {
