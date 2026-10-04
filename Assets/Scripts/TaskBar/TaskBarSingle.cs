@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -11,8 +12,16 @@ namespace TapTapFirst
     {
         [SerializeField]
         private TextMeshProUGUI textMeshPro;
-
+        [SerializeField]
         private Button button;
+
+        private string mWindowName;
+        private bool mInited;
+        //销毁通知Controller,注销
+        private event Action<TaskBarSingle> mDestroy;
+        public string WindowName { get { return mWindowName; } }
+
+
         public TaskBarSingle Init(string name)
         {
             textMeshPro.text = name;
@@ -29,7 +38,7 @@ namespace TapTapFirst
                 {
                     WindowKit.Open(name);
                 }
-                else if(w.gameObject.activeInHierarchy && w.KitState != WindowKitState.Minimized)
+                else if(w.gameObject.activeInHierarchy && w.KitState != WindowKitState.Minimized && !WindowKit.IsFocused(w))
                 {
                     WindowKit.Focus(name);
                 }
@@ -45,6 +54,11 @@ namespace TapTapFirst
         public void CloseWindow()
         {
             Destroy(this.gameObject);
+        }
+
+        public void RefreshStyle()
+        {
+            var window = WindowKit.Get(textMeshPro.text);
         }
 
     }

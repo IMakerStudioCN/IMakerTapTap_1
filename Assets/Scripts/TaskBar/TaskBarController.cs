@@ -22,16 +22,18 @@ namespace TapTapFirst
                 if (!mTaskBarSystem.GetTaskBarSingle(w.WindowName)) {
                     AddTaskSingle(w.WindowName);
                 }
-                
+
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
             WindowKit.OnClosed.Register((w) =>
             {
                 RemoveTaskSingle(w.WindowName);
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
+            WindowKit.OnFocused.Register((w) => { });
             WindowKit.OnStateChanged.Register((w) =>
             {
                 
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
+            
         }
 
         public void AddTaskSingle(string softwareName)
@@ -50,6 +52,17 @@ namespace TapTapFirst
             {
                 task.CloseWindow();
                 mTaskBarSystem.UnregisterTaskBar(softwareName);
+            }
+        }
+        private void RefreshAllStyles()
+        {
+            foreach(var window in WindowKit.Windows)
+            {
+                var task = mTaskBarSystem.GetTaskBarSingle(window.WindowName);
+                if(task != null)
+                {
+                    task.RefreshStyle();
+                }
             }
         }
 

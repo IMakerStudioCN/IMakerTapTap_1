@@ -720,7 +720,15 @@ namespace TapTapFirst
 
         internal void NotifyFocused()
         {
-            OnWindowFocused();
+            NotifyFocusChanged(true);
+        }
+
+        // focused = true 拿到焦点，false 失去焦点（被别的窗口顶下去、被最小化/关闭）
+        internal void NotifyFocusChanged(bool focused)
+        {
+            if (focused) OnWindowFocused();
+
+            OnWindowFocusChanged(focused);
         }
 
         internal void NotifyStateChanged()
@@ -742,6 +750,9 @@ namespace TapTapFirst
 
         // 被置顶（点窗口、进全屏、打开时都会触发）
         protected virtual void OnWindowFocused() { }
+
+        // 焦点变化：true 拿到焦点，false 失去焦点
+        protected virtual void OnWindowFocusChanged(bool focused) { }
 
         // 状态变化：普通 / 最小化 / 全屏
         protected virtual void OnWindowStateChanged(WindowKitState state) { }
