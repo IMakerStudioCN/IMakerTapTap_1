@@ -25,9 +25,13 @@ namespace TapTapFirst
                 {
                     WindowKit.Open(name);
                 }
-                if(!w.gameObject.activeInHierarchy || w.KitState == WindowKitState.Minimized)
+                if(!w.gameObject.activeInHierarchy && w.KitState == WindowKitState.Minimized)
                 {
                     WindowKit.Open(name);
+                }
+                else if(w.gameObject.activeInHierarchy && w.KitState != WindowKitState.Minimized)
+                {
+                    WindowKit.Focus(name);
                 }
                 else
                 {
