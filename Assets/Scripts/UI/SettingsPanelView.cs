@@ -10,6 +10,7 @@ namespace TapTapFirst
     /// </summary>
     public static class GlobalSettingsUI
     {
+        private const string AssetBundleName = "settingspanel_prefab";
         private const string PrefabName = "SettingsPanel";
 
         public static bool Open(Action onClosed = null)
@@ -18,6 +19,7 @@ namespace TapTapFirst
 
             SettingsPanelView panel = UIKit.OpenPanel<SettingsPanelView>(
                 UILevel.PopUI,
+                assetBundleName: AssetBundleName,
                 prefabName: PrefabName);
 
             if (panel == null)

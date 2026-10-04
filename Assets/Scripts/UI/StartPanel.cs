@@ -13,7 +13,8 @@ namespace TapTapFirst
     public partial class StartPanel : UIPanel
     {
         private const string GameSceneName = "GamePlay";
-        private const string SaveSlotsPrefabName = "Resources/UI/SaveSlotPanel";
+        private const string SaveSlotsAssetBundleName = "saveslotpanel_prefab";
+        private const string SaveSlotsPrefabName = "SaveSlotPanel";
 
         private ResLoader mResLoader;
         private bool mInitialized;
@@ -58,6 +59,7 @@ namespace TapTapFirst
             SaveSlotPanelView panel = UIKit.OpenPanel<SaveSlotPanelView>(
                 UILevel.PopUI,
                 new SaveSlotPanelData(LoadGameScene),
+                assetBundleName: SaveSlotsAssetBundleName,
                 prefabName: SaveSlotsPrefabName);
 
             if (panel == null)
