@@ -72,9 +72,12 @@ namespace TapTapFirst
             //在这里注册监听者
             this.RegisterEvent<OnDaysChangeEvent>(e =>
             {
-                
-                Debug.Log("游戏结束");
-                EndTheGame();
+                if(timeModel.days >=timeModel.endDays)
+                {
+                    Debug.Log("游戏结束");
+                    EndTheGame();
+                }
+
 
             });
             this.RegisterEvent<EvilValueChangeEvent>(e =>
