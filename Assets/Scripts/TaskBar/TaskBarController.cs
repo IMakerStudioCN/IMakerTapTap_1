@@ -17,43 +17,64 @@ namespace TapTapFirst
             mTaskBarSystem = this.GetSystem<ITaskBarSystem>();
 
             //订阅事件
-            WindowKit.OnOpened.Register((w) =>
-            {
-                if (!mTaskBarSystem.GetTaskBarSingle(w.WindowName)) {
-                    AddTaskSingle(w.WindowName);
-                }
-
-            }).UnRegisterWhenGameObjectDestroyed(gameObject);
-            WindowKit.OnClosed.Register((w) =>
-            {
-                RemoveTaskSingle(w.WindowName);
-            }).UnRegisterWhenGameObjectDestroyed(gameObject);
-            WindowKit.OnFocused.Register((w) => { });
-            WindowKit.OnStateChanged.Register((w) =>
-            {
-                
-            }).UnRegisterWhenGameObjectDestroyed(gameObject);
+            WindowKit.OnOpened.Register(OnWindowOpened).UnRegisterWhenGameObjectDestroyed(gameObject);
+            WindowKit.OnClosed.Register(OnWindowClosed).UnRegisterWhenGameObjectDestroyed(gameObject);
+            WindowKit.OnFocused.Register(OnFocusChanged);
+            WindowKit.OnStateChanged.Register(OnFocusChanged).UnRegisterWhenGameObjectDestroyed(gameObject);
             
+
+
+            RefreshAllStyles();
         }
 
-        public void AddTaskSingle(string softwareName)
-        {
-            //创建一个新的任务栏单元，并注册到任务栏系统中
-            GameObject taskSingle = Instantiate(taskSinglePrefab, transform);
-            taskSingle.name = softwareName;
-            TaskBarSingle task = taskSingle.GetComponent<TaskBarSingle>().Init(softwareName);
-            mTaskBarSystem.RegisterTaskBar(softwareName, task);
-            
-        }
+
         public void RemoveTaskSingle(string softwareName)
         {
-            TaskBarSingle task = mTaskBarSystem.GetTaskBarSingle(softwareName);
+            var task = mTaskBarSystem.GetTaskBarSingle(softwareName);
+            mTaskBarSystem.UnregisterTaskBar(softwareName);
             if (task != null)
             {
-                task.CloseWindow();
-                mTaskBarSystem.UnregisterTaskBar(softwareName);
+                Destroy(task.gameObject);
             }
         }
+
+        private void OnWindowOpened(WindowsBasic window)
+        {
+            if (window == null) return;
+            EnsureTaskSingle(window.WindowName);
+            RefreshAllStyles();
+        }
+        private void OnWindowClosed(WindowsBasic window)
+        {
+            if (window == null) return;
+            RemoveTaskSingle(window.WindowName);
+            RefreshAllStyles();
+        }
+        private void OnFocusChanged(WindowsBasic window)
+        {
+            RefreshAllStyles();
+        }
+
+        private void EnsureTaskSingle(string windowName)
+        {
+            if(string.IsNullOrEmpty(windowName)) return;
+            if (mTaskBarSystem.GetTaskBarSingle(windowName) != null) return;
+            if(WindowKit.Get(windowName) == null) return;
+
+            var go = Instantiate(taskSinglePrefab, transform);
+            var task = go.GetComponent<TaskBarSingle>();
+            if(task == null)
+            {
+                Debug.LogError("[TaskBar] taskSinglePrefab 上没有 TaskBarSingle 组件",go);
+                Destroy(go);
+                return;
+            }
+            task.mDestroy += OnTaskSingleDestoryed;
+            task.Init(windowName);
+            mTaskBarSystem.RegisterTaskBar(windowName, task);
+
+        }
+
         private void RefreshAllStyles()
         {
             foreach(var window in WindowKit.Windows)
@@ -64,6 +85,12 @@ namespace TapTapFirst
                     task.RefreshStyle();
                 }
             }
+        }
+
+        private void OnTaskSingleDestoryed(TaskBarSingle task)
+        {
+            if(task == null) return;
+            mTaskBarSystem.UnregisterTaskBar(task.WindowName);
         }
 
 
