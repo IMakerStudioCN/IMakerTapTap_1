@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace TapTapFirst
 {
-
-    public struct ClickEmailEvent 
+    public struct SendEmailEvent 
     {
-        public int EmailID;
+        public int EmailWebID;
     }
 }
