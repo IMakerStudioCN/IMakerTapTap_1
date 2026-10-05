@@ -10,30 +10,67 @@ namespace TapTapFirst
 	public partial class Dialog : UIPanel
 	{
 		private CanvasGroup mGroup;
-        protected override void OnInit(IUIData uiData = null)
+		public GameObject inDialog;
+		IActionController mFadeCtrl;
+		const float FadeTime = 1f;
+
+		protected override void OnInit(IUIData uiData = null)
 		{
 			mData = uiData as DialogData ?? new DialogData();
 			// please add init code here
-			mGroup = gameObject.GetOrAddComponent<CanvasGroup>();
-        }
-		
+			mGroup = GetComponentInChildren<CanvasGroup>();
+			
+            mGroup.alpha = 0f;
+		}
+
 		protected override void OnOpen(IUIData uiData = null)
 		{
 
 		}
-		
-		protected override void OnShow()
+        // 开启时，先杀掉之前的淡入淡出动画，避免出现闪烁
+        public override void Show()
+        {
+            KillFade();
+            base.Show(); 
+        }
+        // 开启时，真正的淡入动画在 OnShow 中执行，关闭时，真正的淡出动画在 Hide 中执行
+        protected override void OnShow()
 		{
-
-		}
-		
-		protected override void OnHide()
+            mGroup.blocksRaycasts = false;
+            Fade(0f, 1f, 0f, () => mGroup.blocksRaycasts = true, true);
+        }
+		public override void Hide()
 		{
+            mGroup.blocksRaycasts = false;
+            Fade(0f, 1f, 0f, () => base.Hide(), false); // 动画结束才真正 SetActive(false)
+        }
 
-		}
-		
+        protected override void OnHide()
+		{
+            mGroup.alpha = 0f;
+            mFadeCtrl = null;
+        }
+
 		protected override void OnClose()
 		{
+
+		}
+		void Fade(float from, float midle,float to, System.Action onDone ,bool isShow)
+		{
+			KillFade();
+			mGroup.alpha = from;
+			mFadeCtrl = ActionKit.Sequence()
+				.Lerp(from, midle, FadeTime, a => mGroup.alpha = a)   // 要缓动: a => EaseUtility.OutQuad(0,1,a)
+				.Callback(() => { if(inDialog != null) inDialog.SetActive(isShow);})
+				.Delay(1)
+                .Lerp(midle, to, FadeTime, a => mGroup.alpha = a)
+                .Callback(() => { mFadeCtrl = null; if (onDone != null) onDone(); })
+				.Start(this);
+		}
+
+		void KillFade()
+		{
+			if (mFadeCtrl != null) { mFadeCtrl.Deinit(); mFadeCtrl = null; }
 
 		}
 	}

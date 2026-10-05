@@ -8,8 +8,7 @@ namespace TapTapFirst
     public interface IMapSystem : ISystem
     {
         void RegisterPlace(string placeName, MapMarker marker);
-        public void ShowPlace(params string[] placeNames);
-        public void HidePlace(params string[] placeNames);
+        MapMarker GetPlace(string placeName);
     }
 
     public class MapSystem : AbstractSystem, IMapSystem
@@ -27,27 +26,13 @@ namespace TapTapFirst
             }
             placeDictionary[placeName] = marker;
         }
-        public void ShowPlace(params string[] placeNames)
+        public MapMarker GetPlace(string placeName)
         {
-            foreach (var placeName in placeNames)
+            if (placeDictionary.TryGetValue(placeName, out MapMarker marker))
             {
-                if (placeDictionary.TryGetValue(placeName, out MapMarker marker))
-                {
-                    marker.ShowHaveCase();
-                }
+                return marker;
             }
+            return null;
         }
-        public void HidePlace(params string[] placeNames)
-        {
-            foreach (var placeName in placeNames)
-            {
-                if (placeDictionary.TryGetValue(placeName, out MapMarker marker))
-                {
-                    marker.HideHaveCase();
-                }
-            }
-        }
-
-
     }
 }
