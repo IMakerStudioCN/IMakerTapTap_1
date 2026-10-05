@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using QFramework;
+using TapTapFirst.ScreenFx;
 
 namespace TapTapFirst
 {
@@ -12,7 +13,13 @@ namespace TapTapFirst
 		private CanvasGroup mGroup;
 		public GameObject inDialog;
 		IActionController mFadeCtrl;
-		const float FadeTime = 1f;
+
+		const float DialogGlobalIntensity = 0;
+		const float ScreenFxFadeTime = 0.25f;
+		IActionController mScreenFxCtrl;
+
+        public Shader DisPlayshader;
+        const float FadeTime = 1f;
 
 		protected override void OnInit(IUIData uiData = null)
 		{
@@ -38,10 +45,12 @@ namespace TapTapFirst
 		{
             mGroup.blocksRaycasts = false;
             Fade(0f, 1f, 0f, () => mGroup.blocksRaycasts = true, true);
+			FadeScreenIntensity(DialogGlobalIntensity, ScreenFxFadeTime);
         }
 		public override void Hide()
 		{
             mGroup.blocksRaycasts = false;
+			FadeScreenIntensity(1f, ScreenFxFadeTime);
             Fade(0f, 1f, 0f, () => base.Hide(), false); // 动画结束才真正 SetActive(false)
         }
 
@@ -53,8 +62,9 @@ namespace TapTapFirst
 
 		protected override void OnClose()
 		{
-
-		}
+			if(mScreenFxCtrl != null) { mScreenFxCtrl.Deinit(); mScreenFxCtrl = null; }
+			ScreenEffect.ResetToDefaults();
+        }
 		void Fade(float from, float midle,float to, System.Action onDone ,bool isShow)
 		{
 			KillFade();
@@ -73,5 +83,14 @@ namespace TapTapFirst
 			if (mFadeCtrl != null) { mFadeCtrl.Deinit(); mFadeCtrl = null; }
 
 		}
-	}
+
+		void FadeScreenIntensity(float to,float duration = ScreenFxFadeTime)
+		{
+			if(mScreenFxCtrl != null) { mScreenFxCtrl.Deinit(); mScreenFxCtrl = null; }
+			mScreenFxCtrl = ActionKit.Sequence()
+				.Lerp(ScreenEffect.GlobalIntensity,to,duration,v => ScreenEffect.GlobalIntensity = v)
+				.Callback(() => mScreenFxCtrl = null)
+                .Start(this);
+        }
+    }
 }
