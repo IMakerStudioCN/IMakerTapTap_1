@@ -9,7 +9,8 @@ namespace TapTapFirst
     // 所有窗口类面板的基类：自动全屏适配 / 标题栏拖拽 / 边缘缩放 / 边界夹取 / 置顶 / 最小化 / 关闭 / 位置记忆
     [RequireComponent(typeof(RectTransform))]
     public class WindowsBasic : ViewController, IController,
-        IPointerDownHandler, IDragHandler, IPointerUpHandler, IPointerClickHandler
+        IPointerDownHandler, IDragHandler, IPointerUpHandler, IPointerClickHandler,
+        IPointerMoveHandler, IPointerExitHandler
     {
         private enum PointerMode
         {
@@ -59,6 +60,15 @@ namespace TapTapFirst
         [SerializeField] private bool doubleClickTitleBarTogglesFullScreen = true;
         [SerializeField] private bool dragFromFullScreenRestores = true;
 
+        [Header("光标（可选：悬停/拉伸边缘时切换鼠标形状）")]
+        [SerializeField] private bool showResizeCursor = false;               // 默认关闭，不影响现有观感
+        [SerializeField] private Texture2D cursorHorizontal;                  // ↔ 左右拉伸
+        [SerializeField] private Texture2D cursorVertical;                    // ↕ 上下拉伸
+        [SerializeField] private Texture2D cursorTopLeftBottomRight;          // ＼ 左上-右下（左上角 / 右下角）
+        [SerializeField] private Texture2D cursorTopRightBottomLeft;          // ／ 右上-左下（右上角 / 左下角）
+        [SerializeField] private Vector2 cursorHotspot = new Vector2(16f, 16f);
+        [SerializeField] private CursorMode cursorMode = CursorMode.Auto;
+
         private static readonly Dictionary<string, SavedState> SavedStates = new Dictionary<string, SavedState>();
 
         internal static void ResetStatics()
@@ -72,6 +82,7 @@ namespace TapTapFirst
         private Vector2 mPointerStart;
         private Rect mRectStart;
         private bool mInitialized;
+        private bool mCursorOverridden;
         private bool mMinimized;
         private UIPanel mPanel;
 
@@ -166,6 +177,7 @@ namespace TapTapFirst
         protected virtual void OnDisable()
         {
             mPointerMode = PointerMode.None;
+            RestoreCursor();
             NotifyStateChanged();
         }
 
@@ -415,6 +427,7 @@ namespace TapTapFirst
 
                 mPointerMode = PointerMode.Resize;
                 mResizeEdges = edges;
+                ApplyCursor(GetResizeCursor(edges));      // 锁定缩放光标（拖出边缘也不闪）
             }
             else
             {
@@ -455,7 +468,33 @@ namespace TapTapFirst
             if (mPointerMode == PointerMode.None) return;
 
             mPointerMode = PointerMode.None;
+            ApplyCursor(null);                        // 松开后恢复默认光标
             SaveState();
+        }
+
+        // 鼠标在窗口上移动：在边缘 6px 内就换成对应的拉伸光标
+        public virtual void OnPointerMove(PointerEventData eventData)
+        {
+            if (!showResizeCursor || !enableResize || IsFullScreen) return;
+            if (mPointerMode == PointerMode.Resize) return;          // 正在缩放：保持锁定
+
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(Frame, eventData.position,
+                    eventData.pressEventCamera, out var local))
+            {
+                ApplyCursor(null);
+                return;
+            }
+
+            var edges = WindowsUtility.GetEdgeFromPoint(Frame, local, resizeBorder);
+            ApplyCursor(GetResizeCursor(edges));
+        }
+
+        // 鼠标离开窗口：恢复默认（正在缩放时不恢复）
+        public virtual void OnPointerExit(PointerEventData eventData)
+        {
+            if (mPointerMode == PointerMode.Resize) return;
+
+            ApplyCursor(null);
         }
 
         public virtual void OnPointerClick(PointerEventData eventData)
@@ -582,6 +621,53 @@ namespace TapTapFirst
         }
 
         // 内容区自动加 RectMask2D：窗口缩小时内容被裁在内容区内，不会溢出到窗口外面
+        #region 光标
+
+        // 按命中的边挑贴图：只有左右 → 水平；只有上下 → 垂直；两边都有 → 对角（按方向区分两条对角线）
+        private Texture2D GetResizeCursor(WindowEdge edges)
+        {
+            if (edges == WindowEdge.None) return null;
+
+            var horizontal = (edges & (WindowEdge.Left | WindowEdge.Right)) != 0;
+            var vertical = (edges & (WindowEdge.Top | WindowEdge.Bottom)) != 0;
+
+            if (horizontal && vertical)
+            {
+                var topLeftOrBottomRight = ((edges & WindowEdge.Left) != 0 && (edges & WindowEdge.Top) != 0)
+                                        || ((edges & WindowEdge.Right) != 0 && (edges & WindowEdge.Bottom) != 0);
+
+                return topLeftOrBottomRight ? cursorTopLeftBottomRight : cursorTopRightBottomLeft;
+            }
+
+            if (horizontal) return cursorHorizontal;
+            if (vertical) return cursorVertical;
+
+            return null;
+        }
+
+        // cursor = null 表示恢复系统默认光标
+        private void ApplyCursor(Texture2D cursor)
+        {
+            if (!showResizeCursor || cursor == null)
+            {
+                RestoreCursor();
+                return;
+            }
+
+            Cursor.SetCursor(cursor, cursorHotspot, cursorMode);
+            mCursorOverridden = true;
+        }
+
+        private void RestoreCursor()
+        {
+            if (!mCursorOverridden) return;
+
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            mCursorOverridden = false;
+        }
+
+        #endregion
+
         private void EnsureContentClip()
         {
             var content = Content;
