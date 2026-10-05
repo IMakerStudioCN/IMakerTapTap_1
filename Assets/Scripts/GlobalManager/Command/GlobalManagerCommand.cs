@@ -13,6 +13,7 @@ namespace TapTapFirst
         protected override void OnExecute()
         {
             Debug.Log("command 向你发送了邮件");
+
         }
     }
     /// <summary>

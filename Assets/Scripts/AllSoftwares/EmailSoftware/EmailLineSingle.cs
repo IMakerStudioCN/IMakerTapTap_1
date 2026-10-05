@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace TapTapFirst
 {
-    public class EmailLineSingle : MonoBehaviour
+    public class EmailLineSingle : MonoBehaviour,IController
     {
         [SerializeField]
         private TextMeshProUGUI whoSend;
@@ -23,8 +23,13 @@ namespace TapTapFirst
             this.sendContent.text = EmailLineData.SendContent;
             checkEmailButton.onClick.AddListener(() =>
             { 
-                
+                TapTap.Interface.SendEvent(new ClickEmailEvent { EmailID = this.EmailLineData.EmailID});
             });
+        }
+
+        public IArchitecture GetArchitecture()
+        {
+            return TapTap.Interface;
         }
     }
 }
