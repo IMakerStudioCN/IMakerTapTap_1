@@ -1,4 +1,4 @@
-﻿using QFramework;
+﻿﻿using QFramework;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,50 +8,50 @@ namespace TapTapFirst
     {
         private ResLoader mResLoader = ResLoader.Allocate();
         JsonSaveUtility saveUtility => this.GetUtility<IJsonSaveUtility>() as JsonSaveUtility;
-        #region �ֶ�
+        #region 字段
         /// <summary>
-        /// ���ڴ洢���е�tag����
+        /// 用于存储所有的tag数据
         /// </summary>
         private TagList_SO taglist = new TagList_SO();
         /// <summary>
-        ///���ڴ洢�Ѿ���õ�tag
+        ///用于存储已经获得的tag
         /// </summary>
         private readonly List<Tag_SO> mAcquired1 = new List<Tag_SO>();
         /// <summary>
-        /// ���ڿ����ж��Ƿ��Ѿ�����˸�tag
+        /// 用于快速判断是否已经获得了该tag
         /// </summary>
         private readonly HashSet<int> mAcquiredIds1 = new HashSet<int>();
         /// <summary>
-        /// ����һ��ֻ�����ԣ������Ѿ���õ�tag�б�
+        /// 这是一个只读属性，返回已经获得的tag列表
         /// </summary>
         public IReadOnlyList<Tag_SO> AcquriedTags => saveUtility.Get<TagListSaveData>("TagListSaveData").palyerAcquired;
         #endregion
         /// <summary>
-        /// ��ȡtag�����ã�����tagId�����ض�Ӧ��Tag_SO����ʹ��ʱ���CanUse�����ж��Ƿ��Ѿ�����˸�tag
+        /// 获取tag的配置，根据tagId返回对应的Tag_SO，使用时结合CanUse方法判断是否已经获得了该tag
         /// </summary>
         /// <param name="tagId"></param>
         /// <returns></returns>
         public Tag_SO GetConfig(int tagId) => taglist.GetTagById(tagId);
-        //ʹ�÷���
+        //使用方法
         //if(CanUse(tagId))=>GetConfig(tagId)
         //
 
 
         /// <summary>
-        /// ������õ��ã�ֱ�ӵ�CanUse�����ˣ��ж��Ƿ��Ѿ�����˸�tag
+        /// 如果已经获得的话，直接调CanUse就行了，判断是否已经获得了该tag
         /// </summary>
         /// <param name="tagId"></param>
         /// <returns></returns>
         public bool IsAcquired(int tagId) => saveUtility.Get<TagListSaveData>("TagListSaveData").palyerAcquiredIds.Contains(tagId);
         /// <summary>
-        /// �����Ƿ����ʹ�ø�tag��ʵ���Ͼ����ж��Ƿ��Ѿ�����˸�tag
+        /// 判断是否可以使用该tag，实际上就是判断是否已经获得了该tag
         /// </summary>
         /// <param name="tagId"></param>
         /// <returns></returns>
         public bool CanUse(int tagId) => IsAcquired(tagId);
 
         /// <summary>
-        /// ��һ�ȡtag������tagId������Ѿ�����˸�tag�������κβ��������򽫸�tag��ӵ��ѻ�õ��б���
+        /// 首次获取tag，如果根据tagId发现已经获得了该tag，则不做任何操作；否则将该tag加入已获得的列表中
         /// </summary>
         /// <param name="tagId"></param>
         public void Acquire(int tagId)
