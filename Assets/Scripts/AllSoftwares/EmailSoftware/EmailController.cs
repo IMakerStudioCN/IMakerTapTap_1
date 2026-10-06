@@ -1,4 +1,4 @@
-using QFramework;
+ï»¿using QFramework;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,10 +8,10 @@ namespace TapTapFirst
     {
         //[SerializeField]
         //private List<EmailLine_SO> EmailLineList;
-        //Ô¤ÖÆÌå
+        //é¢„åˆ¶ä½“
         [SerializeField]
         private GameObject EmailPrefab;
-        //ÓÊ¼şÍøÒ³±í
+        //é‚®ä»¶ç½‘é¡µè¡¨
         [SerializeField]
         private List<GameObject> EmailWebList;
 
@@ -20,6 +20,8 @@ namespace TapTapFirst
         private Button SendEmailbutton;
         private IEmailListSystem EmailListSystem;
 
+        private readonly HashSet<int> mShowIDs = new HashSet<int>();
+
         private void Start()
         {
             EmailListSystem = this.GetSystem<IEmailListSystem>();
@@ -27,41 +29,49 @@ namespace TapTapFirst
             UpdateEmailList();
             this.RegisterEvent<ClickEmailEvent>(e => 
             {
-                //ÅĞ¶ÏËùÓĞµÄÓÊ¼ş×ÓÎïÌåÊıÁ¿ÊÇ·ñÓëÓµÓĞµÄÓÊ¼şSOÊıÁ¿Ò»ÖÂ
-                //Èç¹ûÒ»ÖÂ²»ÔÙÌí¼ÓÓÊ¼ş
-                if (EmailWebList.Count<e.EmailID)
+                //åˆ¤æ–­æ‰€æœ‰çš„é‚®ä»¶å­ç‰©ä½“æ•°é‡æ˜¯å¦ä¸æ‹¥æœ‰çš„é‚®ä»¶SOæ•°é‡ä¸€è‡´
+                //å¦‚æœä¸€è‡´ä¸å†æ·»åŠ é‚®ä»¶
+                if (e.EmailID < 0)
+                {
+                    Debug.LogWarning($"[Email] EmailWebList é‡Œæ²¡æœ‰ä¸‹æ ‡ {e.EmailID} çš„è¯¦æƒ…é¡µ");
                     return;
-                //ÉèÖÃÓÊ¼şÍøÒ³µÄ×´Ì¬
-                EmailWebList[e.EmailID].SetActive(true);
-                this.EmailWebList[e.EmailID].GetComponent<EmailWebSingle>().whoSend.text = EmailListSystem.GetEmailLineByIDInYouHave(e.EmailID).WhoSend;
-                this.EmailWebList[e.EmailID].GetComponent<EmailWebSingle>().whenSend.text = EmailListSystem.GetEmailLineByIDInYouHave(e.EmailID).WhenSend;
-                this.EmailWebList[e.EmailID].GetComponent<EmailWebSingle>().sendContent.text = EmailListSystem.GetEmailLineByIDInYouHave(e.EmailID).SendContent;
+                }
+                EmailLine_SO line = EmailListSystem.GetEmailLineByIDInYouHave(e.EmailID);
+                if (line == null) return;
+                //è®¾ç½®çŠ¶æ€
+                EmailWebList[0].SetActive(true);
+                EmailWebSingle web = EmailWebList[0].GetComponent<EmailWebSingle>();
+                web.whoSend.text = line.WhoSend;
+                web.whenSend.text = line.WhenSend;
+                web.sendContent.text = line.SendContent;
+                web.Palce = line.Place;
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
             this.RegisterEvent<SendEmailEvent>(e =>
             {
-                //½ÓÊÜ·¢ËÍµÄÓÊ¼şIDÊÂ¼ş£¬¸üĞÂÓÊ¼şÁĞ±í
+                //æ¥å—å‘é€çš„é‚®ä»¶IDäº‹ä»¶ï¼Œæ›´æ–°é‚®ä»¶åˆ—è¡¨
                 UpdateEmailList();
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
-            //²âÊÔµÄ°´Å¥
+            //æµ‹è¯•çš„æŒ‰é’®
             SendEmailbutton.onClick.AddListener(() => 
             {
                 TapTap.Interface.SendEvent(new SendEmailEvent { EmailWebID = 0});
-                Debug.Log("·¢ËÍÓÊ¼ş");
+                Debug.Log("å‘é€é‚®ä»¶");
             });
 
         }
 
-        //¸üĞÂÓÊ¼şÈí¼şµÄÓÊ¼şÁĞ±í
+        //æ›´æ–°é‚®ä»¶è½¯ä»¶çš„é‚®ä»¶åˆ—è¡¨
         public void UpdateEmailList()
         {
-            if (this.transform.childCount == EmailListSystem.GetEmailYouHaveList().Count)
-                return;
-            foreach(var i in EmailListSystem.GetEmailYouHaveList())
+            foreach(var line in EmailListSystem.GetEmailYouHaveList())
             {
+                if (line == null) continue;
+                if(mShowIDs.Contains(line.EmailID)) continue;
                 GameObject item = Instantiate(EmailPrefab, this.transform);
                 item.transform.SetAsFirstSibling();
-                item.GetComponent<EmailLineSingle>().EmailLineData = i;
+                item.GetComponent<EmailLineSingle>().EmailLineData = line;
+                mShowIDs.Add(line.EmailID);
             }
 
         }

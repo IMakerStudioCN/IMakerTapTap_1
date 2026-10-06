@@ -52,25 +52,20 @@ namespace TapTapFirst
         
         public void CheckEndDay(int days)
         {
-            foreach (var task in runTaskInDo)
+            
+            for(int i = runTaskInDo.Count - 1;i >= 0; i--)
             {
-                if(days == task.endDay)
-                {
-                    //是结束的天数，放入结束列表，并触发地图标志更新
-                    DisableTask(task);
-                }
+                if(days<runTaskInDo[i].endDay) continue;
+                DisableTaskAT(i);
             }
         }
         //对话完成之后就处理任务为完成状态
         public void TaskDone(string taskname)
         {
-            foreach (var task in runTaskInDo)
+            for (int i = runTaskInDo.Count - 1; i >= 0; i--)
             {
-                if (taskname == task.TaskName)
-                {
-                    //是结束的天数，放入结束列表，并触发地图标志更新
-                    DisableTask(task);
-                }
+                if (runTaskInDo[i].TaskName != taskname) continue;
+                DisableTaskAT(i);
             }
         }
         void ActivateTask(TaskSingle task)
@@ -78,17 +73,17 @@ namespace TapTapFirst
             runTaskInDo.Add(task);
             if (!tasksInDoing.Contains(task.TaskName)) tasksInDoing.Add(task.TaskName);
             JsonSaveUtility.Save();                                  // 立刻落盘
-            this.SendEvent(new OnTaskStart { startTask = task });     // 现在全项目没人发它
+            this.SendEvent(new HaveNewMessageEvent { webID = 4 });
             this.SendEvent(new SendEmailEvent { EmailWebID = task.EmailId });
         }
-        void DisableTask(TaskSingle task)
+        void DisableTaskAT(int index)
         {
+            TaskSingle task = runTaskInDo[index];
+            runTaskInDo.RemoveAt(index);
+
             isDoneList.Add(task.TaskName);
             tasksInDoing.Remove(task.TaskName);
             taskIsDone.Add(task);
-            runTaskInDo.Remove(task);
-
-            this.SendEvent(new OnTaskEnd { endTask = task });
         }
         //再Controller获取其config
         public void InitTask(List<TaskSingle> config)

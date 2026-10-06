@@ -43,7 +43,7 @@ namespace TapTapFirst
                     return;
                 }
                 softwareSystem.setDicisTrue(softwareData.webID);
-                HaveOrNotNewMessage();
+                HaveOrNotNewMessage(true);
             }).UnRegisterWhenGameObjectDestroyed(this.gameObject);
         }
 
@@ -54,14 +54,14 @@ namespace TapTapFirst
             WindowKit.Open(softwareData.softwareName);
             //调用system
             this.softwareData.haveNewMessage = softwareSystem.updateSO(softwareData.webID);
-            HaveOrNotNewMessage();
+            HaveOrNotNewMessage(false);
         }
         /// <summary>
         /// 设置红标状态
         /// </summary>
-        public void HaveOrNotNewMessage()
+        public void HaveOrNotNewMessage(bool isNewMessage)
         {
-            this.haveNewMessage?.SetActive(softwareData.haveNewMessage);
+            this.haveNewMessage?.SetActive(isNewMessage);
         }
 
 

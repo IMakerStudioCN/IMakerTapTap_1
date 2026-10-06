@@ -6,7 +6,7 @@ namespace TapTapFirst
     {
         protected override void Init()
         {
-
+            ResKit.Init();
             var save = new JsonSaveUtility();
             #region 注册表
             // 注册工具类
