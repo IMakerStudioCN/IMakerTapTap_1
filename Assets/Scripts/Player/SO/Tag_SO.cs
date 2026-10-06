@@ -1,10 +1,22 @@
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace TapTapFirst
 {
     /// <summary>
-    /// Enum Tag ´ÊµÄÖÖÀà:ĞÎÈİ´Ê¡¢Ãû´Ê¡¢Á¿´Ê¡¢ºú³¶
+    ///  Struct æ•°å€¼:ï¼ˆæœªå®šï¼‰
+    /// </summary>
+    public struct TagValue 
+    {
+        int v1 ;
+        int v2;
+        int v3;
+        int v4;
+    }
+
+    /// <summary>
+    /// Enum Tag è¯çš„ç§ç±»:å½¢å®¹è¯ã€åè¯ã€é‡è¯ã€èƒ¡æ‰¯
     /// </summary>
     public enum TagOfWords
     {
@@ -18,34 +30,39 @@ namespace TapTapFirst
     {
 
         /// <summary>
-        /// Tag µÄ ID
+        /// Tag çš„ ID
         /// </summary>
         [SerializeField]
         public int tagId;
         /// <summary>
-        /// tag µÄÃû×Ö
+        /// tag çš„åå­—
         /// </summary>
         [SerializeField]
         public string tagName;
         /// <summary>
-        /// tag µÄÖÖÀà:ĞÎÈİ´Ê¡¢Ãû´Ê¡¢Á¿´Ê¡¢ºú³¶
+        /// tag çš„æ•°å€¼
+        /// </summary>
+        [SerializeField]
+        public TagValue tagValues;
+        /// <summary>
+        /// tag çš„ç§ç±»:å½¢å®¹è¯ã€åè¯ã€é‡è¯ã€èƒ¡æ‰¯
         /// </summary>
         [SerializeField]
         public TagOfWords tagOfWords;
         /// <summary>
-        /// Ğ´Èë tag µÄÖÖÀàµÄÖĞÎÄÄÚÈİ
+        /// å†™å…¥ tag çš„ç§ç±»çš„ä¸­æ–‡å†…å®¹
         /// </summary>
         [SerializeField]
-        [Tooltip("Tag µÄÖÖÀàµÄÖĞÎÄÄÚÈİ:0ÊÇĞÎÈİ´Ê,1ÊÇÃû´Ê,2ÊÇÁ¿´Ê,3ÊÇºú³¶")]
+        [Tooltip("Tag çš„ç§ç±»çš„ä¸­æ–‡å†…å®¹:0æ˜¯å½¢å®¹è¯,1æ˜¯åè¯,2æ˜¯é‡è¯,3æ˜¯èƒ¡æ‰¯")]
         public List<string> theTypeToContent = new List<string>()
         {
-            "ĞÎÈİ´Ê",
-            "Ãû´Ê",
-            "Á¿´Ê",
-            "ºú³¶"
+            "å½¢å®¹è¯",
+            "åè¯",
+            "é‡è¯",
+            "èƒ¡æ‰¯"
         };
         /// <summary>
-        /// »ñÈ¡ tag µÄÖÖÀàµÄÖĞÎÄÄÚÈİ
+        /// è·å– tag çš„ç§ç±»çš„ä¸­æ–‡å†…å®¹
         /// </summary>
         public string getContent
         {
@@ -62,7 +79,7 @@ namespace TapTapFirst
                     case TagOfWords.blbl:
                         return theTypeToContent[3];
                     default:
-                        return "Î´Öª";
+                        return "æœªçŸ¥";
                 }
             }
         }

@@ -17,6 +17,7 @@ namespace TapTapFirst
             RegisterSystem<IWindowsSystem>(new WindowsSystem());
             this.RegisterSystem<ITaskBarSystem>(new TaskBarSystem());
             this.RegisterSystem<IMapSystem>(new MapSystem());
+            RegisterSystem<ITagSystem>(new TagSystem());
             this.RegisterSystem<ITaskSystem>(new  TaskSystem());
             // 注册模型类
             RegisterModel<IGlobalManagerModel>(new GlobalManagerModel());
