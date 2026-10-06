@@ -29,6 +29,7 @@ namespace TapTapFirst
             {
                 TapTap.Interface.SendEvent(new OnTakeTask { Place = this.Palce });
                 TapTap.Interface.SendEvent(new HaveNewMessageEvent { webID = 1 });
+                NewPlace.gameObject.SetActive(false);
             });
         }
     }
