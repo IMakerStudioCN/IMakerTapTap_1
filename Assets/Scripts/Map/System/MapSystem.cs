@@ -14,8 +14,10 @@ namespace TapTapFirst
     public class MapSystem : AbstractSystem, IMapSystem
     {
         public Dictionary<string, MapMarker> placeDictionary = new Dictionary<string, MapMarker>();
+        
         protected override void OnInit()
         {
+            
         }
 
         public void RegisterPlace(string placeName, MapMarker marker)
@@ -34,5 +36,7 @@ namespace TapTapFirst
             }
             return null;
         }
+
+
     }
 }
