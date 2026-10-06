@@ -17,6 +17,7 @@ namespace TapTapFirst
             RegisterSystem<IWindowsSystem>(new WindowsSystem());
             this.RegisterSystem<ITaskBarSystem>(new TaskBarSystem());
             this.RegisterSystem<IMapSystem>(new MapSystem());
+            this.RegisterSystem<ITaskSystem>(new  TaskSystem());
             // 注册模型类
             RegisterModel<IGlobalManagerModel>(new GlobalManagerModel());
             RegisterModel<IPlayerModel>(new PlayerModel());
@@ -36,6 +37,8 @@ namespace TapTapFirst
             save.Add<TagListSaveData>();
             save.Add<NewsTemplateModel>();
             save.Add<TimeModelData>();
+            save.Add<MapData>();
+            save.Add<TaskModelData>();
             #endregion
             
 

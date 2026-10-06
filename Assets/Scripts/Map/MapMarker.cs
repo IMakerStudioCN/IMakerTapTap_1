@@ -16,7 +16,7 @@ namespace TapTapFirst
         }
 		public void ShowHaveCase()
 		{
-			if (haveCase == null) return;
+			if (haveCase == null) return;;
 			if (!haveCase.isActiveAndEnabled)
 			{
 				haveCase.gameObject.SetActive(true);
