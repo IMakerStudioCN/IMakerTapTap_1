@@ -6,23 +6,24 @@ namespace TapTapFirst
 {
     public class EmailController : MonoBehaviour,IController
     {
-        //邮件SO列表，存储全部邮件
-        [SerializeField]
-        private List<EmailLine_SO> EmailList = new List<EmailLine_SO>();
+        //[SerializeField]
+        //private List<EmailLine_SO> EmailLineList;
         //预制体
         [SerializeField]
         private GameObject EmailPrefab;
         //邮件网页表
         [SerializeField]
         private List<GameObject> EmailWebList;
-        //速查表查看是否接受到了邮件
-        private HashSet<int> EmailYouHaveList = new HashSet<int>();
+
         //test button
         [SerializeField]
         private Button SendEmailbutton;
-        //private int y;
+        private IEmailListSystem EmailListSystem;
+
         private void Start()
         {
+            EmailListSystem = this.GetSystem<IEmailListSystem>();
+            //EmailListSystem.StartEmilLine(EmailLineList);
             UpdateEmailList();
             this.RegisterEvent<ClickEmailEvent>(e => 
             {
@@ -32,15 +33,14 @@ namespace TapTapFirst
                     return;
                 //设置邮件网页的状态
                 EmailWebList[e.EmailID].SetActive(true);
-                this.EmailWebList[e.EmailID].GetComponent<EmailWebSingle>().whoSend.text = this.EmailList[e.EmailID].WhoSend;
-                this.EmailWebList[e.EmailID].GetComponent<EmailWebSingle>().whenSend.text = this.EmailList[e.EmailID].WhenSend;
-                this.EmailWebList[e.EmailID].GetComponent<EmailWebSingle>().sendContent.text = this.EmailList[e.EmailID].SendContent;
+                this.EmailWebList[e.EmailID].GetComponent<EmailWebSingle>().whoSend.text = EmailListSystem.GetEmailLineByIDInYouHave(e.EmailID).WhoSend;
+                this.EmailWebList[e.EmailID].GetComponent<EmailWebSingle>().whenSend.text = EmailListSystem.GetEmailLineByIDInYouHave(e.EmailID).WhenSend;
+                this.EmailWebList[e.EmailID].GetComponent<EmailWebSingle>().sendContent.text = EmailListSystem.GetEmailLineByIDInYouHave(e.EmailID).SendContent;
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
             this.RegisterEvent<SendEmailEvent>(e =>
             {
-                //接受发送的邮件ID，更新
-                EmailYouHaveList.Add(e.EmailWebID);
+                //接受发送的邮件ID事件，更新邮件列表
                 UpdateEmailList();
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
             //测试的按钮
@@ -55,13 +55,13 @@ namespace TapTapFirst
         //更新邮件软件的邮件列表
         public void UpdateEmailList()
         {
-            if (this.transform.childCount == EmailYouHaveList.Count)
+            if (this.transform.childCount == EmailListSystem.GetEmailYouHaveList().Count)
                 return;
-            foreach(int i in EmailYouHaveList)
+            foreach(var i in EmailListSystem.GetEmailYouHaveList())
             {
                 GameObject item = Instantiate(EmailPrefab, this.transform);
-                item.transform.parent = this.transform;
-                item.GetComponent<EmailLineSingle>().EmailLineData = EmailList[i];
+                item.transform.SetAsFirstSibling();
+                item.GetComponent<EmailLineSingle>().EmailLineData = i;
             }
 
         }
