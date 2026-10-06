@@ -1,10 +1,10 @@
-using QFramework;
+ï»¿using QFramework;
 using System.Runtime.CompilerServices;
 
 namespace TapTapFirst
 {
     /// <summary>
-    /// EvilvalueCommand Ê¹ÓÃ¼ÇµÃ´«ÈëintÊıÀ´+-Ğ°¶ñÖµ
+    /// EvilvalueCommand ä½¿ç”¨è®°å¾—ä¼ å…¥intæ•°æ¥+-é‚ªæ¶å€¼
     /// </summary>
     public class EvilValueCommand : AbstractCommand
     {
@@ -17,12 +17,12 @@ namespace TapTapFirst
         protected override void OnExecute()
         {
             this.GetModel<IPlayerModel>().EvilValue += evilValue;
-            //·¢ËÍÊÂ¼şÍ¨Öª
+            //å‘é€äº‹ä»¶é€šçŸ¥
             this.SendEvent(new EvilValueChangeEvent());
         }
     }
     /// <summary>
-    /// CredibilityValueCommand Ê¹ÓÃ¼ÇµÃ´«ÈëintÊıÀ´+-ĞÅÓşÖµ
+    /// CredibilityValueCommand ä½¿ç”¨è®°å¾—ä¼ å…¥intæ•°æ¥+-ä¿¡èª‰å€¼
     /// </summary>
     public class CredibilityValueCommand : AbstractCommand
     {
@@ -34,12 +34,12 @@ namespace TapTapFirst
         protected override void OnExecute()
         {
             this.GetModel<IPlayerModel>().CredibilityValue += credibilityValue;
-            //·¢ËÍÊÂ¼şÍ¨Öª
+            //å‘é€äº‹ä»¶é€šçŸ¥
             this.SendEvent(new CredibilityValueChangeEvent());
         }
     }
     /// <summary>
-    /// FundsValueCommand Ê¹ÓÃ¼ÇµÃ´«ÈëintÊıÀ´+-×Ê½ğÖµ
+    /// FundsValueCommand ä½¿ç”¨è®°å¾—ä¼ å…¥intæ•°æ¥+-èµ„é‡‘å€¼
     /// </summary>
     public class FundsValueCommand : AbstractCommand
     {
@@ -51,12 +51,12 @@ namespace TapTapFirst
         protected override void OnExecute()
         {
             this.GetModel<IPlayerModel>().FundsValue += fundsValue;
-            //·¢ËÍÊÂ¼şÍ¨Öª
+            //å‘é€äº‹ä»¶é€šçŸ¥
             this.SendEvent(new FundsValueChangeEvent());
         }
     }
     /// <summary>
-    /// TargetFundsValueCommand Ê¹ÓÃ¼ÇµÃ´«ÈëintÊıÀ´+-Ä¿±ê×Ê½ğÖµ
+    /// TargetFundsValueCommand ä½¿ç”¨è®°å¾—ä¼ å…¥intæ•°æ¥+-ç›®æ ‡èµ„é‡‘å€¼
     /// </summary>
     public class TargetFundsValueCommand : AbstractCommand
     {
@@ -72,26 +72,9 @@ namespace TapTapFirst
         }
     }
     /// <summary>
-    /// AddTagCommand Ê¹ÓÃ¼ÇµÃ´«ÈëintÊıÀ´Ìí¼Ó±êÇ©
+    /// AddTagCommand ä½¿ç”¨è®°å¾—ä¼ å…¥intæ•°æ¥æ·»åŠ æ ‡ç­¾
     /// </summary>
-    public class AddTagCommand : AbstractCommand
-    {
-        private int tagId;
-        public AddTagCommand(int tagId)
-        {
-            this.tagId = tagId;
-        }
-        protected override void OnExecute()
-        {
-            var tagModel = this.GetModel<ITagModel>();
-            if (!tagModel.IsAcquired(tagId))
-            {
-                tagModel.Acquire(tagId);
-                //·¢ËÍÊÂ¼şÍ¨Öª
-                this.SendEvent(new TagAcquiredEvent());
-            }
-        }
-    }
+   
 
     public class AddNewsCommand : AbstractCommand
     {
@@ -106,7 +89,7 @@ namespace TapTapFirst
             if (!newsModel.IsAcquired(newsId))
             {
                 newsModel.Acquire(newsId);
-                //·¢ËÍÊÂ¼şÍ¨Öª
+                //å‘é€äº‹ä»¶é€šçŸ¥
                 this.SendEvent(new NewsAcquiredEvent());
             }
         }

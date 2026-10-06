@@ -1,4 +1,4 @@
-using QFramework;
+ï»¿using QFramework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,16 +6,12 @@ using UnityEngine;
 namespace TapTapFirst
 {
     /// <summary>
-    /// taglist µÄ model ½Ó¿Ú
-    /// ´«Èëid£¬·µ»ØÊÇ·ñÒÑ¾­»ñµÃÁË¸Ãtag
+    /// taglist çš„ model æ¥å£
     /// </summary>
     public interface ITagModel : IModel
     {
-        IReadOnlyList<Tag_SO> AcquriedTags { get; }
-        Tag_SO GetConfig(int tagId);
-        bool IsAcquired(int tagId);
-        bool CanUse(int tagId);
-        void Acquire(int tagId);
+       
+       
     }
 }
         

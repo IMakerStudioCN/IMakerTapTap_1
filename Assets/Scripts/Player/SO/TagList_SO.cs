@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace TapTapFirst
@@ -7,7 +7,7 @@ namespace TapTapFirst
     public class TagList_SO : ScriptableObject
     {
         /// <summary>
-        /// È«²¿µÄ Tag_SO ÁÐ±í
+        /// å…¨éƒ¨çš„ Tag_SO åˆ—è¡¨
         /// </summary>
         [SerializeField]
         public List<Tag_SO> allTagList = new List<Tag_SO>();
