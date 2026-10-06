@@ -50,6 +50,7 @@ namespace TapTapFirst
                     runTaskInDo.Add(task);
                     tasksInDoing.Add(task.TaskName);
                     daysTask.Dequeue();
+                    this.SendEvent(new OnTaskStart { startTask  = task});
                 }   
             }
         }
@@ -64,9 +65,11 @@ namespace TapTapFirst
                     tasksInDoing.Remove(task.TaskName);
                     taskIsDone.Add(task);
                     runTaskInDo.Remove(task);
+                    this.SendEvent(new OnTaskEnd { endTask = task });
                 }
             }
         }
+        //对话完成之后就处理任务为完成状态
         public void TaskDone(string taskname)
         {
             foreach (var task in runTaskInDo)
@@ -78,10 +81,12 @@ namespace TapTapFirst
                     tasksInDoing.Remove(task.TaskName);
                     taskIsDone.Add(task);
                     runTaskInDo.Remove(task);
+
+                    this.SendEvent(new OnTaskEnd { endTask = task });
                 }
             }
         }
-
+        //再Controller获取其config
         public void InitTask(List<TaskSingle> config)
         {
             foreach (TaskSingle task in config) {
