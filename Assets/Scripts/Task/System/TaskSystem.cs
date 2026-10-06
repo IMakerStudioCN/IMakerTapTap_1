@@ -21,9 +21,8 @@ namespace TapTapFirst
         private IJsonSaveUtility JsonSaveUtility => this.GetUtility<IJsonSaveUtility>();
         private ITimeModel mTimeModel;
         public List<string> isDoneList => JsonSaveUtility.Get<TaskModelData>("TaskModelData").isDoneTask;
-
         public List<string> tasksInDoing => JsonSaveUtility.Get<TaskModelData>("TaskModelData").isDoingTask;
-        Queue<TaskSingle> daysTask = new Queue<TaskSingle>();
+        List<TaskSingle> daysTask = new List<TaskSingle>();
         List<TaskSingle> runTaskInDo = new List<TaskSingle>();
         //完成速度查
         HashSet<TaskSingle> taskIsDone = new HashSet<TaskSingle>();
@@ -40,20 +39,17 @@ namespace TapTapFirst
 
         public void CheckStartDay(int days)
         {
-            if (daysTask.Count == 0) return;
-            TaskSingle task = daysTask.Peek();
-            if (days == task.startDay)
+            for (int i = daysTask.Count - 1; i >= 0; i--)
             {
-                //是开始的天数并且完成前置任务，放入进行任务列表,并触发邮件刷新
-                if (task.prePosition == null || taskIsDone.Contains(task.prePosition))
-                {
-                    runTaskInDo.Add(task);
-                    tasksInDoing.Add(task.TaskName);
-                    daysTask.Dequeue();
-                    this.SendEvent(new OnTaskStart { startTask  = task});
-                }   
+                TaskSingle task = daysTask[i];
+                if (days < task.startDay) continue;                 // 没到期：留着，下次再看
+                if (days > task.endDay) { daysTask.RemoveAt(i); continue; }  // 没开始就过期
+                if (task.prePosition != null && !taskIsDone.Contains(task.prePosition)) continue;   // 前置没完成：留着
+                daysTask.RemoveAt(i);
+                ActivateTask(task);                                  // 见下
             }
         }
+        
         public void CheckEndDay(int days)
         {
             foreach (var task in runTaskInDo)
@@ -61,11 +57,7 @@ namespace TapTapFirst
                 if(days == task.endDay)
                 {
                     //是结束的天数，放入结束列表，并触发地图标志更新
-                    isDoneList.Add(task.TaskName);
-                    tasksInDoing.Remove(task.TaskName);
-                    taskIsDone.Add(task);
-                    runTaskInDo.Remove(task);
-                    this.SendEvent(new OnTaskEnd { endTask = task });
+                    DisableTask(task);
                 }
             }
         }
@@ -77,18 +69,31 @@ namespace TapTapFirst
                 if (taskname == task.TaskName)
                 {
                     //是结束的天数，放入结束列表，并触发地图标志更新
-                    isDoneList.Add(task.TaskName);
-                    tasksInDoing.Remove(task.TaskName);
-                    taskIsDone.Add(task);
-                    runTaskInDo.Remove(task);
-
-                    this.SendEvent(new OnTaskEnd { endTask = task });
+                    DisableTask(task);
                 }
             }
+        }
+        void ActivateTask(TaskSingle task)
+        {
+            runTaskInDo.Add(task);
+            if (!tasksInDoing.Contains(task.TaskName)) tasksInDoing.Add(task.TaskName);
+            JsonSaveUtility.Save();                                  // 立刻落盘
+            this.SendEvent(new OnTaskStart { startTask = task });     // 现在全项目没人发它
+            this.SendEvent(new SendEmailEvent { EmailWebID = task.EmailId });
+        }
+        void DisableTask(TaskSingle task)
+        {
+            isDoneList.Add(task.TaskName);
+            tasksInDoing.Remove(task.TaskName);
+            taskIsDone.Add(task);
+            runTaskInDo.Remove(task);
+
+            this.SendEvent(new OnTaskEnd { endTask = task });
         }
         //再Controller获取其config
         public void InitTask(List<TaskSingle> config)
         {
+            daysTask.Clear(); runTaskInDo.Clear(); taskIsDone.Clear();
             foreach (TaskSingle task in config) {
                 if (isDoneList.Contains(task.TaskName))
                 {
@@ -100,8 +105,11 @@ namespace TapTapFirst
                     runTaskInDo.Add(task);
                     continue;
                 }
-                daysTask.Enqueue(task);
+                daysTask.Add(task);
             }
+            daysTask.Sort((a,b) => a.startDay.CompareTo(b.startDay));
+            CheckStartDay(mTimeModel.days);
+            CheckEndDay(mTimeModel.days);
         }
 
 

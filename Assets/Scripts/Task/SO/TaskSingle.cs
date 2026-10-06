@@ -14,6 +14,7 @@ public class TaskSingle : ScriptableObject
     public bool ismain;
     public TaskSingle prePosition;
 
+    public int EmailId;
     public int startDay;
     public int endDay;
 }
