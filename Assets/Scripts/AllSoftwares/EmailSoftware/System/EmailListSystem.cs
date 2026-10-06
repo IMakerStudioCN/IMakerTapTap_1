@@ -1,4 +1,4 @@
-using QFramework;
+﻿using QFramework;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,12 +37,13 @@ namespace TapTapFirst
         //找对应ID的邮件
         public EmailLine_SO GetEmailLineByID(int id)
         {
-            if(!EmailIDList.Contains(id))
+            EmailLine_SO so = EmailLineList.Find(x => x!=null && x.EmailID==id);
+
+            if(so == null)
             {
                 Debug.LogWarning("没有这个邮件");
-                return null;
             }
-            return EmailLineList[EmailIDList.IndexOf(id)];
+            return so;
         }
         public List<int> GetIDList()
         {
@@ -50,18 +51,22 @@ namespace TapTapFirst
         }
         public void AddEmailYouHave(int EmailID)
         {
-            EmailYouHaveList.Add(GetEmailLineByID(EmailID));
-
+            EmailLine_SO so = GetEmailLineByID(EmailID);
+            if (so == null) return;
+            if (EmailYouHaveList.Contains(so)) return;
+            EmailYouHaveList.Add(so);
         }
 
         public bool CheckEmailYouHave(int EmailID)
         {
-            return EmailYouHaveList.Contains(GetEmailLineByID(EmailID));
+            EmailLine_SO so = GetEmailLineByID(EmailID);
+            return so != null && EmailYouHaveList.Contains(so);
         }
 
         public void DelEmailYouHave(int EmailID)
         {
-            EmailYouHaveList.Remove(GetEmailLineByID(EmailID));
+            EmailLine_SO so = GetEmailLineByID(EmailID);
+            if(so != null)EmailYouHaveList.Remove(so);
         }
         public List<EmailLine_SO> getEmailSOList()
         {
@@ -85,7 +90,8 @@ namespace TapTapFirst
         }
         public void StartEmilLine(List<EmailLine_SO> emailLine)
         {
-            EmailLineList = emailLine;
+            EmailLineList_SO listSO = mResLoader.LoadSync<EmailLineList_SO>("EmailLineList_SO");
+            EmailLineList = (listSO != null && listSO.EmailLines != null)? listSO.EmailLines: new List<EmailLine_SO>();
         }
         protected override void OnInit()
         {

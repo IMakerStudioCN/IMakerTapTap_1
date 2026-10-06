@@ -1,18 +1,20 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 namespace TapTapFirst
 {
     [CreateAssetMenu(fileName = "EmailLine_SO", menuName = "ScriptableObjects/EmailLine_SO", order = 1)]
     public class EmailLine_SO : ScriptableObject
     {
-        [Header("·¢ËÍÈË")]
+        [Header("å‘é€äºº")]
         public string WhoSend;
-        [Header("·¢ËÍÈÕÆÚ")]
+        [Header("å‘é€æ—¥æœŸ")]
         public string WhenSend;
-        [Header("ĞÅ¼şÄÚÈİ")]
+        [Header("ä¿¡ä»¶å†…å®¹")]
         [TextArea(2,3)]
         public string SendContent;
-        [Header("ÓÊ¼şID")]
+        [Header("é‚®ä»¶ID")]
         public int EmailID;
+        [Header("åœ°ç‚¹")]
+        public string[] Place;
 
     }
 }
