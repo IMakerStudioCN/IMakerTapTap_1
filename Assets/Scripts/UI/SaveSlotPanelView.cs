@@ -21,9 +21,11 @@ namespace TapTapFirst
         public Text[] StatusTexts = new Text[SlotCount];
         public InputField[] NameInputs = new InputField[SlotCount];
         public Button[] PlayButtons = new Button[SlotCount];
+        public Button[] DeleteButtons = new Button[SlotCount];
         public Button CloseButton;
 
         private SaveSlotPanelData mData;
+        private int mPendingDeleteSlot;
 
         protected override void OnInit(IUIData uiData = null)
         {
@@ -34,12 +36,14 @@ namespace TapTapFirst
                 int slotIndex = i + 1;
                 NameInputs[i].onEndEdit.AddListener(value => RenameSlot(slotIndex, value));
                 PlayButtons[i].onClick.AddListener(() => SelectSaveSlot(slotIndex));
+                DeleteButtons[i].onClick.AddListener(() => DeleteSaveSlot(slotIndex));
             }
         }
 
         protected override void OnOpen(IUIData uiData = null)
         {
             mData = uiData as SaveSlotPanelData;
+            mPendingDeleteSlot = 0;
             RefreshSaveSlots();
         }
 
@@ -58,6 +62,12 @@ namespace TapTapFirst
                 StatusTexts[i].text = info.HasSave
                     ? $"槽位 {i + 1}\n{info.LastSaveTime:MM-dd HH:mm}"
                     : $"槽位 {i + 1}\n空存档";
+                DeleteButtons[i].interactable = info.HasSave;
+
+                if (mPendingDeleteSlot == i + 1)
+                {
+                    StatusTexts[i].text += "\n再次点击删除";
+                }
             }
         }
 
@@ -76,9 +86,32 @@ namespace TapTapFirst
             onSlotSelected?.Invoke();
         }
 
+        private void DeleteSaveSlot(int slotIndex)
+        {
+            IJsonSaveUtility saveUtility = TapTap.Interface.GetUtility<IJsonSaveUtility>();
+            if (!saveUtility.GetSlotInfo(slotIndex).HasSave)
+            {
+                mPendingDeleteSlot = 0;
+                RefreshSaveSlots();
+                return;
+            }
+
+            if (mPendingDeleteSlot != slotIndex)
+            {
+                mPendingDeleteSlot = slotIndex;
+                RefreshSaveSlots();
+                return;
+            }
+
+            mPendingDeleteSlot = 0;
+            saveUtility.DeleteSlot(slotIndex);
+            RefreshSaveSlots();
+        }
+
         protected override void OnClose()
         {
             mData = null;
+            mPendingDeleteSlot = 0;
         }
     }
 }

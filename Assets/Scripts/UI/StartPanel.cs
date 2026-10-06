@@ -41,6 +41,14 @@ namespace TapTapFirst
 
         private void StartGame()
         {
+            IJsonSaveUtility saveUtility = TapTap.Interface.GetUtility<IJsonSaveUtility>();
+            if (!saveUtility.TrySelectLatestPlayedSlot())
+            {
+                Debug.Log("[StartPanel] 当前没有可继续的存档，打开存档选择界面");
+                OpenSaveSlots();
+                return;
+            }
+
             LoadGameScene();
         }
 
