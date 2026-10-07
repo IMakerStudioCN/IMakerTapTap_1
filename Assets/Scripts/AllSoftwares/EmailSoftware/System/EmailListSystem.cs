@@ -11,7 +11,8 @@ namespace TapTapFirst
         // TODO: 在这里声明模块对外 API（属性/方法）
         List<EmailLine_SO> getEmailSOList();
         List<EmailLine_SO> GetEmailYouHaveList();
-        List<int> GetIDList();
+        public List<EmailLine_SO> GetEmailCheck();
+
         //找对应ID的邮件
         EmailLine_SO GetEmailLineByID(int EmailID);
         //增删查改:针对EmailYouHaveList
@@ -19,8 +20,10 @@ namespace TapTapFirst
         void DelEmailYouHave(int EmailID);
         //增加邮件
         void AddEmailYouHave(int EmailID);
+        public void AddEmailYouCheck(int EmailID);
         //查找是否有邮件
         bool CheckEmailYouHave(int EmailID);
+
 
         //获取拥有的邮件
         EmailLine_SO GetEmailLineByIDInYouHave(int EmailID);
@@ -30,24 +33,41 @@ namespace TapTapFirst
 
     public class EmailListSystem : AbstractSystem, IEmailListSystem
     {    
-        private ResLoader mResLoader = ResLoader.Allocate();   
+        private ResLoader mResLoader = ResLoader.Allocate();  
+        private IJsonSaveUtility mJsonSaveUtility => this.GetUtility<IJsonSaveUtility>();
+
         public List<EmailLine_SO> EmailLineList = new List<EmailLine_SO>();
         public List<EmailLine_SO> EmailYouHaveList = new List<EmailLine_SO>();
-        public List<int> EmailIDList = new List<int>();
+        public List<EmailLine_SO> IsCheckEmail;
+
+        public List<int> EmailYouHaveData;
+
+        
         //找对应ID的邮件
+        
+        protected override void OnInit()
+        {
+            EmailLineList = mResLoader.LoadSync<EmailLineList_SO>("EmailLineList_SO").EmailLines;
+
+            EmailYouHaveList = mJsonSaveUtility.Get<EmailListSystemData>("EmailListSystemData").EmailYouHaveList;
+            IsCheckEmail = mJsonSaveUtility.Get<EmailListSystemData>("EmailListSystemData").IsCheckEmail;
+
+            //注册事件
+            this.RegisterEvent<SendEmailEvent>(e =>
+            {
+                //接受发送的邮件ID事件，更新邮件列表
+                AddEmailYouHave(e.EmailWebID);
+            });
+        }
         public EmailLine_SO GetEmailLineByID(int id)
         {
-            EmailLine_SO so = EmailLineList.Find(x => x!=null && x.EmailID==id);
+            EmailLine_SO so = EmailLineList.Find(x => x != null && x.EmailID == id);
 
-            if(so == null)
+            if (so == null)
             {
                 Debug.LogWarning("没有这个邮件");
             }
             return so;
-        }
-        public List<int> GetIDList()
-        {
-            return EmailIDList;
         }
         public void AddEmailYouHave(int EmailID)
         {
@@ -63,10 +83,17 @@ namespace TapTapFirst
             return so != null && EmailYouHaveList.Contains(so);
         }
 
+        public void AddEmailYouCheck(int EmailID)
+        {
+            EmailLine_SO so = GetEmailLineByID(EmailID);
+            if (so == null) return;
+            IsCheckEmail.Add(so);
+        }
+
         public void DelEmailYouHave(int EmailID)
         {
             EmailLine_SO so = GetEmailLineByID(EmailID);
-            if(so != null)EmailYouHaveList.Remove(so);
+            if (so != null) EmailYouHaveList.Remove(so);
         }
         public List<EmailLine_SO> getEmailSOList()
         {
@@ -78,9 +105,14 @@ namespace TapTapFirst
             return EmailYouHaveList;
         }
 
+        public List<EmailLine_SO> GetEmailCheck()
+        {
+            return IsCheckEmail;
+        }
+
         public EmailLine_SO GetEmailLineByIDInYouHave(int EmailID)
         {
-            if(CheckEmailYouHave(EmailID))
+            if (CheckEmailYouHave(EmailID))
             {
                 return GetEmailLineByID(EmailID);
             }
@@ -91,33 +123,13 @@ namespace TapTapFirst
         public void StartEmilLine(List<EmailLine_SO> emailLine)
         {
             EmailLineList_SO listSO = mResLoader.LoadSync<EmailLineList_SO>("EmailLineList_SO");
-            EmailLineList = (listSO != null && listSO.EmailLines != null)? listSO.EmailLines: new List<EmailLine_SO>();
+            EmailLineList = (listSO != null && listSO.EmailLines != null) ? listSO.EmailLines : new List<EmailLine_SO>();
         }
-        protected override void OnInit()
-        {
-            EmailLineList = mResLoader.LoadSync<EmailLineList_SO>("EmailLineList_SO").EmailLines;
-            EmailYouHaveList = this.GetUtility<IJsonSaveUtility>().Get<EmailListSystemData>("EmailListSystemData").EmailYouHaveList;
-            EmailIDList = this.GetUtility<IJsonSaveUtility>().Get<EmailListSystemData>("EmailListSystemData").EmailIDList;
-            if(EmailIDList.Count == 0)
-            {
-                foreach (var email in EmailLineList)
-                {
-                    EmailIDList.Add(email.EmailID);
-                }
-            }
-            //注册事件
-            this.RegisterEvent<SendEmailEvent>(e =>
-            {
-                //接受发送的邮件ID事件，更新邮件列表
-                AddEmailYouHave(e.EmailWebID);
-            });
-        }
-
 
     }
     public class EmailListSystemData 
     {
         public List<EmailLine_SO> EmailYouHaveList = new List<EmailLine_SO>();
-        public List<int> EmailIDList = new List<int>();
+        public List<EmailLine_SO> IsCheckEmail = new List<EmailLine_SO>();
     }
 }

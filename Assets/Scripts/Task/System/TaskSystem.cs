@@ -20,8 +20,11 @@ namespace TapTapFirst
     {
         private IJsonSaveUtility JsonSaveUtility => this.GetUtility<IJsonSaveUtility>();
         private ITimeModel mTimeModel;
+        //存档内
         public List<string> isDoneList => JsonSaveUtility.Get<TaskModelData>("TaskModelData").isDoneTask;
         public List<string> tasksInDoing => JsonSaveUtility.Get<TaskModelData>("TaskModelData").isDoingTask;
+
+        //游戏内运行时
         List<TaskSingle> daysTask = new List<TaskSingle>();
         List<TaskSingle> runTaskInDo = new List<TaskSingle>();
         //完成速度查
@@ -30,6 +33,7 @@ namespace TapTapFirst
         protected override void OnInit()
         {
             mTimeModel = this.GetModel<ITimeModel>();
+            //同步状态
             this.RegisterEvent<OnDaysChangeEvent>((e) =>
             {
                 CheckStartDay(mTimeModel.days);
