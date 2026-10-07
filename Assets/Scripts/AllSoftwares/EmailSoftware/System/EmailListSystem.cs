@@ -30,7 +30,7 @@ namespace TapTapFirst
 
     public class EmailListSystem : AbstractSystem, IEmailListSystem
     {    
-        private ResLoader mResLoader = ResLoader.Allocate();   
+        private ResLoader mResLoader = ResLoader.Allocate();
         public List<EmailLine_SO> EmailLineList = new List<EmailLine_SO>();
         public List<EmailLine_SO> EmailYouHaveList = new List<EmailLine_SO>();
         public List<int> EmailIDList = new List<int>();

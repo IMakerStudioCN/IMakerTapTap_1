@@ -7,45 +7,57 @@ namespace TapTapFirst
 {
     public class baListController : MonoBehaviour, IController
     {
-        //全部的baLineSO的列表
         [SerializeField]
-        List<baLineSingleSO> balist = new List<baLineSingleSO>();
+        List<GameObject> baWebList = new List<GameObject>();//webList
         [SerializeField]
-        List<GameObject> baWebList = new List<GameObject>();
-        [SerializeField]
-        GameObject baLineProject;
-        //拥有的baLine的
-        HashSet<int> baYouHaveList = new HashSet<int>();
+        GameObject baLineProject; //预制体
+        private IbaSystem baSystem;//系统
+        private void OnGUI()
+        {
+            if(GUI.Button(new Rect(0, 0, 100, 60), "addba"))
+            {
+                TapTap.Interface.SendEvent(new SendBaEvent { baID = 0 });
+                Debug.Log("123123");
+               
+            }
+        }
         private void Start()
         {
-            baYouHaveList.Add(0);
+            baSystem = this.GetSystem<IbaSystem>();
             UpdateBarList();
             //根据Line改变网页状态
             this.RegisterEvent<baLineClickEvent>(e => 
             {
-                if(!baYouHaveList.Contains(e.baWebID))
+                if(!baSystem.ChickBaYouHave(e.baWebID))
                 {
                     return;
                 }
                 //通过获取type种类来设置对应页面的显示
-                baWebList[e.baWebType].SetActive(true);
-                baWebList[e.baWebType].GetComponent<baWebController>().witter.text = balist[e.baWebID].writter;
-                baWebList[e.baWebType].GetComponent<baWebController>().clicks.text = balist[e.baWebID].clicks;
-                baWebList[e.baWebType].GetComponent<baWebController>().content.text = balist[e.baWebID].content;
-                baWebList[e.baWebType].GetComponent<baWebController>().baWebType = e.baWebType;
+                GameObject baWeb = baWebList[e.baWebID];
+                baWeb.SetActive(true);
+                baWebController baWebController = baWeb.GetComponent<baWebController>();
+                baWebController.witter.text = baSystem.GetYouHaveListSOByBaIDIn(e.baWebID).writter;
+                baWebController.clicks.text = baSystem.GetYouHaveListSOByBaIDIn(e.baWebID).clicks;
+                baWebController.content.text = baSystem.GetYouHaveListSOByBaIDIn(e.baWebID).content;
+                baWebController.baWebType = e.baWebType;
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<SendBaEvent>(e =>
+            {
+                //Debug.Log(baSystem.GetBaLineSingleList()[0].title);
+                UpdateBarList();
+            });
         }
         public void UpdateBarList()
         {
-            if(baYouHaveList.Count<this.transform.childCount - 3)
+            if(baSystem.GetBaYouHaveList().Count < this.transform.childCount - 3)
             {
                 Debug.Log("不更新");
                 return;
             }
-            foreach(int i in baYouHaveList)
+            foreach(var i in baSystem.GetBaYouHaveList())
             {
                 GameObject baLine = Instantiate(baLineProject,this.transform);
-                baLine.GetComponent<baLineSingle>().baLineSingleData = balist[i];
+                baLine.GetComponent<baLineSingle>().baLineSingleData = i;
                 baLine.transform.SetSiblingIndex(3);
             }
         }

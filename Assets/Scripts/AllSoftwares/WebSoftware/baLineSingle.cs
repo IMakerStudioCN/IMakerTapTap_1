@@ -23,15 +23,22 @@ namespace TapTapFirst
         private Button clickButton;
         private void Start()
         {
-            this.writter.text = baLineSingleData.writter; 
-            this.clicks.text = baLineSingleData.clicks;
-            this.replies.text = baLineSingleData.replies;
-            this.title.text = baLineSingleData.title;
-            this.data.text = baLineSingleData.data;
-            clickButton.onClick.AddListener(() =>
-            {
-                TapTap.Interface.SendEvent(new baLineClickEvent { baWebID =baLineSingleData.baID ,baWebType = baLineSingleData.baWebType});
-            });
+
+            if (this.writter != null)
+                this.writter.text = baLineSingleData.writter;
+            if (this.title != null)
+                this.title.text = baLineSingleData.title;
+            if (this.data != null)
+                this.data.text = baLineSingleData.data;
+            if(this.clicks != null)
+                this.clicks.text = baLineSingleData.clicks;
+            if (this.replies != null)
+                this.replies.text = baLineSingleData.replies;
+            if(clickButton!=null)
+                clickButton.onClick.AddListener(() =>
+                {
+                    TapTap.Interface.SendEvent(new baLineClickEvent { baWebID =baLineSingleData.baID });
+                });
         }
 
 

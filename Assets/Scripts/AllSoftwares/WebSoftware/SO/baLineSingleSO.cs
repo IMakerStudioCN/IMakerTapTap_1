@@ -25,12 +25,7 @@ namespace TapTapFirst
         public string writter;
 
 
-        [Header("帖子种类")]
-        public int baWebType;
-        [Header("可以获取的tag种类")]
-        public int tagID;
-        [Header("可以获得的NewsTemplate种类")]
-        public int NewsTemplateID;
+
 
 
     }

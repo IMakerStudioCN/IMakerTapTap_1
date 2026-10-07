@@ -6,12 +6,13 @@ namespace TapTapFirst
     {
         protected override void Init()
         {
-
+            ResKit.Init();
             var save = new JsonSaveUtility();
             #region 注册表
             // 注册工具类
             this.RegisterUtility<IJsonSaveUtility>(save);
             //注册系统类
+            RegisterSystem<IbaSystem>(new baSystem());
             RegisterSystem<IEmailListSystem>(new EmailListSystem());
             RegisterSystem<IGlobalManagerSystem>(new GlobalManagerSystem());
             RegisterSystem<ISoftwareSystem>(new SoftwareSystem());
@@ -42,6 +43,7 @@ namespace TapTapFirst
             save.Add<MapData>();
             save.Add<TaskModelData>();
             save.Add<EmailListSystemData>();
+            save.Add<baSystemData>();
             #endregion
             
 
