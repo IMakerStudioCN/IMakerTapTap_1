@@ -18,7 +18,6 @@ namespace TapTapFirst
 		const float ScreenFxFadeTime = 0.25f;
 		IActionController mScreenFxCtrl;
 
-        public Shader DisPlayshader;
         const float FadeTime = 1f;
 
 		protected override void OnInit(IUIData uiData = null)

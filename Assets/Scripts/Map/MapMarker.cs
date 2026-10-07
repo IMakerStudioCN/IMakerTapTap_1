@@ -9,8 +9,6 @@ namespace TapTapFirst
 	{
 		public string placeName;
 		Button haveCase;
-        public IJsonSaveUtility JsonSaveUtility;
-        MapData data => JsonSaveUtility.Get<MapData>("MapData");
 
         void Awake()
 		{
@@ -19,6 +17,7 @@ namespace TapTapFirst
         }
 		public void ShowHaveCase()
 		{
+			if (haveCase == null) haveCase = GetComponent<Button>();
 			if (haveCase == null) return;;
 			if (!haveCase.isActiveAndEnabled)
 			{
@@ -27,6 +26,7 @@ namespace TapTapFirst
 		}
 		public void HideHaveCase()
 		{
+			if (haveCase == null) haveCase = GetComponent<Button>();
 			if (haveCase == null) return;
 			if (haveCase.isActiveAndEnabled)
 			{
@@ -37,9 +37,8 @@ namespace TapTapFirst
 		{
 			// 点击地图标记时的逻辑,跳转到对应的
 			UIKit.OpenPanel<Dialog>(UILevel.PopUI);
-			//并且隐藏自己
-			HideHaveCase();
-			data.visiblePlace.Remove(placeName);
+			//可见性统一交给 MapSystem：数据、通知、存档一起走
+			this.GetSystem<IMapSystem>().HidePlace(placeName);
         }
 
         public IArchitecture GetArchitecture()

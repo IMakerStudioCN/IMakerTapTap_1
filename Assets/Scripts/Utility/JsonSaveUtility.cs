@@ -1,7 +1,10 @@
 ﻿using QFramework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace TapTapFirst
@@ -56,6 +59,8 @@ namespace TapTapFirst
 
         // ===== 三槽位存档 =====
         void SelectSlot(int slotIndex);
+        bool TrySelectLatestPlayedSlot();
+        bool DeleteSlot(int slotIndex);
         SaveSlotInfo GetSlotInfo(int slotIndex);
         void SetSlotName(int slotIndex, string displayName);
 
@@ -65,6 +70,7 @@ namespace TapTapFirst
 
         int Count { get; }
         int CurrentSlot { get; }
+        int LatestPlayedSlot { get; }
         string FilePath { get; }
     }
 
@@ -104,6 +110,8 @@ namespace TapTapFirst
         public int Count => mSaveDataCache.Count;
 
         public int CurrentSlot => mCurrentSlot;
+
+        public int LatestPlayedSlot => FindLatestPlayedSlot();
 
         public string FilePath => GetSlotFilePath(mCurrentSlot);
 
@@ -150,6 +158,63 @@ namespace TapTapFirst
             mCurrentSlot = slotIndex;
             ResetRegisteredData();
             Load();
+            SetLatestPlayedSlot(slotIndex);
+        }
+
+        public bool TrySelectLatestPlayedSlot()
+        {
+            int slotIndex = FindLatestPlayedSlot();
+            if (slotIndex == 0)
+            {
+                return false;
+            }
+
+            SelectSlot(slotIndex);
+            return true;
+        }
+
+        public bool DeleteSlot(int slotIndex)
+        {
+            ValidateSlotIndex(slotIndex);
+            string path = GetSlotFilePath(slotIndex);
+
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[JsonSaveUtility] 删除槽位 {slotIndex} 失败 -> {path}\n{e}");
+                return false;
+            }
+
+            PlayerPrefs.DeleteKey(GetSlotNameKey(slotIndex));
+
+            if (PlayerPrefs.GetInt(GetLatestPlayedSlotKey(), 0) == slotIndex)
+            {
+                int fallbackSlot = FindMostRecentlyModifiedSlot();
+                if (fallbackSlot == 0)
+                {
+                    PlayerPrefs.DeleteKey(GetLatestPlayedSlotKey());
+                }
+                else
+                {
+                    PlayerPrefs.SetInt(GetLatestPlayedSlotKey(), fallbackSlot);
+                }
+            }
+
+            PlayerPrefs.Save();
+
+            if (mCurrentSlot == slotIndex)
+            {
+                ResetRegisteredData();
+            }
+
+            Debug.Log($"[JsonSaveUtility] 已删除槽位 {slotIndex} -> {path}");
+            return true;
         }
 
         public SaveSlotInfo GetSlotInfo(int slotIndex)
@@ -275,10 +340,19 @@ namespace TapTapFirst
                         continue;
                     }
 
-                    // 游戏开始已用 Add<T>() 提前登记过：原地覆盖，引用保持不变
+                    // 已登记的数据始终保留同一个对象实例，并原地更新集合内容。
+                    // 这样系统即使缓存过 List/HashSet 等引用，切换槽位后也不会继续读写旧槽位。
                     if (mSaveDataCache.TryGetValue(entry.key, out object exist) && exist != null && exist.GetType() == type)
                     {
-                        JsonUtility.FromJsonOverwrite(entry.json, exist);
+                        object loaded = JsonUtility.FromJson(entry.json, type);
+
+                        if (loaded == null)
+                        {
+                            Debug.LogWarning($"[JsonSaveUtility] {entry.key} 内容为空，已跳过");
+                            continue;
+                        }
+
+                        CopySerializedDataPreservingReferences(exist, loaded);
                     }
                     else
                     {
@@ -316,16 +390,294 @@ namespace TapTapFirst
 
         private void ResetRegisteredData()
         {
+            // 移除旧版本遗留、但当前版本未登记的条目，避免它们被写进另一个槽位。
+            List<string> cachedKeys = new List<string>(mSaveDataCache.Keys);
+            foreach (string key in cachedKeys)
+            {
+                if (!mRegisteredTypes.ContainsKey(key))
+                {
+                    mSaveDataCache.Remove(key);
+                }
+            }
+
             foreach (KeyValuePair<string, Type> pair in mRegisteredTypes)
             {
                 try
                 {
-                    mSaveDataCache[pair.Key] = Activator.CreateInstance(pair.Value);
+                    object defaultData = Activator.CreateInstance(pair.Value);
+
+                    if (mSaveDataCache.TryGetValue(pair.Key, out object currentData) &&
+                        currentData != null &&
+                        currentData.GetType() == pair.Value)
+                    {
+                        CopySerializedDataPreservingReferences(currentData, defaultData);
+                    }
+                    else
+                    {
+                        mSaveDataCache[pair.Key] = defaultData;
+                    }
                 }
                 catch (Exception e)
                 {
                     Debug.LogWarning($"[JsonSaveUtility] 无法重置 {pair.Key}：{e.Message}");
                 }
+            }
+        }
+
+        /// <summary>
+        /// 将 source 的可序列化字段复制到 target，同时保留 target 中已有对象和集合的引用。
+        /// </summary>
+        private static void CopySerializedDataPreservingReferences(object target, object source)
+        {
+            if (target == null || source == null || target.GetType() != source.GetType())
+            {
+                return;
+            }
+
+            CopySerializedDataPreservingReferences(
+                target,
+                source,
+                new HashSet<object>(ReferenceEqualityComparer.Instance));
+        }
+
+        private static void CopySerializedDataPreservingReferences(
+            object target,
+            object source,
+            HashSet<object> visitedTargets)
+        {
+            if (!visitedTargets.Add(target))
+            {
+                return;
+            }
+
+            foreach (FieldInfo field in GetSerializableFields(target.GetType()))
+            {
+                object sourceValue = field.GetValue(source);
+                object targetValue = field.GetValue(target);
+
+                if (sourceValue == null)
+                {
+                    if (!TryClearCollection(targetValue))
+                    {
+                        field.SetValue(target, null);
+                    }
+
+                    continue;
+                }
+
+                Type fieldType = field.FieldType;
+
+                if (ShouldAssignDirectly(fieldType) || targetValue == null)
+                {
+                    field.SetValue(target, sourceValue);
+                    continue;
+                }
+
+                if (TryCopyCollectionContents(targetValue, sourceValue))
+                {
+                    continue;
+                }
+
+                if (fieldType.IsArray || typeof(IEnumerable).IsAssignableFrom(fieldType))
+                {
+                    field.SetValue(target, sourceValue);
+                    continue;
+                }
+
+                if (targetValue.GetType() == sourceValue.GetType())
+                {
+                    CopySerializedDataPreservingReferences(targetValue, sourceValue, visitedTargets);
+                    continue;
+                }
+
+                field.SetValue(target, sourceValue);
+            }
+        }
+
+        private static IEnumerable<FieldInfo> GetSerializableFields(Type type)
+        {
+            for (Type current = type; current != null && current != typeof(object); current = current.BaseType)
+            {
+                FieldInfo[] fields = current.GetFields(
+                    BindingFlags.Instance |
+                    BindingFlags.Public |
+                    BindingFlags.NonPublic |
+                    BindingFlags.DeclaredOnly);
+
+                foreach (FieldInfo field in fields)
+                {
+                    if (field.IsStatic || field.IsInitOnly || field.IsNotSerialized)
+                    {
+                        continue;
+                    }
+
+                    if (field.IsPublic || field.IsDefined(typeof(SerializeField), true))
+                    {
+                        yield return field;
+                    }
+                }
+            }
+        }
+
+        private static bool ShouldAssignDirectly(Type type)
+        {
+            return type.IsValueType ||
+                   type == typeof(string) ||
+                   typeof(UnityEngine.Object).IsAssignableFrom(type);
+        }
+
+        private static bool TryClearCollection(object value)
+        {
+            if (value == null || value is string || value.GetType().IsArray)
+            {
+                return false;
+            }
+
+            if (value is IDictionary dictionary)
+            {
+                if (dictionary.IsReadOnly)
+                {
+                    return false;
+                }
+
+                dictionary.Clear();
+                return true;
+            }
+
+            if (value is IList list)
+            {
+                if (list.IsReadOnly || list.IsFixedSize)
+                {
+                    return false;
+                }
+
+                list.Clear();
+                return true;
+            }
+
+            MethodInfo clearMethod = value.GetType().GetMethod(
+                "Clear",
+                BindingFlags.Instance | BindingFlags.Public,
+                null,
+                Type.EmptyTypes,
+                null);
+
+            if (clearMethod == null)
+            {
+                return false;
+            }
+
+            clearMethod.Invoke(value, null);
+            return true;
+        }
+
+        private static bool TryCopyCollectionContents(object target, object source)
+        {
+            if (ReferenceEquals(target, source))
+            {
+                return true;
+            }
+
+            if (target is Array targetArray && source is Array sourceArray)
+            {
+                if (targetArray.Rank != 1 || sourceArray.Rank != 1 || targetArray.Length != sourceArray.Length)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < sourceArray.Length; i++)
+                {
+                    targetArray.SetValue(sourceArray.GetValue(i), i);
+                }
+
+                return true;
+            }
+
+            if (target is IDictionary targetDictionary && source is IDictionary sourceDictionary)
+            {
+                if (targetDictionary.IsReadOnly)
+                {
+                    return false;
+                }
+
+                targetDictionary.Clear();
+                foreach (DictionaryEntry entry in sourceDictionary)
+                {
+                    targetDictionary.Add(entry.Key, entry.Value);
+                }
+
+                return true;
+            }
+
+            if (target is IList targetList && source is IEnumerable sourceEnumerable)
+            {
+                if (targetList.IsReadOnly || targetList.IsFixedSize)
+                {
+                    return false;
+                }
+
+                targetList.Clear();
+                foreach (object item in sourceEnumerable)
+                {
+                    targetList.Add(item);
+                }
+
+                return true;
+            }
+
+            if (target is string || !(source is IEnumerable enumerable))
+            {
+                return false;
+            }
+
+            Type targetType = target.GetType();
+            MethodInfo clearMethod = targetType.GetMethod(
+                "Clear",
+                BindingFlags.Instance | BindingFlags.Public,
+                null,
+                Type.EmptyTypes,
+                null);
+            MethodInfo addMethod = null;
+
+            foreach (MethodInfo method in targetType.GetMethods(BindingFlags.Instance | BindingFlags.Public))
+            {
+                if (method.Name == "Add" && method.GetParameters().Length == 1)
+                {
+                    addMethod = method;
+                    break;
+                }
+            }
+
+            if (clearMethod == null || addMethod == null)
+            {
+                return false;
+            }
+
+            clearMethod.Invoke(target, null);
+            foreach (object item in enumerable)
+            {
+                addMethod.Invoke(target, new[] { item });
+            }
+
+            return true;
+        }
+
+        private sealed class ReferenceEqualityComparer : IEqualityComparer<object>
+        {
+            public static readonly ReferenceEqualityComparer Instance = new ReferenceEqualityComparer();
+
+            private ReferenceEqualityComparer()
+            {
+            }
+
+            public new bool Equals(object x, object y)
+            {
+                return ReferenceEquals(x, y);
+            }
+
+            public int GetHashCode(object obj)
+            {
+                return RuntimeHelpers.GetHashCode(obj);
             }
         }
 
@@ -341,9 +693,60 @@ namespace TapTapFirst
             return $"{mBaseFileName}.Slot{slotIndex}.DisplayName";
         }
 
+        private string GetLatestPlayedSlotKey()
+        {
+            return $"{mBaseFileName}.LatestPlayedSlot";
+        }
+
+        private int FindLatestPlayedSlot()
+        {
+            int storedSlot = PlayerPrefs.GetInt(GetLatestPlayedSlotKey(), 0);
+            if (IsValidSlotIndex(storedSlot) && File.Exists(GetSlotFilePath(storedSlot)))
+            {
+                return storedSlot;
+            }
+
+            return FindMostRecentlyModifiedSlot();
+        }
+
+        private int FindMostRecentlyModifiedSlot()
+        {
+            int latestSlot = 0;
+            DateTime latestWriteTime = DateTime.MinValue;
+
+            for (int slotIndex = 1; slotIndex <= 3; slotIndex++)
+            {
+                string path = GetSlotFilePath(slotIndex);
+                if (!File.Exists(path))
+                {
+                    continue;
+                }
+
+                DateTime writeTime = File.GetLastWriteTimeUtc(path);
+                if (latestSlot == 0 || writeTime > latestWriteTime)
+                {
+                    latestSlot = slotIndex;
+                    latestWriteTime = writeTime;
+                }
+            }
+
+            return latestSlot;
+        }
+
+        private void SetLatestPlayedSlot(int slotIndex)
+        {
+            PlayerPrefs.SetInt(GetLatestPlayedSlotKey(), slotIndex);
+            PlayerPrefs.Save();
+        }
+
+        private static bool IsValidSlotIndex(int slotIndex)
+        {
+            return slotIndex >= 1 && slotIndex <= 3;
+        }
+
         private static void ValidateSlotIndex(int slotIndex)
         {
-            if (slotIndex < 1 || slotIndex > 3)
+            if (!IsValidSlotIndex(slotIndex))
             {
                 throw new ArgumentOutOfRangeException(nameof(slotIndex), "存档槽位只能是 1、2、3");
             }
