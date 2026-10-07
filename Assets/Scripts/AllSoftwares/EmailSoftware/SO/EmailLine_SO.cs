@@ -15,6 +15,8 @@ namespace TapTapFirst
         public int EmailID;
         [Header("地点")]
         public string[] Place;
+        [Header("是否检查邮件")]
+        public bool isCheck = false;
 
     }
 }

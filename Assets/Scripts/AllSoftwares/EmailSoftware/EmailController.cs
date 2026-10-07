@@ -21,7 +21,6 @@ namespace TapTapFirst
         private IEmailListSystem EmailListSystem;
 
         private readonly HashSet<int> mShowIDs = new HashSet<int>();
-
         private void Start()
         {
             EmailListSystem = this.GetSystem<IEmailListSystem>();
@@ -41,10 +40,10 @@ namespace TapTapFirst
                 //设置状态
                 EmailWebList[0].SetActive(true);
                 EmailWebSingle web = EmailWebList[0].GetComponent<EmailWebSingle>();
-                web.whoSend.text = line.WhoSend;
-                web.whenSend.text = line.WhenSend;
-                web.sendContent.text = line.SendContent;
-                web.Palce = line.Place;
+                web.ReFrash(line);
+                //web.whoSend.text = line.WhoSend;
+                //web.whenSend.text = line.WhenSend;
+                //web.sendContent.text = line.SendContent;
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
             this.RegisterEvent<SendEmailEvent>(e =>
@@ -68,6 +67,12 @@ namespace TapTapFirst
             {
                 if (line == null) continue;
                 if(mShowIDs.Contains(line.EmailID)) continue;
+                line.isCheck = false;
+                if (EmailListSystem.GetEmailCheck().Contains(line))
+                {
+                    line.isCheck = true;
+                }
+                
                 GameObject item = Instantiate(EmailPrefab, this.transform);
                 item.transform.SetAsFirstSibling();
                 item.GetComponent<EmailLineSingle>().EmailLineData = line;
