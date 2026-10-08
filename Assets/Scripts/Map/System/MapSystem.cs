@@ -33,6 +33,13 @@ namespace TapTapFirst
         protected override void OnInit()
         {
             RegisterTakeTaskEvent();
+            this.RegisterEvent<OnTaskEnd>((e) =>
+            {
+                HidePlace(e.endTask.place);
+                this.SendEvent<OnMapVisibilityChangedEvent>();
+                mTaskByPlace.Remove(e.endTask.place);
+            });
+
         }
 
         public void RegisterPlace(string placeName, MapMarker marker)

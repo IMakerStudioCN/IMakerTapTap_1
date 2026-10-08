@@ -47,10 +47,10 @@ namespace TapTapFirst
             {
                 TaskSingle task = daysTask[i];
                 if (days < task.startDay) continue;                 // 没到期：留着，下次再看
-                if (days > task.endDay) { daysTask.RemoveAt(i); continue; }  // 没开始就过期
+                if (days >= task.endDay) { DisableTaskAT(i); continue; }  // 没开始就过期
                 if (task.prePosition != null && !taskIsDone.Contains(task.prePosition)) continue;   // 前置没完成：留着
                 daysTask.RemoveAt(i);
-                ActivateTask(task);                                  // 见下
+                ActivateTask(task);
             }
         }
         
@@ -59,7 +59,7 @@ namespace TapTapFirst
             
             for(int i = runTaskInDo.Count - 1;i >= 0; i--)
             {
-                if(days<runTaskInDo[i].endDay) continue;
+                if(days < runTaskInDo[i].endDay) continue;
                 DisableTaskAT(i);
             }
         }
@@ -77,8 +77,11 @@ namespace TapTapFirst
             runTaskInDo.Add(task);
             if (!tasksInDoing.Contains(task.TaskName)) tasksInDoing.Add(task.TaskName);
             JsonSaveUtility.Save();                                  // 立刻落盘
+
             this.SendEvent(new HaveNewMessageEvent { webID = 4 });
             this.SendEvent(new SendEmailEvent { EmailWebID = task.EmailId,Task = task });
+
+            this.SendEvent(new OnTaskStart { startTask = task });
         }
         void DisableTaskAT(int index)
         {
@@ -88,6 +91,8 @@ namespace TapTapFirst
             isDoneList.Add(task.TaskName);
             tasksInDoing.Remove(task.TaskName);
             taskIsDone.Add(task);
+
+            this.SendEvent(new OnTaskEnd { endTask = task });
         }
         //再Controller获取其config
         public void InitTask(List<TaskSingle> config)

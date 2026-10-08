@@ -7,6 +7,8 @@ namespace TapTapFirst
     [CreateAssetMenu(fileName = "DialogSO", menuName = "ScriptableObjects/DialogSO", order = 1)]
     public class DialogSO : ScriptableObject
     {
+        [Header("背景图片")]
+        public Sprite BackGround;
         [Header("对话ID")]
         public string title;
         [Header("配置")]

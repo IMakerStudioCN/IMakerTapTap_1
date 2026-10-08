@@ -11,6 +11,7 @@ namespace TapTapFirst
 		public Button mButton;
 		public Image mStanding;
 		public ScrollRect mScrollRect;
+		public Image mBackGround;
 
 		IDialogSystem mDialogSystem;
         DialogSO mDialogSO;
@@ -88,7 +89,7 @@ namespace TapTapFirst
 			mStanding.sprite = mSingle.Standing;
 			GameObject mObject =  Instantiate<GameObject>(mSingle.prefab,this.transform);
 			mObject.GetComponentInChildren<TextMeshProUGUI>().text = mSingle.Sentence;
-			
+			mScrollRect.verticalNormalizedPosition = 0;
 			
 		}
 		//设置对话内容
@@ -110,6 +111,10 @@ namespace TapTapFirst
 			}
 			mDialogSO = so;
 			index = 0;
+
+			if (mBackGround == null) Debug.LogWarning($"{so.title}的背景没有配置");
+			mBackGround.sprite = so.BackGround;
+
 			if (mButton != null) {
 				mButton.gameObject.SetActive(true);
 			}

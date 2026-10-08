@@ -61,12 +61,19 @@ namespace TapTapFirst
             //注册事件
             this.RegisterEvent<SendEmailEvent>(e =>
             {
-                //接受发送的邮件ID事件，更新邮件列表
-                AddEmailYouHave(e.Task.EmailId);
-
                 if(e.Task != null)
                 {
                     mTaskByEmail[e.EmailWebID] = e.Task;
+                    //接受发送的邮件ID事件，更新邮件列表
+                    AddEmailYouHave(e.Task.EmailId);
+                }  
+            });
+            this.RegisterEvent<OnTaskEnd>(e =>
+            {
+                if (CheckEmailYouHave(e.endTask.EmailId))
+                {
+                    DelEmailYouHave(e.endTask.EmailId);
+                    this.SendEvent<SendEmailEvent>();
                 }
             });
         }
