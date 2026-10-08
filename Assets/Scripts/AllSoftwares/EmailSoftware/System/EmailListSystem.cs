@@ -33,8 +33,10 @@ namespace TapTapFirst
 
     public class EmailListSystem : AbstractSystem, IEmailListSystem
     {    
+
         private ResLoader mResLoader = ResLoader.Allocate();  
         private IJsonSaveUtility mJsonSaveUtility => this.GetUtility<IJsonSaveUtility>();
+
 
         public List<EmailLine_SO> EmailLineList = new List<EmailLine_SO>();
         public List<EmailLine_SO> EmailYouHaveList = new List<EmailLine_SO>();

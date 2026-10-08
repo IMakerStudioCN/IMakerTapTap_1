@@ -11,6 +11,6 @@ namespace TapTapFirst
         /// </summary>
         [SerializeField]
         public List<Tag_SO> allTagList = new List<Tag_SO>();
-        public Tag_SO GetTagById(int id)=> allTagList.Find(tag => tag.tagId == id);
+        //public Tag_SO GetTagById(int id)=> allTagList.Find(tag => tag.tagId == id);
     }
 }
