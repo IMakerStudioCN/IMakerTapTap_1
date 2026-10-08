@@ -43,6 +43,7 @@ namespace TapTapFirst
             save.Add<MapData>();
             save.Add<TaskModelData>();
             save.Add<EmailListSystemData>();
+            save.Add<NewsTemplateSaveData>();
             #endregion
             
 

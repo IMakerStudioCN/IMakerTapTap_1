@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace TapTapFirst
@@ -16,13 +16,6 @@ namespace TapTapFirst
     public struct TargetFundsValueChangeEvent
     {
     }
-    public struct TagAcquiredEvent
-    {
-       public int tagId;
-       
-    }
-    public struct NewsAcquiredEvent
-    {
-        public int newsId;
-    }
+   
+    
 }
