@@ -12,37 +12,54 @@ namespace TapTapFirst
         public void RegisterTaskBar(string taskBarName, TaskBarSingle taskBar);
         public void UnregisterTaskBar(string taskBarName);
         public TaskBarSingle GetTaskBarSingle(string taskBarName);
+        void Clear();
     }
 
     public class TaskBarSystem : AbstractSystem, ITaskBarSystem
     {
-        Dictionary<string, TaskBarSingle> taskBars = new Dictionary<string, TaskBarSingle>();
+        Dictionary<string, TaskBarSingle> mTaskBars = new Dictionary<string, TaskBarSingle>();
         protected override void OnInit()
         {
         }
 
         public void RegisterTaskBar(string taskBarName, TaskBarSingle taskBar)
         {
-            if (!taskBars.ContainsKey(taskBarName))
+            if (string.IsNullOrEmpty(taskBarName) || taskBar == null)
             {
-                taskBars.Add(taskBarName, taskBar);
+                return;
             }
+            mTaskBars[taskBarName] = taskBar;
         }
         public void UnregisterTaskBar(string taskBarName)
         {
-            if (taskBars.ContainsKey(taskBarName))
+            if (!string.IsNullOrEmpty(taskBarName))
             {
-                taskBars.Remove(taskBarName);
+                mTaskBars.Remove(taskBarName);
             }
         }
 
         public TaskBarSingle GetTaskBarSingle(string taskBarName)
         {
-            if (!taskBars.ContainsKey(taskBarName))
+            if (!mTaskBars.ContainsKey(taskBarName))
             {
                 return null;
             }
-            return taskBars[taskBarName];
+            TaskBarSingle taskBar;
+            if(!mTaskBars.TryGetValue(taskBarName, out taskBar))
+            {
+                return null;
+            }
+            if (taskBar == null)
+            {
+                mTaskBars.Remove(taskBarName);
+                return null;
+            }
+            return taskBar;
+        }
+
+        public void Clear()
+        {
+            mTaskBars.Clear();
         }
     }
 }

@@ -10,19 +10,14 @@ namespace TapTapFirst
     /// </summary>
     public static class GlobalExitConfirmUI
     {
-        // ResKit 按 AB 表里的资源名查（= prefab 文件名，小写比较），只能填资源名，不能带路径
+        private const string AssetBundleName = "exitconfirmpanel_prefab";
         private const string PrefabName = "ExitConfirmPanel";
 
         public static bool Open(Action onClosed = null)
         {
-            ResKit.Init();
-            if (!(UIKit.Config.PanelLoaderPool is ResKitPanelLoaderPool))
-            {
-                UIKit.Config.PanelLoaderPool = new ResKitPanelLoaderPool();
-            }
-
             ExitConfirmPanelView panel = UIKit.OpenPanel<ExitConfirmPanelView>(
                 UILevel.PopUI,
+                assetBundleName: AssetBundleName,
                 prefabName: PrefabName);
 
             if (panel == null)
@@ -45,8 +40,6 @@ namespace TapTapFirst
         public Button BackToMenuButton; // 退出游戏到主菜单
         public Button CancelButton;     // 取消
 
-        private ResLoader mResLoader;
-
         protected override void OnInit(IUIData uiData = null)
         {
             QuitGameButton.onClick.AddListener(QuitGame);
@@ -61,22 +54,18 @@ namespace TapTapFirst
 
         private void BackToMainMenu()
         {
-            // 如需在返回主菜单前保存进度，可在此处调用：
-            // TapTap.Interface.GetUtility<IJsonSaveUtility>().Save();
-            PlayerPrefs.Save();
-
             if (!Application.CanStreamedLevelBeLoaded(MainMenuSceneName))
             {
                 Debug.LogError($"[ExitConfirmPanelView] 场景 {MainMenuSceneName} 尚未加入 Build Settings");
                 return;
             }
 
-            if (mResLoader == null)
-            {
-                mResLoader = ResLoader.Allocate();
-            }
+            // 先关闭所有面板（包括自己），清空 UIKit 缓存，避免场景卸载后残留“已销毁面板”引用
+            UIKit.CloseAllPanel();
 
-            mResLoader.LoadSceneAsync(MainMenuSceneName, onStartLoading: operation =>
+            // 用独立加载器加载主菜单场景：面板自身已随 CloseAllPanel 被关闭，不能再依赖成员加载器
+            ResLoader loader = ResLoader.Allocate();
+            loader.LoadSceneAsync(MainMenuSceneName, onStartLoading: operation =>
             {
                 Debug.Log($"[ExitConfirmPanelView] ResKit 开始异步加载主菜单场景：{MainMenuSceneName}");
             });
@@ -91,8 +80,6 @@ namespace TapTapFirst
             QuitGameButton?.onClick.RemoveListener(QuitGame);
             BackToMenuButton?.onClick.RemoveListener(BackToMainMenu);
             CancelButton?.onClick.RemoveListener(CloseSelf);
-            mResLoader?.Recycle2Cache();
-            mResLoader = null;
             base.OnBeforeDestroy();
         }
     }

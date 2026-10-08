@@ -5,13 +5,13 @@ using QFramework;
 
 namespace TapTapFirst
 {
-	// Generate Id:689616e3-3547-414f-9296-8ec58a89389f
+	// Generate Id:57533102-8aa1-4be2-a5eb-20e4b64b0417
 	public partial class ComputerDisplay
 	{
 		public const string Name = "ComputerDisplay";
 		
 		[SerializeField]
-		public UnityEngine.UI.Image Image;
+		public UnityEngine.UI.Image Taskbar;
 		[SerializeField]
 		public UnityEngine.UI.Toggle PlayStatuMenu;
 		[SerializeField]
@@ -21,7 +21,7 @@ namespace TapTapFirst
 		
 		protected override void ClearUIComponents()
 		{
-			Image = null;
+			Taskbar = null;
 			PlayStatuMenu = null;
 			Menu = null;
 			

@@ -71,10 +71,35 @@ namespace TapTapFirst
 
         public static int OpenedCount { get { return sStack.Count; } }
 
-        // 当前最上面的窗口
-        public static WindowsBasic Active
+        // 当前真正在前台的窗口（= 可见的最上层窗口；最小化/隐藏的窗口不算）
+        public static WindowsBasic Focused
         {
-            get { return sStack.Count > 0 ? sStack[sStack.Count - 1] : null; }
+            get
+            {
+                for (var i = sStack.Count - 1; i >= 0; i--)
+                {
+                    var window = sStack[i];
+                    if (window == null || !window.gameObject.activeInHierarchy) continue;
+
+                    return window;
+                }
+
+                return null;
+            }
+        }
+
+        // Active 就是 Focused（保留旧名字）
+        public static WindowsBasic Active { get { return Focused; } }
+
+        // 判断某一扇窗是不是当前前台窗口（名字或组件都行）
+        public static bool IsFocused(WindowsBasic window)
+        {
+            return window != null && window == Focused;
+        }
+
+        public static bool IsFocused(string windowName)
+        {
+            return IsFocused(Get(windowName));
         }
 
         public static WindowsBasic Get(string windowName)
@@ -249,12 +274,16 @@ namespace TapTapFirst
                 sStack.Remove(window);
             }
 
+            var previous = Focused;                  // 注意：要在改动堆叠之前取
+
             sStack.Add(window);
             window.RaisePanel();
 
+            if (previous != null && previous != window) previous.NotifyFocusChanged(false);
+
             if (!window.OpenedNotified) return;      // 还没广播过打开（窗口尚未初始化完成）就不发聚焦
 
-            window.NotifyFocused();
+            window.NotifyFocusChanged(true);
             SafeTrigger(OnFocused, window);
         }
 
@@ -354,7 +383,11 @@ namespace TapTapFirst
 
             if (window.OpenedNotified) SafeTrigger(OnStateChanged, window);
 
-            if (window.KitState == WindowKitState.Minimized) FocusTopVisible();
+            if (window.KitState == WindowKitState.Minimized)
+            {
+                window.NotifyFocusChanged(false);     // 隐藏即失焦
+                FocusTopVisible();                    // 焦点交给下一个可见窗口
+            }
         }
 
         internal static Vector2 NextCascadeOffset()

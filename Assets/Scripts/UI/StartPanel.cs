@@ -1,4 +1,4 @@
-using QFramework;
+﻿using QFramework;
 using UnityEngine;
 
 namespace TapTapFirst
@@ -13,7 +13,7 @@ namespace TapTapFirst
     public partial class StartPanel : UIPanel
     {
         private const string GameSceneName = "GamePlay";
-        // ResKit 按 AB 表里的资源名查（= prefab 文件名，小写比较），只能填资源名，不能带路径
+        private const string SaveSlotsAssetBundleName = "saveslotpanel_prefab";
         private const string SaveSlotsPrefabName = "SaveSlotPanel";
 
         private ResLoader mResLoader;
@@ -59,6 +59,7 @@ namespace TapTapFirst
             SaveSlotPanelView panel = UIKit.OpenPanel<SaveSlotPanelView>(
                 UILevel.PopUI,
                 new SaveSlotPanelData(LoadGameScene),
+                assetBundleName: SaveSlotsAssetBundleName,
                 prefabName: SaveSlotsPrefabName);
 
             if (panel == null)
@@ -80,9 +81,23 @@ namespace TapTapFirst
             }
 
             SetMainButtonsInteractable(false);
+
+            //先单独关闭 ComputerDisplay，把它从 UIManager 缓存里踢出去
+            UIKit.ClosePanel<ComputerDisplay>();
+
+            //再关闭所有其他面板
+            UIKit.CloseAllPanel();
+
             mResLoader.LoadSceneAsync(GameSceneName, onStartLoading: operation =>
             {
+                // 在场景开始加载时，不要立即清理 UI，而是等一帧让 UIManager 自己整理
                 Debug.Log($"[StartPanel] ResKit 开始异步加载场景：{GameSceneName}");
+
+                // 延迟一帧执行清理，确保旧场景的销毁流程已经走完
+                ActionKit.DelayFrame(1, () =>
+                {
+                    UIKit.CloseAllPanel();
+                }).StartGlobal();
             });
         }
 
