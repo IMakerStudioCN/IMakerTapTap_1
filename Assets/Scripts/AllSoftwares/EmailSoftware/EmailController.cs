@@ -87,7 +87,6 @@ namespace TapTapFirst
 
         private void CreatList(EmailLine_SO line)
         {
-            Debug.Log(EmailListSystem.GetEmailYouHaveList().Count);
             GameObject item = Instantiate(EmailPrefab, this.transform);
 
             item.transform.SetAsFirstSibling();

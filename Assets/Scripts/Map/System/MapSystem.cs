@@ -55,6 +55,7 @@ namespace TapTapFirst
         }
         public MapMarker GetPlace(string placeName)
         {
+            if(placeName.IsNullOrEmpty()) return null;
             if (placeDictionary.TryGetValue(placeName, out MapMarker marker))
             {
                 return marker;
