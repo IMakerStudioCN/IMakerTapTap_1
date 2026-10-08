@@ -10,6 +10,7 @@ namespace TapTapFirst
         [SerializeField]
         public List<NewsTemplate_SO> newsTemplateList;
 
-        public NewsTemplate_SO GetNewsTemplateById(int id) => newsTemplateList.Find(news => news.newsId == id);
+        public NewsTemplate_SO GetNewsTemplateById(int id) =>
+            newsTemplateList == null ? null : newsTemplateList.Find(news => news != null && news.newsId == id);
     }
 }

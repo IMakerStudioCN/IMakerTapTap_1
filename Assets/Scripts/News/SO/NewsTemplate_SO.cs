@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,8 +12,7 @@ namespace TapTapFirst
         [SerializeField]
         public string newsTitle;
         [SerializeField]
-        public string newsContent;
-        [SerializeField]
-        public List<string> blank;
+        public GameObject newsContent;
+      
     }
 }
