@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 namespace TapTapFirst
 {
-    [CreateAssetMenu(fileName = "baLine_SO", menuName = "ScriptableObjects/baLine_SO", order = 1)]
+    [CreateAssetMenu(fileName = "baLineSingle_SO", menuName = "ScriptableObjects/Ba/baSingleLine_SO", order = 1)]
     public class baLineSingleSO : ScriptableObject
     {
 
@@ -25,12 +25,7 @@ namespace TapTapFirst
         public string writter;
 
 
-        [Header("帖子种类")]
-        public int baWebType;
-        [Header("可以获取的tag种类")]
-        public int tagID;
-        [Header("可以获得的NewsTemplate种类")]
-        public int NewsTemplateID;
+
 
 
     }

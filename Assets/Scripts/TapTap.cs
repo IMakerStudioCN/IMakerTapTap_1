@@ -12,6 +12,8 @@ namespace TapTapFirst
             // 注册工具类
             this.RegisterUtility<IJsonSaveUtility>(save);
             //注册系统类
+            RegisterSystem<IbaListSystem>(new baListSystem());
+            //RegisterSystem<IbaSystem>(new baSystem());
             RegisterSystem<IEmailListSystem>(new EmailListSystem());
             RegisterSystem<IGlobalManagerSystem>(new GlobalManagerSystem());
             RegisterSystem<ISoftwareSystem>(new SoftwareSystem());
@@ -21,6 +23,7 @@ namespace TapTapFirst
             RegisterSystem<ITagSystem>(new TagSystem());
             this.RegisterSystem<ITaskSystem>(new  TaskSystem());
             this.RegisterSystem<IDialogSystem>(new DialogSystem());
+            RegisterSystem<INewsSystem>(new NewsSystem());
             // 注册模型类
             RegisterModel<IGlobalManagerModel>(new GlobalManagerModel());
             RegisterModel<IPlayerModel>(new PlayerModel());
@@ -30,19 +33,22 @@ namespace TapTapFirst
             //工具注册
             this.RegisterUtility<IJsonSaveUtility>(save);
             this.RegisterUtility<IWindowsUtility>(new WindowsUtility());
-            
+
 
             #endregion
 
 
             // 游戏开始：提前把要保存的纯 C# 类放进字典 ，不要在Controller里用Add和Remove
             #region 添加要纯C#的数据
-            save.Add<TagListSaveData>();
+            save.Add<baListSystemData>();
+            save.Add<baSystemData>();
+            save.Add<TagListSaveData>(); 
             save.Add<NewsTemplateModel>();
             save.Add<TimeModelData>();
             save.Add<MapData>();
             save.Add<TaskModelData>();
             save.Add<EmailListSystemData>();
+            save.Add<NewsTemplateSaveData>();
             #endregion
             
 

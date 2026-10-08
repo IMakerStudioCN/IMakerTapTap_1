@@ -14,6 +14,7 @@ namespace TapTapFirst
         bool IsAcquired(int tagId);
         bool CanUse(int tagId);
         void Acquire(int tagId);
+        Tag_SO GetTagById(int id);
 
     }
 
@@ -26,8 +27,6 @@ namespace TapTapFirst
         private IUnRegister mPlayerDiedUnRegister;
 
         private ResLoader mResLoader = ResLoader.Allocate();
-
-
 
 
 
@@ -65,6 +64,7 @@ namespace TapTapFirst
         private  List<Tag_SO> acquiredTaglist = new();
         #endregion
 
+
         private void InitList()
         {
             allTaglist = mResLoader.LoadSync<TagList_SO>("Tag_List_SO");
@@ -91,11 +91,14 @@ namespace TapTapFirst
         /// </summary>
         /// <param name="tagId"></param>
         /// <returns></returns>
-        public Tag_SO GetConfig(int tagId) => allTaglist.GetTagById(tagId);
+        public Tag_SO GetConfig(int tagId) => GetTagById(tagId);
         //使用方法
         //if(CanUse(tagId))=>GetConfig(tagId)
         //
-
+        public Tag_SO GetTagById(int id)
+        {
+            return allTaglist.allTagList.Find(tag => tag.tagId == id);
+        }
 
         /// <summary>
         /// 如果已经获得的话，直接调CanUse就行了，判断是否已经获得了该tag
