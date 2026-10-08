@@ -27,7 +27,8 @@ namespace TapTapFirst
         {
             if (mTimeModel != null)
             {
-                DaysText.text = " " + "Days: " + mTimeModel.days.ToString();
+                int disPlayDays = mTimeModel.days;
+                DaysText.text = " " + "Days: " + disPlayDays.ToString();
 
             }
         }

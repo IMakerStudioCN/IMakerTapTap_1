@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 namespace TapTapFirst
 {
-    public struct SendEmailEvent 
+    public struct OnToPlaceEvent
     {
         public TaskSingle Task;
-        public int EmailWebID;
+        public string DialogID;
     }
 }
