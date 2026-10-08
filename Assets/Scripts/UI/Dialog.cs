@@ -10,7 +10,7 @@ namespace TapTapFirst
 	}
 	public partial class Dialog : UIPanel
 	{
-		private CanvasGroup mGroup;
+		public CanvasGroup mGroup;
 		public GameObject inDialog;
 		IActionController mFadeCtrl;
 
@@ -24,8 +24,8 @@ namespace TapTapFirst
 		{
 			mData = uiData as DialogData ?? new DialogData();
 			// please add init code here
-			mGroup = GetComponentInChildren<CanvasGroup>();
-			
+			if(mData != null ) mGroup = GetComponentInChildren<CanvasGroup>();
+
             mGroup.alpha = 0f;
 		}
 
@@ -42,9 +42,11 @@ namespace TapTapFirst
         // 开启时，真正的淡入动画在 OnShow 中执行，关闭时，真正的淡出动画在 Hide 中执行
         protected override void OnShow()
 		{
+            mGroup.gameObject.SetActive(true);
             mGroup.blocksRaycasts = false;
             Fade(0f, 1f, 0f, () => mGroup.blocksRaycasts = true, true);
 			FadeScreenIntensity(DialogGlobalIntensity, ScreenFxFadeTime);
+			
         }
 		public override void Hide()
 		{
@@ -69,12 +71,14 @@ namespace TapTapFirst
 			KillFade();
 			mGroup.alpha = from;
 			mFadeCtrl = ActionKit.Sequence()
-				.Lerp(from, midle, FadeTime, a => mGroup.alpha = a)   // 要缓动: a => EaseUtility.OutQuad(0,1,a)
-				.Callback(() => { if(inDialog != null) inDialog.SetActive(isShow);})
+                .Callback(() => { mGroup.gameObject.SetActive(true); })
+                .Lerp(from, midle, FadeTime, a => mGroup.alpha = a)   // 要缓动: a => EaseUtility.OutQuad(0,1,a)
+				.Callback(() => { if (inDialog != null) inDialog.SetActive(isShow); })
 				.Delay(1)
-                .Lerp(midle, to, FadeTime, a => mGroup.alpha = a)
-                .Callback(() => { mFadeCtrl = null; if (onDone != null) onDone(); })
-				.Start(this);
+				.Lerp(midle, to, FadeTime, a => mGroup.alpha = a)
+				.Callback(() => { mFadeCtrl = null; if (onDone != null) onDone(); })
+                .Callback(() => { mGroup.gameObject.SetActive(false); })
+                .Start(this);
 		}
 
 		void KillFade()

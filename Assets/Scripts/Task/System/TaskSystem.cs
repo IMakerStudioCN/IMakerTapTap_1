@@ -78,7 +78,7 @@ namespace TapTapFirst
             if (!tasksInDoing.Contains(task.TaskName)) tasksInDoing.Add(task.TaskName);
             JsonSaveUtility.Save();                                  // 立刻落盘
             this.SendEvent(new HaveNewMessageEvent { webID = 4 });
-            this.SendEvent(new SendEmailEvent { EmailWebID = task.EmailId });
+            this.SendEvent(new SendEmailEvent { EmailWebID = task.EmailId,Task = task });
         }
         void DisableTaskAT(int index)
         {
@@ -102,6 +102,7 @@ namespace TapTapFirst
                 else if (tasksInDoing.Contains(task.TaskName))
                 {
                     runTaskInDo.Add(task);
+                    this.SendEvent(new SendEmailEvent { EmailWebID = task.EmailId, Task = task });
                     continue;
                 }
                 daysTask.Add(task);

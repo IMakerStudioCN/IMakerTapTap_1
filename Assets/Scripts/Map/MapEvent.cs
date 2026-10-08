@@ -9,6 +9,7 @@ namespace TapTapFirst
     }
     struct OnTakeTask
     {
+        public TaskSingle Task;
         public string[] Place;
     }
     struct OnMapVisibilityChangedEvent

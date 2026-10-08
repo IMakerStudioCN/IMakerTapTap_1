@@ -20,6 +20,7 @@ namespace TapTapFirst
             this.RegisterSystem<IMapSystem>(new MapSystem());
             RegisterSystem<ITagSystem>(new TagSystem());
             this.RegisterSystem<ITaskSystem>(new  TaskSystem());
+            this.RegisterSystem<IDialogSystem>(new DialogSystem());
             // 注册模型类
             RegisterModel<IGlobalManagerModel>(new GlobalManagerModel());
             RegisterModel<IPlayerModel>(new PlayerModel());

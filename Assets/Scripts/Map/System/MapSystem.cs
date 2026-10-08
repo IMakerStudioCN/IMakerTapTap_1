@@ -17,12 +17,15 @@ namespace TapTapFirst
         void HidePlace(string placeName);
         bool IsVisible(string placeName);
         IReadOnlyList<string> VisiblePlaces { get; }
+        //得到对应地点的Task
+        public TaskSingle GetTaskForPlace(string placeName);
     }
 
     public class MapSystem : AbstractSystem, IMapSystem
     {
         public Dictionary<string, MapMarker> placeDictionary = new Dictionary<string, MapMarker>();
-
+        //缓存Task
+        private readonly Dictionary<string,TaskSingle> mTaskByPlace = new Dictionary<string, TaskSingle>();
         private IJsonSaveUtility JsonSaveUtility => this.GetUtility<IJsonSaveUtility>();
         private MapData data => JsonSaveUtility?.Get<MapData>("MapData");
         private bool mTakeTaskRegistered;
@@ -128,6 +131,10 @@ namespace TapTapFirst
                     mapData.visiblePlace.Add(placeName);
                 }
             }
+            else
+            {
+                mapData.visiblePlace.Remove(placeName);
+            }
 
             // 地图窗口开着却找不到这个标记，多半是 prefab 里的 placeName 和传进来的对不上
             if (placeDictionary.Count > 0 && !placeDictionary.ContainsKey(placeName))
@@ -139,6 +146,18 @@ namespace TapTapFirst
 
         }
 
+        //缓存Task，地点和task暂时绑定
+        private void BindTask(string[] placeNames,TaskSingle task)
+        {
+            if (task == null || placeNames == null) return;
+            foreach (var placeName in placeNames)
+            {
+                if (string.IsNullOrEmpty(placeName)) continue;
+                mTaskByPlace[placeName] = task;
+            }
+        }
+
+
         private void RegisterTakeTaskEvent()
         {
             if (mTakeTaskRegistered)
@@ -147,7 +166,21 @@ namespace TapTapFirst
             }
 
             mTakeTaskRegistered = true;
-            this.RegisterEvent<OnTakeTask>(e => ShowPlace(e.Place));
+            this.RegisterEvent<OnTakeTask>(e =>
+            {
+                BindTask(e.Place, e.Task);
+                ShowPlace(e.Place);
+            } );
+        }
+
+        //取得某个地点对应的Task
+        public TaskSingle GetTaskForPlace(string placeName)
+        {
+            if(string.IsNullOrEmpty(placeName)) return null;
+            if(mTaskByPlace.TryGetValue(placeName, out var task) && task != null) return task;
+            task = this.GetSystem<IEmailListSystem>().GetTaskByPlace(placeName);
+            if(task != null) return task;
+            return null;
         }
 
 
