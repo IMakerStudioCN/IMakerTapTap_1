@@ -16,12 +16,12 @@ namespace TapTapFirst
     public struct TargetFundsValueChangeEvent
     {
     }
-    public struct TagAcquiredEvent
-    {
-       public int tagId;
+    //public struct TagAcquiredEvent
+    //{
+    //   public int tagId;
        
-    }
-    public struct NewsAcquiredEvent
-    {
-    }
+    //}
+    //public struct NewsAcquiredEvent
+    //{
+    //}
 }

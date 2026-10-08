@@ -41,6 +41,9 @@ namespace TapTapFirst
                 baWebController baWebController = baWeb.GetComponent<baWebController>();
                 //设置对应ba的楼层
                 baWebController.balist = baListSystem.GetbaLineListByIDInYouHave(e.baWebID).baLineList;
+                //设置对应的ba楼的Tag和News
+                baWebController.getTagID = baListSystem.GetbaLineListByIDInYouHave(e.baWebID).tagID;
+                baWebController.getNewsTemplateID = baListSystem.GetbaLineListByIDInYouHave(e.baWebID).NewsTemplateID;
                 baWebController.baWebType = e.baWebType;
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
             this.RegisterEvent<SendBaEvent>(e =>

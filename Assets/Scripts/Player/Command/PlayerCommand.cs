@@ -71,28 +71,28 @@ namespace TapTapFirst
             this.SendEvent(new TargetFundsValueChangeEvent());
         }
     }
-    /// <summary>
-    /// AddTagCommand 使用记得传入int数来添加标签
-    /// </summary>
+    ///// <summary>
+    ///// AddTagCommand 使用记得传入int数来添加标签
+    ///// </summary>
    
 
-    public class AddNewsCommand : AbstractCommand
-    {
-        private int newsId;
-        public AddNewsCommand(int newsId)
-        {
-            this.newsId = newsId;
-        }
-        protected override void OnExecute()
-        {
-            var newsModel = this.GetModel<INewsTemplateModel>();
-            if (!newsModel.IsAcquired(newsId))
-            {
-                newsModel.Acquire(newsId);
-                //发送事件通知
-                this.SendEvent(new NewsAcquiredEvent());
-            }
-        }
-    }
+    //public class AddNewsCommand : AbstractCommand
+    //{
+    //    private int newsId;
+    //    public AddNewsCommand(int newsId)
+    //    {
+    //        this.newsId = newsId;
+    //    }
+    //    protected override void OnExecute()
+    //    {
+    //        var newsModel = this.GetModel<INewsTemplateModel>();
+    //        if (!newsModel.IsAcquired(newsId))
+    //        {
+    //            newsModel.Acquire(newsId);
+    //            //发送事件通知
+    //            this.SendEvent(new NewsAcquiredEvent());
+    //        }
+    //    }
+    //}
 
 }
