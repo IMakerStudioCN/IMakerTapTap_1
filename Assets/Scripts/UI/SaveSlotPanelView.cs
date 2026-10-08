@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using QFramework;
 using UnityEngine.UI;
 
@@ -60,8 +60,8 @@ namespace TapTapFirst
                 SaveSlotInfo info = saveUtility.GetSlotInfo(i + 1);
                 NameInputs[i].SetTextWithoutNotify(info.DisplayName);
                 StatusTexts[i].text = info.HasSave
-                    ? $"槽位 {i + 1}\n{info.LastSaveTime:MM-dd HH:mm}"
-                    : $"槽位 {i + 1}\n空存档";
+                    ? $"{info.DisplayName}\n{info.LastSaveTime.Value:MM-dd HH:mm}"
+                    : $"{info.DisplayName}\n空存档";
                 DeleteButtons[i].interactable = info.HasSave;
 
                 if (mPendingDeleteSlot == i + 1)

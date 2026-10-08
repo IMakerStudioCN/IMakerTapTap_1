@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 namespace TapTapFirst
 {
-    [CreateAssetMenu(fileName = "baLine_SO", menuName = "ScriptableObjects/baLine_SO", order = 1)]
+    [CreateAssetMenu(fileName = "baLineSingle_SO", menuName = "ScriptableObjects/Ba/baSingleLine_SO", order = 1)]
     public class baLineSingleSO : ScriptableObject
     {
 

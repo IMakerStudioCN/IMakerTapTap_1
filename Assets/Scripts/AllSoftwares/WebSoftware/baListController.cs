@@ -11,7 +11,8 @@ namespace TapTapFirst
         List<GameObject> baWebList = new List<GameObject>();//webList
         [SerializeField]
         GameObject baLineProject; //预制体
-        private IbaSystem baSystem;//系统
+        //private IbaSystem baSystem;//系统
+        private IbaListSystem baListSystem;//系统
         private void OnGUI()
         {
             if(GUI.Button(new Rect(0, 0, 100, 60), "addba"))
@@ -23,12 +24,14 @@ namespace TapTapFirst
         }
         private void Start()
         {
-            baSystem = this.GetSystem<IbaSystem>();
+            //baSystem = this.GetSystem<IbaSystem>();
+            baListSystem = this.GetSystem<IbaListSystem>();
             UpdateBarList();
             //根据Line改变网页状态
             this.RegisterEvent<baLineClickEvent>(e => 
+
             {
-                if(!baSystem.ChickBaYouHave(e.baWebID))
+                if(!baListSystem.CheckbaLineListYouHave(e.baWebID))
                 {
                     return;
                 }
@@ -36,9 +39,8 @@ namespace TapTapFirst
                 GameObject baWeb = baWebList[e.baWebID];
                 baWeb.SetActive(true);
                 baWebController baWebController = baWeb.GetComponent<baWebController>();
-                baWebController.witter.text = baSystem.GetYouHaveListSOByBaIDIn(e.baWebID).writter;
-                baWebController.clicks.text = baSystem.GetYouHaveListSOByBaIDIn(e.baWebID).clicks;
-                baWebController.content.text = baSystem.GetYouHaveListSOByBaIDIn(e.baWebID).content;
+                //设置对应ba的楼层
+                baWebController.balist = baListSystem.GetbaLineListByIDInYouHave(e.baWebID).baLineList;
                 baWebController.baWebType = e.baWebType;
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
             this.RegisterEvent<SendBaEvent>(e =>
@@ -49,17 +51,24 @@ namespace TapTapFirst
         }
         public void UpdateBarList()
         {
-            if(baSystem.GetBaYouHaveList().Count < this.transform.childCount - 3)
+            if (baListSystem.GetbaLineListYouHave().Count <= this.transform.childCount - 3)
             {
                 Debug.Log("不更新");
                 return;
             }
-            foreach(var i in baSystem.GetBaYouHaveList())
+            foreach (var i in baListSystem.GetbaLineListYouHave())
             {
-                GameObject baLine = Instantiate(baLineProject,this.transform);
-                baLine.GetComponent<baLineSingle>().baLineSingleData = i;
+                if (i == null) continue;
+                if(baListSystem.GetIsCheckbaList().Contains(i))
+                {
+                    i.isGetTag = true;
+                    i.isGetNewsTemp = true;
+                }
+                GameObject baLine = Instantiate(baLineProject, this.transform);
+                baLine.GetComponent<baLineSingle>().baLineSingleData = i.baLineList[0];
                 baLine.transform.SetSiblingIndex(3);
             }
+            
         }
 
         public IArchitecture GetArchitecture()

@@ -12,6 +12,7 @@ namespace TapTapFirst
             // 注册工具类
             this.RegisterUtility<IJsonSaveUtility>(save);
             //注册系统类
+            RegisterSystem<IbaListSystem>(new baListSystem());
             RegisterSystem<IbaSystem>(new baSystem());
             RegisterSystem<IEmailListSystem>(new EmailListSystem());
             RegisterSystem<IGlobalManagerSystem>(new GlobalManagerSystem());
@@ -44,6 +45,7 @@ namespace TapTapFirst
             save.Add<TaskModelData>();
             save.Add<EmailListSystemData>();
             save.Add<baSystemData>();
+            save.Add<baListSystemData>();
             #endregion
             
 
