@@ -179,7 +179,7 @@ namespace QFramework
         [DidReloadScripts]
         static void Compile()
         {
-            Default.OnCompile();
+            //Default.OnCompile();
         }
     }
 }
