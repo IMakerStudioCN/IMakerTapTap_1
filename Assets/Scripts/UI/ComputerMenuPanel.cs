@@ -68,7 +68,15 @@ namespace TapTapFirst
         // 3. 关闭当前面板
         private void OnClickCloseSelf()
         {
+            //先调用CloseSelf触发正常的生命周期
             CloseSelf();
+
+            // 同步桌面的 Menu 开关状态，避免下次要点两下
+            ComputerDisplay display = UIKit.GetPanel<ComputerDisplay>();
+            if (display != null && display.Menu != null)
+            {
+                display.Menu.SetIsOnWithoutNotify(false);
+            }
         }
 
         protected override void OnOpen(IUIData uiData = null) { }
