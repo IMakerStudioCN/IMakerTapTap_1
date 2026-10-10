@@ -31,7 +31,11 @@ namespace TapTapFirst
             
             NewPlace.onClick.AddListener(() =>
             {
-                TapTap.Interface.SendEvent(new OnTakeTask { Place = this.Place });
+                TapTap.Interface.SendEvent(new OnTakeTask
+                {
+                    Place = this.Place,
+                    Task = mEmailSystem.GetTaskByEmail(currentId)
+                });
                 TapTap.Interface.SendEvent(new HaveNewMessageEvent { webID = 1 });
                 NewPlace.gameObject.SetActive(false);
                 //加入到IsCheck列表

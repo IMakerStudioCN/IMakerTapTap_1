@@ -48,6 +48,7 @@ namespace TapTapFirst
 
             this.RegisterEvent<SendEmailEvent>(e =>
             {
+                this.transform.DestroyChildren();
                 //接受发送的邮件ID事件，更新邮件列表
                 UpdateEmailList();
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
@@ -63,22 +64,33 @@ namespace TapTapFirst
         //更新邮件软件的邮件列表
         public void UpdateEmailList()
         {
+            
             foreach(var line in EmailListSystem.GetEmailYouHaveList())
             {
                 if (line == null) continue;
-                if(mShowIDs.Contains(line.EmailID)) continue;
+                if (mShowIDs.Contains(line.EmailID)) {
+                    CreatList(line); 
+                    continue;
+                }
                 line.isCheck = false;
                 if (EmailListSystem.GetEmailCheck().Contains(line))
                 {
                     line.isCheck = true;
                 }
-                
-                GameObject item = Instantiate(EmailPrefab, this.transform);
-                item.transform.SetAsFirstSibling();
-                item.GetComponent<EmailLineSingle>().EmailLineData = line;
+
+                CreatList(line);
+
                 mShowIDs.Add(line.EmailID);
             }
 
+        }
+
+        private void CreatList(EmailLine_SO line)
+        {
+            GameObject item = Instantiate(EmailPrefab, this.transform);
+
+            item.transform.SetAsFirstSibling();
+            item.GetComponent<EmailLineSingle>().EmailLineData = line;
         }
 
         public IArchitecture GetArchitecture()

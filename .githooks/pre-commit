@@ -1,0 +1,17 @@
+#!/bin/sh
+# 提交前检查：暂存区里有没有残留的 git 冲突标记（<<<<<<< / >>>>>>>）
+# 启用方式（每个仓库做一次）：git config core.hooksPath .githooks
+# 跳过：git commit --no-verify
+
+ROOT=$(git rev-parse --show-toplevel) || exit 0
+
+if command -v pwsh >/dev/null 2>&1; then
+    PWSH=pwsh
+elif command -v powershell >/dev/null 2>&1; then
+    PWSH=powershell
+else
+    echo "[asset-integrity] 没找到 pwsh/powershell，跳过检查" >&2
+    exit 0
+fi
+
+exec "$PWSH" -NoProfile -ExecutionPolicy Bypass -File "$ROOT/Tools/CheckAssetIntegrity.ps1" -Mode Staged

@@ -22,6 +22,7 @@ namespace TapTapFirst
             this.RegisterSystem<IMapSystem>(new MapSystem());
             RegisterSystem<ITagSystem>(new TagSystem());
             this.RegisterSystem<ITaskSystem>(new  TaskSystem());
+            this.RegisterSystem<IDialogSystem>(new DialogSystem());
             RegisterSystem<INewsSystem>(new NewsSystem());
             // 注册模型类
             RegisterModel<IGlobalManagerModel>(new GlobalManagerModel());
@@ -48,8 +49,9 @@ namespace TapTapFirst
             save.Add<TaskModelData>();
             save.Add<EmailListSystemData>();
             save.Add<NewsTemplateSaveData>();
+            save.Add<TagFillSaveData>();
             #endregion
-            
+
 
 
 

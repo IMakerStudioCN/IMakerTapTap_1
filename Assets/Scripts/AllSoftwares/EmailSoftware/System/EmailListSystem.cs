@@ -29,6 +29,10 @@ namespace TapTapFirst
         EmailLine_SO GetEmailLineByIDInYouHave(int EmailID);
         //初始化EmilLine
         void StartEmilLine(List<EmailLine_SO> emailLine);
+
+        //供外部传递Task
+        public TaskSingle GetTaskByEmail(int EmailID);
+        public TaskSingle GetTaskByPlace(string placeName);
     }
 
     public class EmailListSystem : AbstractSystem, IEmailListSystem
@@ -44,6 +48,8 @@ namespace TapTapFirst
 
         public List<int> EmailYouHaveData;
 
+        private readonly Dictionary<int,TaskSingle> mTaskByEmail = new Dictionary<int,TaskSingle>();
+
         
         //找对应ID的邮件
         
@@ -57,8 +63,20 @@ namespace TapTapFirst
             //注册事件
             this.RegisterEvent<SendEmailEvent>(e =>
             {
-                //接受发送的邮件ID事件，更新邮件列表
-                AddEmailYouHave(e.EmailWebID);
+                if(e.Task != null)
+                {
+                    mTaskByEmail[e.EmailWebID] = e.Task;
+                    //接受发送的邮件ID事件，更新邮件列表
+                    AddEmailYouHave(e.Task.EmailId);
+                }  
+            });
+            this.RegisterEvent<OnTaskEnd>(e =>
+            {
+                if (CheckEmailYouHave(e.endTask.EmailId))
+                {
+                    DelEmailYouHave(e.endTask.EmailId);
+                    this.SendEvent<SendEmailEvent>();
+                }
             });
         }
         public EmailLine_SO GetEmailLineByID(int id)
@@ -126,6 +144,25 @@ namespace TapTapFirst
         {
             EmailLineList_SO listSO = mResLoader.LoadSync<EmailLineList_SO>("EmailLineList_SO");
             EmailLineList = (listSO != null && listSO.EmailLines != null) ? listSO.EmailLines : new List<EmailLine_SO>();
+        }
+
+        //新增两个方法供模块外引用
+        public TaskSingle GetTaskByEmail(int EmailID)
+        {
+            return mTaskByEmail.TryGetValue(EmailID,out TaskSingle task) ? task : null;
+        }
+
+        public TaskSingle GetTaskByPlace(string placeName)
+        {
+            if (string.IsNullOrEmpty(placeName)) return null;
+            foreach(EmailLine_SO line in EmailYouHaveList)
+            {
+                if(line == null || line.Place == null) continue;
+                if(System.Array.IndexOf(line.Place,placeName) <0) continue;
+                TaskSingle task = GetTaskByEmail(line.EmailID);
+                if(task != null) return task;
+            }
+            return null;
         }
 
     }

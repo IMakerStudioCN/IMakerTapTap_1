@@ -1,4 +1,4 @@
-using QFramework;
+﻿using QFramework;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -21,6 +21,48 @@ namespace TapTapFirst
         private IPlayerModel playerModel;
         private ITimeModel timeModel;
         private IGlobalManagerModel globalModel;
+
+        protected override void OnInit()
+        {
+            playerModel = this.GetModel<IPlayerModel>();
+            timeModel = this.GetModel<ITimeModel>();
+            globalModel = this.GetModel<IGlobalManagerModel>();
+            //在这里注册监听者
+            this.RegisterEvent<OnDaysChangeEvent>(e =>
+            {
+                if (timeModel.days >= timeModel.endDays)
+                {
+                    Debug.Log("游戏结束");
+                    EndTheGame();
+                }
+
+
+            });
+            this.RegisterEvent<EvilValueChangeEvent>(e =>
+            {
+                if (playerModel.EvilValue <= 0)
+                {
+                    Debug.Log("游戏结束");
+                    EndTheGame();
+                }
+            });
+            this.RegisterEvent<CredibilityValueChangeEvent>(e =>
+            {
+                if (playerModel.CredibilityValue <= 0)
+                {
+                    Debug.Log("游戏结束");
+                    EndTheGame();
+                }
+            });
+            this.RegisterEvent<FundsValueChangeEvent>(e =>
+            {
+                if (playerModel.FundsValue < playerModel.TargetFundsValue * 0.8)
+                {
+                    Debug.Log("游戏结束");
+                    EndTheGame();
+                }
+            });
+        }
 
         /// <summary>
         /// 返回结局的序号 
@@ -64,47 +106,7 @@ namespace TapTapFirst
             //暂定1000为目标资金
             Debug.LogWarning("触发结局：" + WhichEnd(1000));
         }
-        protected override void OnInit()
-        {
-            playerModel = this.GetModel<IPlayerModel>();
-            timeModel = this.GetModel<ITimeModel>();
-            globalModel = this.GetModel<IGlobalManagerModel>();
-            //在这里注册监听者
-            this.RegisterEvent<OnDaysChangeEvent>(e =>
-            {
-                if(timeModel.days >=timeModel.endDays)
-                {
-                    Debug.Log("游戏结束");
-                    EndTheGame();
-                }
-
-
-            });
-            this.RegisterEvent<EvilValueChangeEvent>(e =>
-            {
-                if(playerModel.EvilValue <= 0)
-                {
-                    Debug.Log("游戏结束");
-                    EndTheGame();
-                }
-            });
-            this.RegisterEvent<CredibilityValueChangeEvent>(e => 
-            {
-                if (playerModel.CredibilityValue <= 0)
-                {
-                    Debug.Log("游戏结束");
-                    EndTheGame();
-                }
-            });
-            this.RegisterEvent<FundsValueChangeEvent>(e =>
-            {
-                if(playerModel.FundsValue< playerModel.TargetFundsValue*0.8)
-                {
-                    Debug.Log("游戏结束");
-                    EndTheGame();
-                }
-            });
-        }
+        
 
     }
 }
