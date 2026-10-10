@@ -1,0 +1,12 @@
+# 「已有 .meta 的 GUID 被主动改动」允许清单
+#
+# CheckAssetIntegrity.ps1 -Mode Diff 默认把「某个已存在的 .meta 的 guid 发生变更」视为错误，
+# 因为这类改动会让场景 / 预制件里已经写好的 GUID 引用全部悬空（最近两次资源丢失都是这个原因）。
+# 确属有意改动时，在这里登记一行即可放行：
+#
+#   <相对路径>  [<旧 GUID>]  [<新 GUID>]
+#
+# 例：
+#   Assets/Art/ui/start/startgame.png.meta  97f70a6a44e9b1241931c7ca2e5890c8  1bd4d5b875358144b90400d4f4c1888e
+#
+# 只写路径时表示该文件任意 GUID 变更都放行；建议同时写旧/新 GUID 以便追溯。

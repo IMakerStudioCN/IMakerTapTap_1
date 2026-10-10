@@ -1,0 +1,17 @@
+# 已知并可接受的悬空 GUID 引用基线清单（每行一个 GUID，# 后面是注释）
+#
+# 用途：CheckAssetIntegrity.ps1 -Mode Full 在扫描"悬空 GUID 引用"时，会忽略这里登记的 GUID。
+#       这样历史遗留的噪声不会让检查失败，但任何**新增**的悬空引用都会被拦下来。
+# 维护：确认为历史遗留 / 框架模板自带 / 指向已删除资源且不影响运行，才登记到这里。
+
+f70555f144d8491a825f0804e09c671c    # Unity 旧版内置 UnityEngine.UI 程序集 GUID（QFramework 模板 prefab 引用），Unity 会自动重映射
+f5f67c52d1564df4a8936ccd202a3bd8    # 同上，QFramework UIRoot.prefab / ScreenTransitionCanvas.prefab
+56188b5c36237a742b4994dae15eb7ee    # QFramework ResKit HotFix 示例 CommonConfirm.prefab 自带的缺失贴图
+f20bbb4905f670f4db2314b0f6ba363b    # 同上
+f700b4e867e15e841b95dbf91a6894ee    # 同上
+57847d6835fd93549aed95803afa6375    # Assets/Scenes/Test.unity 上挂的脚本已删除（测试场景）
+a6560a915ef98420e9faacc1c7438823    # Assets/Settings/SampleSceneProfile.asset 已删除（URP 体积配置）
+e634585d5c4544dd297acaee93dc2beb    # URP Renderer Data 上引用的已删除资源
+707360a9c581a4bd7aa53bfeb1429f71    # URP Renderer Data 上引用的已删除资源
+7871f9406eb5023459b925f7f3f6cd8e    # Assets/Config/Prefabs/software.prefab 引用的 softwareTest.asset 已删除
+d2c44af2d6c414d4cb1b2d2d8849d400    # QFramework PackageKit Markdown 的 .guiskin 引用的 Unity 内置字体 GUID（Unity 内部注册，工程里没有 .meta）

@@ -1,0 +1,31 @@
+name: asset-integrity
+
+# 资源完整性闸门：
+#   - 本次改动里有没有残留的 git 冲突标记
+#   - 有没有把已存在的 .meta 的 GUID 换掉却没同步引用（历史上两次美术丢失的根因）
+#   - 有没有重复 GUID
+# 悬空 GUID 引用的全量扫描依赖 Library/PackageCache，留给本地 Tools/CheckAssetIntegrity.ps1 -Mode Full。
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: asset integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Fetch main
+        shell: bash
+        run: git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
+
+      - name: Check asset integrity
+        shell: pwsh
+        run: ./Tools/CheckAssetIntegrity.ps1 -Mode Diff -Base origin/main
