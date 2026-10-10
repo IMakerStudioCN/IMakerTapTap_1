@@ -1,0 +1,7 @@
+# 「资源文件缺少配套 .meta」的例外清单（每行一个仓库相对路径）
+#
+# Assets 下的资源文件如果没有 .meta，Unity 会在每台机器上各自生成一个随机 GUID，
+# 一旦有人提交上去，合并时就会出现同路径两个 GUID 的冲突（popup.png 就是这么出事的）。
+# 生成物 / 缓存文件可以登记在这里豁免。
+
+Assets/.qframework/PackageManager/PackageInfosRequestCache.json    # QFramework 包管理器缓存，本不该入库
