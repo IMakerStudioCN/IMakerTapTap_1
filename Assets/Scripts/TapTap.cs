@@ -49,8 +49,9 @@ namespace TapTapFirst
             save.Add<TaskModelData>();
             save.Add<EmailListSystemData>();
             save.Add<NewsTemplateSaveData>();
+            save.Add<TagFillSaveData>();
             #endregion
-            
+
 
 
 
