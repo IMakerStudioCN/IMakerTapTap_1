@@ -15,6 +15,8 @@ namespace TapTapFirst
         void setDicisFalse(int windowID);//设置为假
         Dictionary<int, bool> getDic();//获取字典
 
+        
+
     }
 
     public class SoftwareSystem : AbstractSystem, ISoftwareSystem
