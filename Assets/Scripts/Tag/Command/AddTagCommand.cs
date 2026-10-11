@@ -1,4 +1,4 @@
-﻿using QFramework;
+using QFramework;
 using System.Collections;
 using System.Collections.Generic;
 using TapTapFirst;
@@ -27,7 +27,7 @@ namespace TapTapFirst
 
 
             //发送事件通知
-            this.SendEvent(new TagAcquiredEvent());
+            this.SendEvent(new TagAcquiredEvent { tagId = tagId });
         }
 
     }

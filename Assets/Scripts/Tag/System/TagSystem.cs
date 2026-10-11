@@ -1,4 +1,4 @@
-﻿using Markdig.Extensions.TaskLists;
+using Markdig.Extensions.TaskLists;
 using QFramework;
 using System.Collections;
 using System.Collections.Generic;
@@ -150,9 +150,21 @@ namespace TapTapFirst
 
         private void OnTagAcquired(TagAcquiredEvent e)
         {
+            bool isNew = !IsAcquired(e.tagId);
             Acquire(e.tagId);
             Debug.Log($"TagAcquiredEvent触发，tagId: {e.tagId}，已调用Acquire方法");
 
+            if (isNew)
+            {
+                var tag = GetConfig(e.tagId);
+                if (tag != null)
+                {
+                    UIKit.OpenPanel<KeywordPopup>(
+                        UILevel.PopUI,
+                        new KeywordPopupData { Keyword = tag.tagName },
+                        prefabName: "KeywordPopup");
+                }
+            }
         }
 
 

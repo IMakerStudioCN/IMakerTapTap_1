@@ -2,11 +2,13 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using QFramework;
+using TMPro;
 
 namespace TapTapFirst
 {
     public class KeywordPopupData : UIPanelData
     {
+        public string Keyword;
     }
 
     public partial class KeywordPopup : UIPanel
@@ -17,6 +19,9 @@ namespace TapTapFirst
         // 弹窗音效名（对应 Resources 里音频文件的名字，不含扩展名）
         //private const string PopupSoundName = "keyword_popup";
 
+        // 关键词文字
+        public TextMeshProUGUI KeywordText;
+
         private Coroutine mAutoHideCoroutine;
 
         protected override void OnInit(IUIData uiData = null)
@@ -26,12 +31,17 @@ namespace TapTapFirst
 
         protected override void OnOpen(IUIData uiData = null)
         {
+            var data = uiData as KeywordPopupData;
+            if (data != null && KeywordText != null)
+            {
+                KeywordText.text = $"获得了 {data.Keyword} 关键词";
+            }
         }
 
         protected override void OnShow()
         {
             // 显示时播放弹窗音效
-           // AudioKit.PlaySound(PopupSoundName);
+            // AudioKit.PlaySound(PopupSoundName);
 
             // 每次显示都重新计时，避免残留上一个计时器
             StopAutoHide();
