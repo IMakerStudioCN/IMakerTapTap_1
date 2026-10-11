@@ -12,8 +12,9 @@ namespace TapTapFirst
             // 注册工具类
             this.RegisterUtility<IJsonSaveUtility>(save);
             //注册系统类
+            RegisterSystem<ImyRepliesSystem>(new myRepliesSystem());
             RegisterSystem<IbaListSystem>(new baListSystem());
-            //RegisterSystem<IbaSystem>(new baSystem());
+            RegisterSystem<IMybaSystem>(new MybaSystem());
             RegisterSystem<IEmailListSystem>(new EmailListSystem());
             RegisterSystem<IGlobalManagerSystem>(new GlobalManagerSystem());
             RegisterSystem<ISoftwareSystem>(new SoftwareSystem());
@@ -40,6 +41,7 @@ namespace TapTapFirst
 
             // 游戏开始：提前把要保存的纯 C# 类放进字典 ，不要在Controller里用Add和Remove
             #region 添加要纯C#的数据
+            save.Add<mybaSystemData>();
             save.Add<baListSystemData>();
             save.Add<baSystemData>();
             save.Add<TagListSaveData>(); 
