@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using QFramework;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace TapTapFirst
 {
@@ -35,26 +36,51 @@ namespace TapTapFirst
         }
         public baLineSingleSO GetbalaReply()
         {
+            if (balaReplyList == null || balaReplyList.Count == 0)
+            {
+                Debug.LogWarning("胡扯评论列表没有东西");
+                return null;
+            }
             return balaReplyList[mRandom.Next(0,balaReplyList.Count)];
         }
 
         public baLineSingleSO GetevilReply()
         {
+            if (evilReplyList == null || evilReplyList.Count == 0)
+            {
+                Debug.LogWarning("邪恶评论列表没有东西");
+                return null;
+            }
             return evilReplyList[mRandom.Next(0, evilReplyList.Count)];
         }
 
         public baLineSingleSO GetfairReply()
         {
+            if (fairReplyList == null || fairReplyList.Count == 0)
+            {
+                Debug.LogWarning("公正评论列表没有东西");
+                return null;
+            }
             return fairReplyList[mRandom.Next(0, fairReplyList.Count)];
         }
 
         public baLineSingleSO GetnormalReply()
         {
+            if (normalReplyList == null || normalReplyList.Count == 0)
+            {
+                Debug.LogWarning("正常评论列表没有东西");
+                return null;
+            }
             return normalReplyList[mRandom.Next(0, normalReplyList.Count)];
         }
 
         public baLineSingleSO GetotherReply()
         {
+            if (otherReplyList == null || otherReplyList.Count == 0)
+            {
+                Debug.LogWarning("其他评论列表没有东西");
+                return null;
+            }
             return otherReplyList[mRandom.Next(0, otherReplyList.Count)];
         }
 
