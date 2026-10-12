@@ -17,9 +17,13 @@ namespace TapTapFirst
         public baLineSingleSO baLineSingle;
         void Start()
         {
-            writter.text = baLineSingle.writter;
-            content.text = baLineSingle.content;
-            data.text = baLineSingle.data;
+            if(baLineSingle != null)
+            {
+                writter.text = baLineSingle.writter;
+                content.text = baLineSingle.content;
+                data.text = baLineSingle.data;
+            }
+
         }
 
 
