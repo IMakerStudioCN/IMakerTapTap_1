@@ -15,6 +15,8 @@ namespace TapTapFirst
         private TextMeshProUGUI buttonText;//软件名称
         [SerializeField]
         private GameObject haveNewMessage;//红点标记
+        [SerializeField]
+        public bool softwareIsLock;
 
         private ISoftwareSystem softwareSystem;
         private void Start()
@@ -31,6 +33,8 @@ namespace TapTapFirst
             //点击软件，然后发送command
             button.onClick.AddListener(() =>
             {
+                if (softwareIsLock)
+                    return;
                 softwareSystem.clickSoftware(softwareData.webID);
                 clickSoftware();
             });

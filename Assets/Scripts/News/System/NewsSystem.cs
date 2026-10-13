@@ -206,13 +206,13 @@ namespace TapTapFirst
             mWrittenNews.Clear();
         }
 
-        // ============================================================
-        //  已获得的新闻
-        // ============================================================
+        public NewsTemplate_SO GetConfig(int newsId) => GetNewsTemplateById(newsId);
+            //newsList != null ? newsList.GetNewsTemplateById(newsId) : null;//根据ID获取新闻模板
 
-        public NewsTemplate_SO GetConfig(int newsId) =>
-            newsList != null ? newsList.GetNewsTemplateById(newsId) : null;//根据ID获取新闻模板
-
+        public NewsTemplate_SO GetNewsTemplateById(int newsId)
+        {
+            return newsList.newsTemplateList.Find(tag => tag.newsId == newsId);
+        }
         public bool IsAcquired(int newsId)
         {
             NewsTemplateSaveData save = GetSaveData();

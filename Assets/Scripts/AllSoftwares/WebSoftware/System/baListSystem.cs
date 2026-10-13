@@ -40,8 +40,16 @@ namespace TapTapFirst
             AllbaList = mResLoader.LoadSync<baListList_SO>("baListList").baLineList;
             baLineListYouHave = mJsonSaveUtility.Get<baListSystemData>("baListSystemData").baLineListYouHave;
             if (baLineListYouHave == null)
-                Debug.LogWarning("kong");
+            {
+                Debug.LogWarning("你现在可以查看的ba为空");
+                baLineListYouHave = new List<baLineList_SO>();
+            }
             isCheckbaList = mJsonSaveUtility.Get<baListSystemData>("baListSystemData").isCheckbaList;
+            if (isCheckbaList == null)
+            {
+                Debug.LogWarning("你现在依旧查看的ba为空");
+                isCheckbaList = new List<baLineList_SO>();
+            }
             //订阅
             this.RegisterEvent<SendBaEvent>(e =>
             {
