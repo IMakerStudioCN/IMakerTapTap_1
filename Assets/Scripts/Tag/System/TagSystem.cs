@@ -15,6 +15,9 @@ namespace TapTapFirst
         void Acquire(int tagId);
         Tag_SO GetTagById(int id);
         void UpdateAcquiredTaglist();
+
+        /// <summary>已获得的 Tag 列表（由存档里的 id 反查配置得到，始终和存档一致）</summary>
+        List<Tag_SO> GetAcquiredTagList();
     }
 
     public class TagSystem : AbstractSystem, ITagSystem
@@ -78,14 +81,43 @@ namespace TapTapFirst
             }
         }
 
+        /// <summary>
+        /// 用存档里的 id 重建"已获得 Tag"列表（反查总表，拿不到配置的跳过）。
+        /// 和 NewsSystem 的做法保持一致：存档只信 id，配置靠反查。
+        /// </summary>
         public void UpdateAcquiredTaglist()
         {
+            acquiredTaglist.Clear();
+
             TagListSaveData data = saveUtility.Get<TagListSaveData>("TagListSaveData");
 
-            if (data != null)
+            if (data == null || data.palyerAcquiredIds == null)
             {
-                acquiredTaglist = data.palyerAcquired;
+                return;
             }
+
+            foreach (int tagId in data.palyerAcquiredIds)
+            {
+                Tag_SO tag = GetTagById(tagId);
+
+                if (tag == null)
+                {
+                    Debug.LogWarning($"[TagSystem] 存档里的 Tag {tagId} 在 Tag_List_SO 中不存在，已跳过");
+                    continue;
+                }
+
+                if (!acquiredTaglist.Contains(tag))
+                {
+                    acquiredTaglist.Add(tag);
+                }
+            }
+        }
+
+        /// <summary>已获得的 Tag 列表（列表内容归本系统所有，调用方只读遍历）。</summary>
+        public List<Tag_SO> GetAcquiredTagList()
+        {
+            UpdateAcquiredTaglist();
+            return acquiredTaglist;
         }
 
         /// <summary>

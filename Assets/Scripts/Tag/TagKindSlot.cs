@@ -118,6 +118,14 @@ namespace TapTapFirst
         /// <summary>把 Tag 填进这个空缺。</summary>
         public void Place(Tag_SO tag, TagOption source = null)
         {
+            Log($"Place 被调用：slotId={mSlotId} tagId={(tag != null ? tag.tagId : -1)} 当前是否已填={IsFilled} 帧={Time.frameCount}");
+
+            // 幂等：同一个 Tag 重复放入就直接返回（拖动过程中可能被反复触发）
+            if (mTag == tag)
+            {
+                return;
+            }
+
             if (tag == null)
             {
                 return;
@@ -132,7 +140,8 @@ namespace TapTapFirst
             mSource = source;
 
             EnsureDisplay();
-            mDisplay?.SetTag(tag);
+            mDisplay.LogEventsEnabled = mLog;   // 空缺开了日志，显示件也跟着开
+            mDisplay.SetTag(tag);
             Refresh();
             Changed?.Invoke(this);
 
@@ -163,6 +172,63 @@ namespace TapTapFirst
         }
 
         /// <summary>刷新显示。</summary>
+        /// <summary>
+        /// 让空缺里的 Tag 显示件与空缺齐平（四边拉伸、offset 归零）。
+        /// 预制体上若挂了 LayoutElement / ContentSizeFitter / AspectRatioFitter，
+        /// 它们会盖过锚点，这里一并忽略掉。
+        /// </summary>
+        public void StretchDisplayToFill()
+        {
+            if (mDisplay == null)
+            {
+                return;
+            }
+
+            StretchRectToFill(mDisplay.transform as RectTransform);
+        }
+
+        /// <summary>把某个 RectTransform 拉成铺满父级。</summary>
+        private static void StretchRectToFill(RectTransform rect)
+        {
+            if (rect == null)
+            {
+                return;
+            }
+
+            LayoutElement layoutElement = rect.GetComponent<LayoutElement>();
+
+            if (layoutElement != null)
+            {
+                layoutElement.ignoreLayout = true;
+            }
+
+            ContentSizeFitter sizeFitter = rect.GetComponent<ContentSizeFitter>();
+
+            if (sizeFitter != null)
+            {
+                sizeFitter.enabled = false;
+            }
+
+            AspectRatioFitter aspectFitter = rect.GetComponent<AspectRatioFitter>();
+
+            if (aspectFitter != null)
+            {
+                aspectFitter.enabled = false;
+            }
+
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            // 位置 / 缩放也归一，避免预制体留下的坐标把内容顶偏
+            rect.anchoredPosition = Vector2.zero;
+            rect.localScale = Vector3.one;
+            rect.localRotation = Quaternion.identity;
+            rect.SetAsLastSibling();
+        }
+
         public void Refresh()
         {
             bool filled = mTag != null;
@@ -175,6 +241,7 @@ namespace TapTapFirst
             if (filled && mDisplay != null)
             {
                 mDisplay.SetTag(mTag);
+                StretchDisplayToFill();
             }
 
             ApplyHighlight(false);
@@ -204,16 +271,15 @@ namespace TapTapFirst
                 GameObject go = new GameObject("TagDisplay", typeof(RectTransform));
                 RectTransform rect = (RectTransform)go.transform;
                 rect.SetParent(transform, false);
-                rect.anchorMin = Vector2.zero;
-                rect.anchorMax = Vector2.one;
-                rect.offsetMin = Vector2.zero;
-                rect.offsetMax = Vector2.zero;
 
                 mDisplay = go.AddComponent<TagDisplay>();
             }
 
             mDisplay.Owner = this;
-            mDisplay.transform.SetAsLastSibling();
+
+            // 让 Tag 与空缺齐平。预制体自带的 anchoredPosition / sizeDelta /
+            // LayoutElement 都会盖过锚点，所以统一放在最后处理。
+            StretchDisplayToFill();
         }
 
         /// <summary>运行时 / 编辑器里配置这个空缺（生成器用）。</summary>
@@ -247,6 +313,28 @@ namespace TapTapFirst
             mHighlight = highlight;
             mOriginColorCached = false;
         }
+        /// <summary>
+        /// 只把空缺标记成【空】，不销毁里面那份显示副本。
+        /// 供 TagDisplay.OnBeginDrag 使用：拖拽开始时如果把自己 Destroy 掉，
+        /// EventSystem 会找不到 pointerDrag，OnEndDrag 永不触发，拖动幽灵会永久留在屏幕上。
+        /// </summary>
+        public void MarkEmptied()
+        {
+            if (mTag == null && mDisplay == null)
+            {
+                return;
+            }
+
+            mTag = null;
+            mSource = null;
+            mDisplay = null;   // 副本由调用方（正在拖动的那个 TagDisplay）自己负责销毁
+
+            Refresh();
+            Changed?.Invoke(this);
+
+            Log("已标记为空（显示副本保留到拖拽结束）");
+        }
+
         // ---------------- 悬停高亮 ----------------
 
         public void SetHighlight(bool on)

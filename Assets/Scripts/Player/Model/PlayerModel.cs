@@ -8,14 +8,37 @@ namespace TapTapFirst
         int TargetFundsValue { get; set; }
         int EvilValue { get; set; }
         int CredibilityValue { get; set; }
+        int PageViews { get; set; }
+        int MoralityValue { get; set; }
+        int PressureValue { get; set; }
+
+        int basePageViews { get; }
+        int baseMoralityValue { get; }
+        int basePressureValue { get; }
+
+
+
     }
     public class PlayerModel : AbstractModel, IPlayerModel
-    {
+    {   
+
+
+            
         public int FundsValue { get; set; } = 1;
         public int EvilValue { get; set; } = 1;
         public int CredibilityValue { get; set; } = 1;
 
         public int TargetFundsValue { get; set; } = 1000;
+        public int PageViews { get; set; } = 30000;
+        public int MoralityValue { get; set; } = 70;
+        public int PressureValue { get; set; } = 400;
+
+        public int basePageViews { get; } = 30000 ;
+
+        public int baseMoralityValue { get; } = 70;
+
+        public int basePressureValue { get; } = 400;
+
         protected override void OnInit()
         {
         }
