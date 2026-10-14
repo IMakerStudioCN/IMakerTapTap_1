@@ -12,6 +12,7 @@ public class TaskSingle : ScriptableObject
     public string dialogTitle;
 
     public bool ismain;
+
     public TaskSingle prePosition;
 
     public int EmailId;
