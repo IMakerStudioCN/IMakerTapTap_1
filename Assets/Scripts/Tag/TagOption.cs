@@ -32,6 +32,9 @@ namespace TapTapFirst
         [Tooltip("拖动副本相对鼠标的偏移")]
         [SerializeField] private Vector2 mDragOffset = Vector2.zero;
 
+        [Tooltip("拖动时显示的副本预制体；留空则自动生成一个带文字的半透明幽灵")]
+        [SerializeField] private GameObject mDragGhostPrefab;
+
         [Tooltip("拖动时副本的透明度")]
         [Range(0.2f, 1f)]
         [SerializeField] private float mDragAlpha = 0.9f;
@@ -41,7 +44,6 @@ namespace TapTapFirst
 
         private RectTransform mRect;
         private RectTransform mDragLayer;
-        private CanvasGroup mDragLayerGroup;
         private Canvas mCanvas;
 
         private TagDisplay mGhost;          // 拖动中的副本
@@ -167,7 +169,7 @@ namespace TapTapFirst
                 return;
             }
 
-            TagKindSlot target = FindSlotUnder(eventData);
+            TagKindSlot target = FindDropTarget(eventData);   // 落点判定更严格
             SetHover(null);
 
             if (target != null)
@@ -189,43 +191,53 @@ namespace TapTapFirst
         //  内部
         // ============================================================
 
-        private TagDisplay CreateGhost()
+                private TagDisplay CreateGhost()
         {
-            GameObject go = new GameObject("TagGhost", typeof(RectTransform));
-            RectTransform rect = (RectTransform)go.transform;
-            rect.SetParent(mDragLayer, false);
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta = mRect.rect.size;
-            rect.SetAsLastSibling();
+            // 幽灵必须"看得见"：之前只建了空 GameObject + TagDisplay 组件，
+            // 既没有 Image 也没有文字，等于一个隐身物体跟着鼠标，玩家什么都看不到。
+            TMP_FontAsset font = null;
+            TMP_Text ownLabel = GetComponentInChildren<TMP_Text>(true);
 
-            CanvasGroup group = go.AddComponent<CanvasGroup>();
-            group.alpha = mDragAlpha;
-            group.blocksRaycasts = false;
-            group.interactable = false;
+            if (ownLabel != null)
+            {
+                font = ownLabel.font;
+            }
 
-            TagDisplay display = go.AddComponent<TagDisplay>();
-            display.Owner = null;
-            display.SetTag(mTagData);
-            display.SetPreviewText(DisplayText);
-
-            return display;
+            return TagDragUtility.CreateGhost(
+                mDragLayer,
+                mDragGhostPrefab,
+                DisplayText,
+                mRect.rect.size,
+                mDragAlpha,
+                font);
         }
 
         /// <summary>鼠标下方的空缺（矩形内优先，否则取最近且在吸附半径内的）。</summary>
+        /// <summary>鼠标下的空缺（高亮用：允许一点余量，方便看出"会吸到哪"）。</summary>
         private TagKindSlot FindSlotUnder(PointerEventData eventData)
+        {
+            return FindSlotUnder(eventData, SnapRadiusForHover);
+        }
+
+        /// <summary>松手落点：必须鼠标真的在空缺框里（或极小的容差内），避免"路过就被挂上"。</summary>
+        private TagKindSlot FindDropTarget(PointerEventData eventData)
+        {
+            return FindSlotUnder(eventData, DropTolerance);
+        }
+
+        private const float SnapRadiusForHover = 140f;   // 高亮提示用
+        private const float DropTolerance = 12f;         // 真正落点的容差
+
+        private TagKindSlot FindSlotUnder(PointerEventData eventData, float tolerance)
         {
             TagKindSlot inside = null;
             TagKindSlot nearest = null;
             float nearestDistance = float.MaxValue;
 
-            const float snapDistance = 140f;
-
             foreach (TagKindSlot slot in TagKindSlot.AllSlots)
             {
                 if (slot == null || !slot.isActiveAndEnabled) continue;
-                if (slot.IsFilled) continue;               // 已填的空缺需要先清空/替换由 Place 处理
+                if (slot.IsFilled) continue;
 
                 RectTransform rect = slot.transform as RectTransform;
 
@@ -255,7 +267,7 @@ namespace TapTapFirst
                 return inside;
             }
 
-            return nearest != null && nearestDistance <= snapDistance ? nearest : null;
+            return nearest != null && nearestDistance <= tolerance ? nearest : null;
         }
 
         private static float DistanceToRect(RectTransform rect, Vector2 pointer, Camera camera)
@@ -285,13 +297,8 @@ namespace TapTapFirst
             mHoverSlot?.SetHighlight(true);
         }
 
-        private void EnsureDragLayer()
+                private void EnsureDragLayer()
         {
-            if (mDragLayer != null)
-            {
-                return;
-            }
-
             if (mCanvas == null)
             {
                 mCanvas = GetComponentInParent<Canvas>();
@@ -303,20 +310,8 @@ namespace TapTapFirst
                 return;
             }
 
-            GameObject go = new GameObject("TagDragLayer", typeof(RectTransform));
-            RectTransform rect = (RectTransform)go.transform;
-            rect.SetParent(mCanvas.transform, false);
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-            rect.SetAsLastSibling();
-
-            mDragLayerGroup = go.AddComponent<CanvasGroup>();
-            mDragLayerGroup.blocksRaycasts = false;
-            mDragLayerGroup.interactable = false;
-
-            mDragLayer = rect;
+            // 整个 Canvas 共用一份拖拽层，重复创建会导致多层叠加、互相干扰
+            mDragLayer = TagDragUtility.GetLayer(mCanvas);
         }
 
         /// <summary>就地打印一条诊断日志。</summary>

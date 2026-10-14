@@ -1,4 +1,4 @@
-﻿using QFramework;
+using QFramework;
 
 namespace TapTapFirst
 {
@@ -52,6 +52,7 @@ namespace TapTapFirst
             save.Add<EmailListSystemData>();
             save.Add<NewsTemplateSaveData>();
             save.Add<TagFillSaveData>();
+            save.Add<NewsResultSaveData>();
             #endregion
 
 

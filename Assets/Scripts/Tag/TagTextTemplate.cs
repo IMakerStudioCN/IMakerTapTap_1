@@ -134,6 +134,7 @@ namespace TapTapFirst
             {
                 if (segment.IsSlot)
                 {
+                    segment.Slot.Changed -= OnSlotChanged;
                     segment.Slot.Changed += OnSlotChanged;
                 }
             }
@@ -408,7 +409,22 @@ namespace TapTapFirst
                 }
             }
 
+            // Configure 把原来的空缺全销毁重建了，必须重新挂 Changed：
+            // 否则新空缺填入 / 清空时不会触发 SegmentsChanged，
+            // 进度、预览、自适应排版、TagSlotFilledEvent 全部不会响应。
+            foreach (TagTextSegment segment in mSegments)
+            {
+                if (!segment.IsSlot)
+                {
+                    continue;
+                }
+
+                segment.Slot.Changed -= OnSlotChanged;
+                segment.Slot.Changed += OnSlotChanged;
+            }
+
             Log($"Configure -> {mSegments.Count} 个片段，其中空缺 {CountSlots()} 个");
+            SegmentsChanged?.Invoke();
         }
 
         private static void DestroyImmediateSafe(GameObject go)

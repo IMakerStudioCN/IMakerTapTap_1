@@ -18,19 +18,25 @@ namespace TapTapFirst
     /// </summary>
     [DisallowMultipleComponent]
     public class TagDisplay : MonoBehaviour,
-        IBeginDragHandler, IDragHandler, IEndDragHandler
+        IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler
     {
         [Header("清空按钮（可选）。点它等于把该空缺清空")]
         [SerializeField] private Button mClearButton;
 
         [Header("拖动")]
         [SerializeField] private Vector2 mDragOffset = Vector2.zero;
+
+        [Tooltip("拖出去时显示的副本预制体；留空则自动生成半透明幽灵")]
+        [SerializeField] private GameObject mDragGhostPrefab;
         [Range(0.2f, 1f)]
         [SerializeField] private float mDragAlpha = 0.9f;
 
+        [Header("诊断")]
+        [Tooltip("打开后打印每次指针事件，用于排查点不动/拖不动的问题")]
+        [SerializeField] private bool mLogEvents;
+
         private RectTransform mRect;
         private RectTransform mDragLayer;
-        private CanvasGroup mDragLayerGroup;
         private Canvas mCanvas;
         private Camera mDragCamera;
         private Vector2 mLocalAtPress;
@@ -66,6 +72,7 @@ namespace TapTapFirst
             if (mClearButton != null)
             {
                 mClearButton.onClick.RemoveListener(OnClearClicked);
+            DestroyGhost();
             }
         }
 
@@ -182,6 +189,68 @@ namespace TapTapFirst
         //  拖出去（把 Tag 从这个空缺移走）
         // ============================================================
 
+        /// <summary>只为诊断：确认射线有没有打到这个显示件。</summary>
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            LogEvent($"OnPointerDown 命中自己（Owner={(Owner != null ? Owner.name : "null")} tagId={(TagData != null ? TagData.tagId : -1)}）");
+        }
+
+        /// <summary>全局诊断开关：打开后所有 TagDisplay 都会打印指针事件（不用改预制体）。</summary>
+        public static bool GlobalLogEvents;
+
+        /// <summary>是否开启本实例的诊断日志。</summary>
+        public bool LogEventsEnabled
+        {
+            get => mLogEvents || GlobalLogEvents;
+            set => mLogEvents = value;
+        }
+
+        private void LogEvent(string message)
+        {
+            if (mLogEvents || GlobalLogEvents)
+            {
+                Debug.Log($"[TagDisplay/{name}] {message}");
+            }
+        }
+
+        /// <summary>打印这个显示件的完整状态（右键菜单 / 诊断用）。</summary>
+        [ContextMenu("打印显示件诊断")]
+        public void DumpState()
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine($"===== TagDisplay 诊断 {name} =====");
+            sb.AppendLine($"Owner={(Owner != null ? Owner.name : "null")}  tagId={(TagData != null ? TagData.tagId : -1)}  activeInHierarchy={gameObject.activeInHierarchy}");
+            sb.AppendLine($"interactable/raycast: 自身 Graphic={(GetComponent<Graphic>() != null)} 子物体数={transform.childCount}");
+
+            CanvasGroup group = GetComponent<CanvasGroup>();
+            sb.AppendLine($"CanvasGroup={(group != null ? "有, blocksRaycasts=" + group.blocksRaycasts : "无")}");
+
+            Graphic[] graphics = GetComponentsInChildren<Graphic>(true);
+            foreach (Graphic g in graphics)
+            {
+                sb.AppendLine($"    Graphic {g.GetType().Name} on {g.name} raycastTarget={g.raycastTarget} enabled={g.enabled}");
+            }
+
+            sb.AppendLine($"实现接口: IBeginDrag={this is IBeginDragHandler} IDrag={this is IDragHandler} IEndDrag={this is IEndDragHandler} IPointerDown={this is IPointerDownHandler}");
+            sb.AppendLine($"父级链: {BuildPath(transform)}");
+            sb.AppendLine("=========================");
+            Debug.Log(sb.ToString());
+        }
+
+        private static string BuildPath(Transform t)
+        {
+            string path = t.name;
+            Transform current = t.parent;
+
+            while (current != null)
+            {
+                path = current.name + "/" + path;
+                current = current.parent;
+            }
+
+            return path;
+        }
+
         public void OnBeginDrag(PointerEventData eventData)
         {
             if (eventData.button != PointerEventData.InputButton.Left)
@@ -191,8 +260,11 @@ namespace TapTapFirst
 
             if (Owner == null || TagData == null)
             {
+                LogEvent($"OnBeginDrag 被忽略（Owner={(Owner != null ? Owner.name : "null")} TagData={(TagData != null ? "有" : "null")}）——这是拖拽副本或没归属");
                 return;   // 这个是拖拽副本本身，不参与
             }
+
+            LogEvent("OnBeginDrag 开始");
 
             mDragStartedFrame = Time.frameCount;
 
@@ -205,29 +277,29 @@ namespace TapTapFirst
 
             Tag_SO tag = TagData;
             TagOption source = Owner.SourceOption;
-            TagOfWords wordTypeAtPickup = Owner.WordType;   // 必须在 Clear() 之前取好，Clear 之后 Owner 就没了
+            TagOfWords wordTypeAtPickup = Owner.WordType;
+            TagKindSlot slot = Owner;
+            Vector2 ghostSize = mRect.rect.size;
 
-            // 先把空缺清掉（副本会被销毁），再在拖拽层生成一份新的副本跟着鼠标
-            Owner.Clear();
+            // 只把空缺标记为空，绝不能调用 Owner.Clear()：
+            // Clear() 会 Destroy 掉"正在执行 OnBeginDrag 的自己"，
+            // EventSystem 随即找不到 pointerDrag，OnEndDrag 永不触发，拖动幽灵会永久留在屏幕上。
+            slot.MarkEmptied();
 
-            GameObject go = new GameObject("TagGhost", typeof(RectTransform));
-            RectTransform rect = (RectTransform)go.transform;
-            rect.SetParent(mDragLayer, false);
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta = mRect.rect.size;
-            rect.SetAsLastSibling();
+            TMP_FontAsset font = GetComponentInChildren<TMP_Text>(true)?.font;
+            string previewText = Tag_SO.GetDisplayContent(tag, wordTypeAtPickup);
 
-            CanvasGroup group = go.AddComponent<CanvasGroup>();
-            group.alpha = mDragAlpha;
-            group.blocksRaycasts = false;
-            group.interactable = false;
+            TagDisplay ghost = TagDragUtility.CreateGhost(
+                mDragLayer, mDragGhostPrefab, previewText, ghostSize, mDragAlpha, font);
 
-            TagDisplay ghost = go.AddComponent<TagDisplay>();
+            if (ghost == null)
+            {
+                return;
+            }
+
             ghost.Owner = null;
             ghost.SetTag(tag);
-            ghost.SetPreviewText(Tag_SO.GetDisplayContent(tag, wordTypeAtPickup));
+            ghost.SetPreviewText(previewText);
 
             mGhost = ghost;
             mGhostSource = source;
@@ -237,6 +309,36 @@ namespace TapTapFirst
                 mDragLayer, eventData.position, eventData.pressEventCamera, out mLocalAtPress);
 
             ghost.RectTransform.anchoredPosition = mLocalAtPress + mDragOffset;
+
+            // 幽灵已经在跟着鼠标了，把空缺里原来那份显示副本收掉（延迟销毁，下一帧才真正移除）
+            if (gameObject != null)
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        /// <summary>销毁当前拖动幽灵（重复调用安全）。</summary>
+        private void DestroyGhost()
+        {
+            if (mGhost == null)
+            {
+                return;
+            }
+
+            if (mGhost.gameObject != null)
+            {
+                Destroy(mGhost.gameObject);
+            }
+
+            mGhost = null;
+            mGhostTag = null;
+            mGhostSource = null;
+        }
+
+        private void OnDisable()
+        {
+            // 拖拽中途被禁用时，别把幽灵落在场上
+            DestroyGhost();
         }
 
         private TagDisplay mGhost;
@@ -247,6 +349,7 @@ namespace TapTapFirst
         {
             if (mGhost == null)
             {
+                LogEvent("OnDrag 但 mGhost 为空（说明 OnBeginDrag 没成功建幽灵）");
                 return;
             }
 
@@ -262,10 +365,13 @@ namespace TapTapFirst
         {
             if (mGhost == null)
             {
+                LogEvent("OnEndDrag 但 mGhost 为空");
                 return;
             }
 
-            TagKindSlot target = FindSlotUnder(eventData);
+            LogEvent("OnEndDrag 结束拖拽");
+
+            TagKindSlot target = FindDropTarget(eventData);   // 落点判定更严格
             SetHover(null);
 
             if (target != null)
@@ -274,10 +380,7 @@ namespace TapTapFirst
             }
             // 没命中任何空缺 -> 保持"已清空"，Tag 仍在列表里可再次使用
 
-            Destroy(mGhost.gameObject);
-            mGhost = null;
-            mGhostTag = null;
-            mGhostSource = null;
+            DestroyGhost();
         }
 
         private TagKindSlot mHoverSlot;
@@ -294,10 +397,23 @@ namespace TapTapFirst
             mHoverSlot?.SetHighlight(true);
         }
 
+        /// <summary>鼠标下的空缺（高亮用，允许余量）。</summary>
         private TagKindSlot FindSlotUnder(PointerEventData eventData)
         {
-            const float snapDistance = 140f;
+            return FindSlotUnder(eventData, SnapRadiusForHover);
+        }
 
+        /// <summary>松手落点：必须鼠标真在空缺框里，避免"路过就被挂上"。</summary>
+        private TagKindSlot FindDropTarget(PointerEventData eventData)
+        {
+            return FindSlotUnder(eventData, DropTolerance);
+        }
+
+        private const float SnapRadiusForHover = 140f;
+        private const float DropTolerance = 12f;
+
+        private TagKindSlot FindSlotUnder(PointerEventData eventData, float tolerance)
+        {
             TagKindSlot inside = null;
             TagKindSlot nearest = null;
             float nearestDistance = float.MaxValue;
@@ -335,7 +451,7 @@ namespace TapTapFirst
                 return inside;
             }
 
-            return nearest != null && nearestDistance <= snapDistance ? nearest : null;
+            return nearest != null && nearestDistance <= tolerance ? nearest : null;
         }
 
         private static float DistanceToRect(RectTransform rect, Vector2 pointer, Camera camera)
@@ -353,11 +469,6 @@ namespace TapTapFirst
 
         private void EnsureDragLayer()
         {
-            if (mDragLayer != null)
-            {
-                return;
-            }
-
             if (mCanvas == null)
             {
                 mCanvas = GetComponentInParent<Canvas>();
@@ -368,22 +479,10 @@ namespace TapTapFirst
                 return;
             }
 
-            mDragCamera = mCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : mCanvas.worldCamera;
+            mDragCamera = TagDragUtility.GetCamera(mCanvas);
 
-            GameObject go = new GameObject("TagDragLayer", typeof(RectTransform));
-            RectTransform rect = (RectTransform)go.transform;
-            rect.SetParent(mCanvas.transform, false);
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-            rect.SetAsLastSibling();
-
-            mDragLayerGroup = go.AddComponent<CanvasGroup>();
-            mDragLayerGroup.blocksRaycasts = false;
-            mDragLayerGroup.interactable = false;
-
-            mDragLayer = rect;
+            // 整个 Canvas 共用一份拖拽层，重复创建会导致多层叠加、互相干扰
+            mDragLayer = TagDragUtility.GetLayer(mCanvas);
         }
 
         private void EnsureClickable()

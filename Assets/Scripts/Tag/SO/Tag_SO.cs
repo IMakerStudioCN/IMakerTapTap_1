@@ -5,14 +5,42 @@ using UnityEngine;
 namespace TapTapFirst
 {
     /// <summary>
-    ///  Struct 数值:（未定）
+    /// Tag 数值的类型（可扩展：往后加类型不用动结构体）。
+    /// 下标即 valuePairs 里的 key：
+    ///   0 = PageViews      浏览量
+    ///   1 = PressureValue  压力值
     /// </summary>
+    public enum TagValueType
+    {
+        PageViews = 0,
+        PressureValue = 1,
+    }
+
+    /// <summary>一对"类型 -> 数值"。</summary>
+    [Serializable]
+    public class TagValuePair
+    {
+        public TagValueType type = TagValueType.PageViews;
+        public float value;
+
+        public TagValuePair() { }
+
+        public TagValuePair(TagValueType type, float value)
+        {
+            this.type = type;
+            this.value = value;
+        }
+    }
+
+    /// <summary>
+    /// 【旧结构，保留兼容】原先是两个 private 字段（外部读不到、也从没被使用过）。
+    /// 新数据请用 Tag_SO.valuePairs + Tag_SO.GetValue(...)。
+    /// </summary>
+    [Serializable]
     public struct TagValue
     {
-        int v1;
-        int v2;
-        int v3;
-        int v4;
+        public float PageViews;
+        public float PressureValue;
     }
 
     /// <summary>
@@ -51,9 +79,17 @@ namespace TapTapFirst
         [SerializeField]
         public string tagName;
         /// <summary>
-        /// tag 的数值
+        /// 【推荐】tag 的数值：类型 -> 数值 的列表。
+        /// 取法：GetValue(TagValueType.PageViews)
         /// </summary>
         [SerializeField]
+        public List<TagValuePair> valuePairs = new List<TagValuePair>();
+
+        /// <summary>
+        /// 【旧字段，保留兼容】老的数值结构体；新数据请用 valuePairs。
+        /// </summary>
+        [SerializeField]
+        [Tooltip("旧数值结构体；新数据请用上面的 Value Pairs")]
         public TagValue tagValues;
         /// <summary>
         /// tag 的种类:形容词、名词、量词、胡扯
@@ -136,6 +172,102 @@ namespace TapTapFirst
         {
             EnsureWordTypeSlots();
             theTypeToContent[(int)wordType] = content;
+        }
+
+        // ============================================================
+        //  数值查询（valuePairs）
+        // ============================================================
+
+        /// <summary>取指定类型的数值；没配过返回 0。</summary>
+        public float GetValue(TagValueType type)
+        {
+            if (valuePairs != null)
+            {
+                for (int i = 0; i < valuePairs.Count; i++)
+                {
+                    TagValuePair pair = valuePairs[i];
+
+                    if (pair != null && pair.type == type)
+                    {
+                        return pair.value;
+                    }
+                }
+            }
+
+            // 兜底：旧的 tagValues 结构体（只有前两个类型）
+            switch (type)
+            {
+                case TagValueType.PageViews:
+                    return tagValues.PageViews;
+                case TagValueType.PressureValue:
+                    return tagValues.PressureValue;
+                default:
+                    return 0f;
+            }
+        }
+
+        /// <summary>取指定类型的数值；没配过返回 false（out 为 0）。</summary>
+        public bool TryGetValue(TagValueType type, out float value)
+        {
+            value = 0f;
+
+            if (valuePairs == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < valuePairs.Count; i++)
+            {
+                TagValuePair pair = valuePairs[i];
+
+                if (pair != null && pair.type == type)
+                {
+                    value = pair.value;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>写指定类型的数值；没有这条就新建。</summary>
+        public void SetValue(TagValueType type, float value)
+        {
+            if (valuePairs == null)
+            {
+                valuePairs = new List<TagValuePair>();
+            }
+
+            for (int i = 0; i < valuePairs.Count; i++)
+            {
+                TagValuePair pair = valuePairs[i];
+
+                if (pair != null && pair.type == type)
+                {
+                    pair.value = value;
+                    return;
+                }
+            }
+
+            valuePairs.Add(new TagValuePair(type, value));
+        }
+
+        /// <summary>浏览量。</summary>
+        public float PageViews => GetValue(TagValueType.PageViews);
+
+        /// <summary>压力值。</summary>
+        public float PressureValue => GetValue(TagValueType.PressureValue);
+
+        /// <summary>把 valuePairs 补齐到所有类型各一条（生成器 / 编辑器用）。</summary>
+        public void EnsureValuePairs()
+        {
+            foreach (TagValueType type in Enum.GetValues(typeof(TagValueType)))
+            {
+                if (!TryGetValue(type, out _))
+                {
+                    SetValue(type, 0f);
+                }
+            }
         }
     }
 }
