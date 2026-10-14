@@ -273,6 +273,11 @@ namespace TapTapFirst
             return sum;
         }
 
+        public float GetPageViews()
+        {
+            return new Calculate().CalculatePageViews(PageViewsTotal,GetEffectValue());
+        }
+
         /// <summary>浏览量总值。</summary>
         public float PageViewsTotal => GetTagValueTotal(TagValueType.PageViews);
 
@@ -331,6 +336,46 @@ namespace TapTapFirst
         public string GetEffectTypeName()
         {
             return NewsEffectTypeNames.Get(effectType);
+        }
+
+        // ============================================================
+        //  还原
+        // ============================================================
+
+        /// <summary>
+        /// 把这份结果还原成填空文档（读档回填用）。
+        /// 没有草稿但已经提交过的新闻，靠它把写作区恢复原样。
+        /// </summary>
+        public TagFillDocument ToDocument()
+        {
+            TagFillDocument document = new TagFillDocument
+            {
+                documentId = documentId,
+                version = version,
+                items = new List<TagFillItem>()
+            };
+
+            if (items != null)
+            {
+                for (int i = 0; i < items.Count; i++)
+                {
+                    TagFillItem item = items[i];
+
+                    if (item == null)
+                    {
+                        continue;
+                    }
+
+                    document.items.Add(item);
+
+                    if (item.kind == TagFillItem.KindSlot)
+                    {
+                        document.slots.Add(new TagFillSlotEntry(item.slotId, item.tagId, item.filled));
+                    }
+                }
+            }
+
+            return document;
         }
 
         // ============================================================

@@ -1,4 +1,6 @@
-using QFramework;
+﻿using QFramework;
+using System.Diagnostics;
+using UnityEngine;
 
 namespace TapTapFirst
 {
@@ -35,6 +37,15 @@ namespace TapTapFirst
             }
 
             this.SendEvent(new NewsWrittenEvent { newsId = mNewsId, result = result });
+
+            this.SendEvent(new mybaSendEvent
+            {
+                content = result.content,
+                click = result.pageViews
+            }
+            );
+            UnityEngine.Debug.Log($"向MyBa发送新闻：{result.content}{result.pageViews}");
+            
             return result;
         }
     }

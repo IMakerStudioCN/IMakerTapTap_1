@@ -1,4 +1,4 @@
-﻿using QFramework;
+using QFramework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -69,6 +69,9 @@ namespace TapTapFirst
 
         /// <summary>某篇写好的新闻拼好的正文。</summary>
         string GetWrittenContent(int newsId);
+
+        /// <summary>把某篇写好的新闻还原成填空文档（读档回填用）；没有返回 null。</summary>
+        TagFillDocument GetWrittenDocument(int newsId);
 
         //// ---------------- 全部新闻的合计 ----------------
 
@@ -411,6 +414,12 @@ namespace TapTapFirst
         {
             NewsResultData result = GetWrittenNews(newsId);
             return result != null ? result.GetContent() : null;
+        }
+
+        public TagFillDocument GetWrittenDocument(int newsId)
+        {
+            NewsResultData result = GetWrittenNews(newsId);
+            return result != null ? result.ToDocument() : null;
         }
 
         // ---------------- 全局合计 ----------------
