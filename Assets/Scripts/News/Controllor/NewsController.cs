@@ -215,6 +215,27 @@ namespace TapTapFirst
             {
                 SelectTemplate(mCards[0].NewsId);
             }
+
+            // 没走到 SelectTemplate 时按钮状态也要算一次
+            RefreshUI();
+        }
+
+        private void OnDisable()
+        {
+            // 面板被隐藏 / 关掉时也留一份草稿（不只 Close() 那条路）
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
+            try
+            {
+                SaveDraft();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[NewsController] 关闭时存草稿失败：{e.Message}");
+            }
         }
         // ============================================================
         //  模板列表
@@ -315,6 +336,12 @@ namespace TapTapFirst
                 return;
             }
 
+            // 切走之前把当前这条的草稿存了（没提交过的内容也能接着写）
+            if (CurrentNews != null && CurrentTemplate != null && CurrentNews.newsId != newsId)
+            {
+                SaveDraft();
+            }
+
             CurrentNews = news;
 
             if (mTitleText != null)
@@ -413,6 +440,9 @@ namespace TapTapFirst
                 return;
             }
 
+            // 让 Controller 真正握住当前模版 —— 提交 / 清空 / 读档全靠它
+            SetCurrentTemplate(target);
+
             // 2) 按配置生成片段
             if (!news.HasContent)
             {
@@ -423,6 +453,30 @@ namespace TapTapFirst
             target.Configure(news.BuildSequence(), LoadPrefab(mTagOptionResName));
 
             Debug.Log($"[NewsController] 已按配置生成写作区：{news.newsTitle}（{news.contentSegments.Count} 段 / {news.SlotCount} 个空缺）");
+        }
+
+        /// <summary>
+        /// 切换 Controller 手里的当前模版，并同步 SegmentsChanged 的订阅。
+        /// 之前这里一直是 null，导致 IsOpen 永远 false —— 提交 / 清空 / 读档全部失效。
+        /// </summary>
+        private void SetCurrentTemplate(TagTextTemplate template)
+        {
+            if (CurrentTemplate == template)
+            {
+                return;
+            }
+
+            if (CurrentTemplate != null)
+            {
+                CurrentTemplate.SegmentsChanged -= RefreshUI;
+            }
+
+            CurrentTemplate = template;
+
+            if (CurrentTemplate != null)
+            {
+                CurrentTemplate.SegmentsChanged += RefreshUI;
+            }
         }
 
         /// <summary>实例化内容预制体（换预制体时先销毁旧的）。</summary>
@@ -436,9 +490,10 @@ namespace TapTapFirst
                 return;
             }
 
-            // 换预制体时先销毁旧的
+            // 换预制体时先销毁旧的（先把 Controller 手里的引用摘掉，免得留着已销毁对象）
             if (mContentInstance != null)
             {
+                SetCurrentTemplate(null);
                 Destroy(mContentInstance.gameObject);
                 mContentInstance = null;
             }
@@ -477,6 +532,8 @@ namespace TapTapFirst
         /// <summary>销毁上一次实例化的内容。</summary>
         public void DestroyContentInstance()
         {
+            SetCurrentTemplate(null);
+
             if (mContentInstance == null)
             {
                 return;
@@ -629,28 +686,29 @@ namespace TapTapFirst
         // ============================================================
 
 
-        /// <summary>关闭写作界面（实例化出来的模版会被清掉）。</summary>
+        /// <summary>关闭写作界面（先把当前内容存成草稿，再清掉实例化出来的模版）。</summary>
         public void Close()
         {
-            if (CurrentTemplate != null)
-            {
-                CurrentTemplate.SegmentsChanged -= RefreshUI;
-            }
+            // 关之前留一份草稿，下次打开能接着写
+            SaveDraft();
 
             ClearContentInstance();
 
             CurrentNews = null;
-            CurrentTemplate = null;
 
             RefreshUI();
         }
 
         private void ClearContentInstance()
         {
-            if (CurrentTemplate != null)
+            TagTextTemplate template = CurrentTemplate != null ? CurrentTemplate : mContentInstance;
+
+            SetCurrentTemplate(null);
+            mContentInstance = null;
+
+            if (template != null)
             {
-                Destroy(CurrentTemplate.gameObject);
-                CurrentTemplate = null;
+                Destroy(template.gameObject);
             }
         }
 
@@ -731,7 +789,12 @@ namespace TapTapFirst
         /// <summary>按钮回调（Button.onClick 需要 void）。</summary>
         public void OnSubmitClicked()
         {
-            Submit();
+            if (Submit())
+            {
+                Debug.Log($"[NewsController] 提交成功：\n{GetResultContent(CurrentNews.newsId)}");
+            }
+
+            RefreshUI();
         }
 
 
@@ -757,6 +820,14 @@ namespace TapTapFirst
                 return false;
             }
 
+            // 没填满不给提交，避免把半成品当成"写好的新闻"存进 NewsSystem
+            if (!CurrentTemplate.IsAllSlotsFilled)
+            {
+                Debug.LogWarning($"[NewsController] 新闻 {CurrentNews.newsId}({CurrentNews.newsTitle}) 还有空缺没填满，不能提交");
+                RefreshUI();
+                return false;
+            }
+
             // 只负责把当前排版交出去，存哪儿、怎么结算都是 NewsSystem 的事
             string json = CurrentTemplate.SaveToJson();
             result = this.SendCommand(new SaveWrittenNewsCommand(CurrentNews.newsId, json));
@@ -770,7 +841,11 @@ namespace TapTapFirst
             return true;
         }
 
-        /// <summary>读取该新闻上次存的草稿并还原空缺。</summary>
+        /// <summary>
+        /// 还原这条新闻的写作区：
+        ///   1) 优先用草稿（玩家正在写的，或清空后留下的"全空"文档）
+        ///   2) 没有草稿但已经提交过，就用结算结果里的片段还原
+        /// </summary>
         public bool LoadDocument()
         {
             if (!IsOpen)
@@ -778,18 +853,39 @@ namespace TapTapFirst
                 return false;
             }
 
-            if (!NewsSystem.TryGetDraft(CurrentNews.newsId, out string json))
+            TagFillDocument document = NewsSystem.GetDraftDocument(CurrentNews.newsId);
+
+            if (document == null)
+            {
+                document = NewsSystem.GetWrittenDocument(CurrentNews.newsId);
+            }
+
+            if (document == null)
             {
                 return false;
             }
 
-            return CurrentTemplate.LoadFromJson(json);
+            return CurrentTemplate.ApplyDocument(document);
         }
 
-        /// <summary>清空所有空缺。</summary>
+        /// <summary>
+        /// 清空所有空缺。
+        /// 顺手把"全空"存成草稿：否则切走再切回来，LoadDocument 会回退到已提交的内容，Tag 又活了。
+        /// </summary>
         public void ResetContent()
         {
-            CurrentTemplate?.ClearAll();
+            if (CurrentTemplate == null)
+            {
+                return;
+            }
+
+            CurrentTemplate.ClearAll();
+
+            if (CurrentNews != null)
+            {
+                SaveDraft();
+            }
+
             RefreshUI();
         }
 
@@ -925,9 +1021,12 @@ namespace TapTapFirst
                 mPreviewText.text = open ? CurrentTemplate.GetPlainText() : string.Empty;
             }
 
+            // 提交要求所有空缺都填满（没有空缺的模版不给提交）
+            bool canSubmit = open && progress != null && progress.total > 0 && progress.filled >= progress.total;
+
             if (mSubmitButton != null)
             {
-                mSubmitButton.interactable = open && progress != null && progress.total > 0;
+                mSubmitButton.interactable = canSubmit;
             }
 
             if (mResetButton != null)
