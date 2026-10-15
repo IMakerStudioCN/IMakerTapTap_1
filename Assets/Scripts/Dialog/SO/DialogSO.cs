@@ -13,5 +13,7 @@ namespace TapTapFirst
         public string title;
         [Header("配置")]
         public List<DialogSOSingle> dialog;
+        [Header("可获得的Tag")]
+        public List<int> TagID;
     }
 }
