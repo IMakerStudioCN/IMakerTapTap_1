@@ -45,7 +45,18 @@ namespace TapTapFirst
         public static bool Layout(RectTransform root, IReadOnlyList<TagTextSegment> segments,
             TagLayoutSettings settings, out string report)
         {
+            return Layout(root, segments, settings, out report, out _);
+        }
+
+        /// <summary>
+        /// 同上，额外返回排完之后内容的【总高】（不含 padding）。
+        /// 外层 ScrollRect 靠它撑开可滚动区（TagTextAdaptiveLayout 会写进 LayoutElement.preferredHeight）。
+        /// </summary>
+        public static bool Layout(RectTransform root, IReadOnlyList<TagTextSegment> segments,
+            TagLayoutSettings settings, out string report, out float contentHeight)
+        {
             report = string.Empty;
+            contentHeight = 0f;
 
             if (root == null || segments == null || segments.Count == 0)
             {
@@ -240,6 +251,7 @@ namespace TapTapFirst
             report = $"{items.Count} 段 / {lines.Count} 行 / 可用宽 {availableWidth:0.##} / " +
                      $"内容 {Mathf.Max(0f, maxX - minX):0.##}x{totalHeight:0.##} / 基准字号 {baseFontSize:0.##}";
 
+            contentHeight = totalHeight;
             return true;
         }
 
