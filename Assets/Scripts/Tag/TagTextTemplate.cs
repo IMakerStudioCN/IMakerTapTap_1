@@ -75,10 +75,23 @@ namespace TapTapFirst
         [Tooltip("玩家没有填的空缺在纯文本里显示成什么")]
         [SerializeField] private string mEmptyPlaceholder = "____";
 
+        [Header("生成的文字样式（Configure / CreateSlot 造出来的 TMP 用）")]
+        [Tooltip("运行时生成的文本与空缺提示统一用这个字体；留空则用 TMP 默认字体")]
+        [SerializeField] private TMP_FontAsset mFont;
+
+        [Tooltip("运行时生成的文字颜色")]
+        [SerializeField] private Color mTextColor = Color.black;
+
         [Header("日志")]
         [SerializeField] private bool mLog;
 
         private readonly List<TagTextSegment> mSegments = new List<TagTextSegment>();
+
+        /// <summary>是否已经收集过（哪怕收集到 0 段）。EnsureCollected 用它判断，不能再按 Count==0 判断。</summary>
+        private bool mCollected;
+
+        /// <summary>正在收集的重入锁。</summary>
+        private bool mCollecting;
 
         /// <summary>片段内容发生变化时触发（空缺填入/清空，或重新收集）。自适应排版靠它重排。</summary>
         public event Action SegmentsChanged;
@@ -88,8 +101,8 @@ namespace TapTapFirst
         /// <summary>按文本顺序排好的片段（只读）。</summary>
         public IReadOnlyList<TagTextSegment> Segments => mSegments;
 
-        /// <summary>是否已经收集过片段。</summary>
-        public bool IsCollected => mSegments.Count > 0;
+        /// <summary>是否已经收集过片段（收集到 0 段也算收集过）。</summary>
+        public bool IsCollected => mCollected;
 
         /// <summary>所有空缺是否都已填满。</summary>
         public bool IsAllSlotsFilled
@@ -151,19 +164,49 @@ namespace TapTapFirst
             }
         }
 
-        /// <summary>开始收集片段（会等一帧，保证 LayoutGroup 已经算完）。</summary>
+        /// <summary>
+        /// 重新收集片段。
+        ///
+        /// 注意：这里会发 SegmentsChanged，而订阅方（NewsController.RefreshUI）会反过来调
+        /// GetProgress() / IsAllSlotsFilled()，那些又都会走 EnsureCollected()。
+        /// 所以必须加防重入锁，否则一旦收集到 0 段就会无限递归（StackOverflowException）。
+        /// </summary>
         public void Collect()
         {
-            mSegments.Clear();
-            CollectInto(transform, mSegments);
-            Log($"收集到 {mSegments.Count} 个片段，其中空缺 {CountSlots()} 个");
-            SegmentsChanged?.Invoke();
+            if (mCollecting)
+            {
+                return;
+            }
+
+            mCollecting = true;
+
+            try
+            {
+                mSegments.Clear();
+                CollectInto(transform, mSegments);
+                mCollected = true;
+                Log($"收集到 {mSegments.Count} 个片段，其中空缺 {CountSlots()} 个");
+
+                // 事件也在锁里发：万一订阅方绕一圈又调 Collect()，直接忽略，不会继续递归
+                SegmentsChanged?.Invoke();
+            }
+            finally
+            {
+                mCollecting = false;
+            }
         }
 
-        /// <summary>确保已经收集过。</summary>
+        /// <summary>
+        /// 确保已经收集过片段。
+        ///
+        /// 判定条件必须是「从没收集过」，不能是 mSegments.Count == 0：
+        /// 内容本来就是空的时候（Configure(null, null) 清空后、或这条新闻没配片段），
+        /// 按 Count==0 判断会让每次调用都重新 Collect 并发 SegmentsChanged，
+        /// 而订阅方 RefreshUI 又会调回来 —— 直接栈溢出。
+        /// </summary>
         public void EnsureCollected()
         {
-            if (mSegments.Count == 0)
+            if (!mCollected)
             {
                 Collect();
             }
@@ -317,6 +360,7 @@ namespace TapTapFirst
                 }
             }
 
+            mCollected = true;
             Log($"SetSegments -> {mSegments.Count} 个片段，其中空缺 {CountSlots()} 个");
             SegmentsChanged?.Invoke();
         }
@@ -350,8 +394,8 @@ namespace TapTapFirst
             TMPro.TextMeshProUGUI phText = placeholder.AddComponent<TMPro.TextMeshProUGUI>();
             phText.text = placeholderText;
             phText.alignment = TMPro.TextAlignmentOptions.Center;
-            phText.color = new Color(0.6f, 0.6f, 0.6f, 1f);
             phText.raycastTarget = false;
+            ApplyTextStyle(phText);
 
             TagKindSlot slot = go.AddComponent<TagKindSlot>();
             slot.ApplySetup(slotId, wordType, tagDisplayPrefab);
@@ -392,6 +436,7 @@ namespace TapTapFirst
                         tmp.text = text;
                         tmp.alignment = TMPro.TextAlignmentOptions.Center;
                         tmp.raycastTarget = false;
+                        ApplyTextStyle(tmp);
 
                         mSegments.Add(new TagTextSegment { TextObject = go, Text = text });
                     }
@@ -423,6 +468,7 @@ namespace TapTapFirst
                 segment.Slot.Changed += OnSlotChanged;
             }
 
+            mCollected = true;
             Log($"Configure -> {mSegments.Count} 个片段，其中空缺 {CountSlots()} 个");
             SegmentsChanged?.Invoke();
         }
@@ -581,6 +627,35 @@ namespace TapTapFirst
             });
 
             SegmentsChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// 把「统一字体 + 纯黑」套到运行时生成的文字上。
+        /// 预制体里的 TMP 由 Tools/News &amp; Tag/统一字体与颜色 处理；
+        /// Configure / CreateSlot 现场造的 TMP 只能靠这里。
+        /// </summary>
+        private void ApplyTextStyle(TMP_Text text)
+        {
+            if (text == null)
+            {
+                return;
+            }
+
+            if (mFont != null)
+            {
+                text.font = mFont;
+
+                // 材质还指着旧字体图集的话会显示成豆腐块，换回新字体的默认材质
+                Material material = mFont.material;
+
+                if (material != null &&
+                    (text.fontSharedMaterial == null || text.fontSharedMaterial.mainTexture != mFont.atlasTexture))
+                {
+                    text.fontSharedMaterial = material;
+                }
+            }
+
+            text.color = mTextColor;
         }
 
         private void Log(string message)

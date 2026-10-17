@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 using TMPro;
 
@@ -47,6 +48,11 @@ namespace TapTapFirst
         [Tooltip("尺寸变化时自动重排（关掉就只能手动调 Relayout）")]
         [SerializeField] private bool mAutoRelayout = true;
 
+        [Header("滚动")]
+        [Tooltip("把排出来的内容高度写进本节点的 LayoutElement.preferredHeight，" +
+                 "外层 VerticalLayoutGroup + ContentSizeFitter 才能撑开可滚动区")]
+        [SerializeField] private bool mDrivePreferredHeight = true;
+
         [Header("诊断")]
         [Tooltip("打印每次重排的计算结果")]
         [SerializeField] private bool mLog;
@@ -57,6 +63,9 @@ namespace TapTapFirst
         private Vector2 mLastSelfSize = Vector2.negativeInfinity;
         private Vector2 mLastParentSize = Vector2.negativeInfinity;
         private bool mLaidOutOnce;
+
+        private LayoutElement mLayoutElement;
+        private float mLastPreferredHeight = -1f;
 
         private void Awake()
         {
@@ -135,14 +144,58 @@ namespace TapTapFirst
 
             TagLayoutSettings settings = BuildSettings();
 
-            if (TagSegmentLayout.Layout(mRect, mTemplate.Segments, settings, out string report))
+            if (TagSegmentLayout.Layout(mRect, mTemplate.Segments, settings, out string report, out float contentHeight))
             {
                 mLaidOutOnce = true;
+                ApplyPreferredHeight(contentHeight);
                 Log($"重排完成：{report}");
             }
             else
             {
                 Log($"重排跳过：{report}");
+            }
+        }
+
+        /// <summary>
+        /// 把内容高度写进 LayoutElement.preferredHeight。
+        /// 外层 Content 挂着 VerticalLayoutGroup(childControlHeight) + ContentSizeFitter(PreferredSize)，
+        /// 于是写作区就和模板列表 / Tag 列表用的是同一套滚动方案。
+        /// </summary>
+        private void ApplyPreferredHeight(float contentHeight)
+        {
+            if (!mDrivePreferredHeight)
+            {
+                return;
+            }
+
+            if (mLayoutElement == null)
+            {
+                mLayoutElement = GetComponent<LayoutElement>();
+
+                if (mLayoutElement == null)
+                {
+                    mLayoutElement = gameObject.AddComponent<LayoutElement>();
+                }
+
+                // 宽度交给外层布局组撑满（写作区宽度由栏宽决定，不由内容决定）
+                mLayoutElement.flexibleWidth = 1f;
+            }
+
+            // mPadding = (左, 上, 右, 下)
+            float height = Mathf.Max(0f, contentHeight) + mPadding.y + mPadding.w;
+
+            if (Mathf.Abs(height - mLastPreferredHeight) < 0.5f)
+            {
+                return;
+            }
+
+            mLastPreferredHeight = height;
+            mLayoutElement.preferredHeight = height;
+
+            // 让外层 Content 的 ContentSizeFitter 立刻重算，避免晚一帧才可滚动
+            if (mRect.parent is RectTransform parentRect)
+            {
+                LayoutRebuilder.MarkLayoutForRebuild(parentRect);
             }
         }
 
