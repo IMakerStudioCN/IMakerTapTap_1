@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.UI;
+using TapTapFirst.Audio;
 
 namespace TapTapFirst
 {
@@ -35,6 +36,8 @@ namespace TapTapFirst
         }
         public void OnClick()
 		{
+			GameAudio.PlaySfxFor(GameAudioId.SfxTravel, 2f);
+
 			TaskSingle task = this.GetSystem<IMapSystem>().GetTaskForPlace(placeName);
 			if (task == null)
 			{

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using TapTapFirst.Audio;
 
 namespace TapTapFirst
 {
@@ -98,13 +99,30 @@ namespace TapTapFirst
         }
 
 
+        private bool mGameEnded;
+
         /// <summary>
         /// 结束游戏
         /// </summary>
         public void EndTheGame()
         {
             //暂定1000为目标资金
-            Debug.LogWarning("触发结局：" + WhichEnd(1000));
+            var end = WhichEnd(1000);
+            Debug.LogWarning("触发结局：" + end);
+
+            // 结局条件可能被多个数值变化事件重复触发，音频只响一次
+            if (mGameEnded || end < 0) return;
+            mGameEnded = true;
+
+            if (end <= 2)                       // 0 信任 / 1 道德 / 2 资金：坏结局
+            {
+                GameAudio.PlaySfx(GameAudioId.SfxGameOver);
+                GameAudio.PlayBadEndingBgm();
+            }
+            else if (end == 4)                  // NB 结局
+            {
+                GameAudio.PlaySfx(GameAudioId.SfxEndingPerfect);
+            }
         }
         
 
