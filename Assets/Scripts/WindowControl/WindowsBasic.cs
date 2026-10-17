@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using QFramework;
+using TapTapFirst.Audio;
 
 namespace TapTapFirst
 {
@@ -271,6 +272,8 @@ namespace TapTapFirst
 
         public virtual void CloseWindow()
         {
+            GameAudio.PlaySfx(GameAudioId.SfxWindowClose);
+
             SaveState();
             OnWindowClose();
 
@@ -295,6 +298,8 @@ namespace TapTapFirst
         // 从最小化恢复（已经显示时就是置顶）
         public virtual void ShowWindow()
         {
+            GameAudio.PlaySfx(GameAudioId.SfxWindowOpen);
+
             EnsureInit();
 
             mMinimized = false;
