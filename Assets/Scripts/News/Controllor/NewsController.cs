@@ -47,9 +47,6 @@ namespace TapTapFirst
         // ============================================================
 
         [Header("资源名（ResKit）")]
-        [Tooltip("写作内容预制体资源名（根节点带 TagTextTemplate）")]
-        [SerializeField] private string mContentResName = "NewsContent";
-
         [Tooltip("模板卡片预制体资源名（根节点带 TemplateCardItem）")]
         [SerializeField] private string mTemplateCardResName = "TemplateCard";
 
@@ -91,7 +88,6 @@ namespace TapTapFirst
         [SerializeField] private bool mAutoSpawnTagOptions = true;
 
         [Tooltip("切换模板时销毁上一次实例化的内容")]
-        [SerializeField] private bool mDestroyOldContentOnSwitch = true;
 
         [Header("日志")]
         [SerializeField] private bool mLog;
@@ -429,22 +425,14 @@ namespace TapTapFirst
             }
         }
 
-        /// <summary>取这条新闻该用哪个内容预制体资源名：自己的优先，否则用默认的。</summary>
-        public string ResolveContentResName(NewsTemplate_SO news)
-        {
-            if (news != null && !string.IsNullOrEmpty(news.contentResName))
-            {
-                return news.contentResName;
-            }
-
-            return mContentResName;
-        }
-
         /// <summary>
-        /// 按 NewsTemplate_SO 的配置生成写作区：
-        ///   1. 按资源名（ResKit）实例化内容预制体到 mContentParent
-        ///   2. 按 contentSegments 生成「固定文本 + 空缺」
-        /// 没有配置片段时，只切换模版、不改内容。
+        /// 按 NewsTemplate_SO 的配置生成写作区。
+        ///
+        /// 不再实例化「完整模版预制体」：
+        ///   Content 节点（TagModel/Scroll View/Viewport/Content）自己就是 TagTextTemplate，
+        ///   生成的固定文本 / 空缺直接挂在 Content 下，
+        ///   于是写作区和模板列表 / Tag 列表共用同一套
+        ///   ScrollRect + Viewport(RectMask2D) + Content + 垂直滚动条 的滚动方案。
         /// </summary>
         public void ApplyContentFromConfig(NewsTemplate_SO news)
         {
@@ -453,27 +441,24 @@ namespace TapTapFirst
                 return;
             }
 
-            // 1) 换内容实例（强制用预制体）：优先用这条新闻自己的资源名，其次用 mContentResName
-            if (mContentInstance == null || mDestroyOldContentOnSwitch)
-            {
-                InstantiateContentInstance(ResolveContentResName(news));
-            }
-
-            TagTextTemplate target = mContentInstance;
+            TagTextTemplate target = EnsureContentTemplate();
 
             if (target == null)
             {
-                Debug.LogError($"[NewsController] 内容预制体没加载成功，无法生成写作区。请检查资源名 " +
-                               $"[{ResolveContentResName(news)}] 的预制体是否存在、是否打过 AssetBundle 标签");
                 return;
             }
 
             // 让 Controller 真正握住当前模版 —— 提交 / 清空 / 读档全靠它
             SetCurrentTemplate(target);
 
-            // 2) 按配置生成片段
             if (!news.HasContent)
             {
+                // 写作区空白最常见的原因就是这个：NewsTemplate_SO 的 contentSegments 是空的
+                Debug.LogWarning($"[NewsController] 新闻 {news.newsId}({news.newsTitle}) 没有配置 contentSegments，" +
+                                 "写作区会是空白。请在 NewsTemplate_SO 的 Content Segments 里加「固定文本 / 空缺」，" +
+                                 "或跑 Tools/WritePanel/生成测试新闻模板 重新生成。");
+
+                target.Configure(null, null);
                 return;
             }
 
@@ -507,68 +492,53 @@ namespace TapTapFirst
             }
         }
 
-        /// <summary>实例化内容预制体（换预制体时先销毁旧的）。</summary>
-        /// <summary>实例化内容预制体（走 ResKit；换预制体时先销毁旧的）。</summary>
-        private void InstantiateContentInstance(string resName)
+        /// <summary>
+        /// 保证 Content 节点上有 TagTextTemplate（+ TagTextAdaptiveLayout）。
+        /// 正常情况 prefab 里已经挂好；漏挂就运行时补上，避免整个写作区空白。
+        /// </summary>
+        private TagTextTemplate EnsureContentTemplate()
         {
-            GameObject source = LoadPrefab(resName);
+            Transform content = ResolveContentParent();
 
-            if (source == null)
+            if (content == null)
             {
-                return;
+                Debug.LogError("[NewsController] 找不到写作区内容节点（TagModel/Scroll View/Viewport/Content）");
+                return null;
             }
 
-            // 换预制体时先销毁旧的（先把 Controller 手里的引用摘掉，免得留着已销毁对象）
-            if (mContentInstance != null)
+            TagTextTemplate template = content.GetComponent<TagTextTemplate>();
+
+            if (template == null)
             {
-                SetCurrentTemplate(null);
-                Destroy(mContentInstance.gameObject);
-                mContentInstance = null;
+                template = content.gameObject.AddComponent<TagTextTemplate>();
+                Debug.LogWarning($"[NewsController] {content.name} 上没挂 TagTextTemplate，已运行时补上（建议直接配在 prefab 里）");
             }
 
-            Transform parent = ResolveContentParent();
-
-            if (parent == null)
+            if (content.GetComponent<TagTextAdaptiveLayout>() == null)
             {
-                Debug.LogError("[NewsController] 找不到内容父节点（TagModel/Scroll View/Viewport/Content）");
-                return;
+                content.gameObject.AddComponent<TagTextAdaptiveLayout>();
+                Debug.LogWarning($"[NewsController] {content.name} 上没挂 TagTextAdaptiveLayout，已运行时补上（建议直接配在 prefab 里）");
             }
 
-            GameObject go = Instantiate(source, parent);
-            go.name = source.name;
-            go.SetActive(true);
-
-            RectTransform rect = go.transform as RectTransform;
-
-            if (rect != null)
-            {
-                rect.anchorMin = Vector2.zero;
-                rect.anchorMax = Vector2.one;
-                rect.offsetMin = Vector2.zero;
-                rect.offsetMax = Vector2.zero;
-                rect.localScale = Vector3.one;
-            }
-
-            mContentInstance = go.GetComponent<TagTextTemplate>();
-
-            if (mContentInstance == null)
-            {
-                mContentInstance = go.GetComponentInChildren<TagTextTemplate>(true);
-            }
+            mContentInstance = template;
+            return template;
         }
 
-        /// <summary>销毁上一次实例化的内容。</summary>
+        /// <summary>
+        /// 清空写作区。
+        /// Content 节点是 prefab 自带的，不销毁节点本身，只清掉里面生成的文本 / 空缺。
+        /// </summary>
         public void DestroyContentInstance()
         {
+            TagTextTemplate template = CurrentTemplate != null ? CurrentTemplate : mContentInstance;
+
             SetCurrentTemplate(null);
-
-            if (mContentInstance == null)
-            {
-                return;
-            }
-
-            Destroy(mContentInstance.gameObject);
             mContentInstance = null;
+
+            if (template != null)
+            {
+                template.Configure(null, null);
+            }
         }
 
         /// <summary>找内容父节点：TagModel/Scroll View/Viewport/Content。</summary>
@@ -714,30 +684,17 @@ namespace TapTapFirst
         // ============================================================
 
 
-        /// <summary>关闭写作界面（先把当前内容存成草稿，再清掉实例化出来的模版）。</summary>
+        /// <summary>关闭写作界面（先把当前内容存成草稿，再清空写作区）。</summary>
         public void Close()
         {
             // 关之前留一份草稿，下次打开能接着写
             SaveDraft();
 
-            ClearContentInstance();
+            DestroyContentInstance();
 
             CurrentNews = null;
 
             RefreshUI();
-        }
-
-        private void ClearContentInstance()
-        {
-            TagTextTemplate template = CurrentTemplate != null ? CurrentTemplate : mContentInstance;
-
-            SetCurrentTemplate(null);
-            mContentInstance = null;
-
-            if (template != null)
-            {
-                Destroy(template.gameObject);
-            }
         }
 
         // ============================================================
