@@ -45,6 +45,25 @@ namespace TapTapFirst
         // ============================================================
         //  临时测试 UI
         // ============================================================
+        //  临时测试 UI
+        //
+        //  注意两件事（都是曾经踩过的坑）：
+        //   1. 绝对不能在 OnGUI 里每帧 LoadSync 资源 —— 会不停申请 ResKit 句柄，
+        //      而且 GUI 绘制过程中触发资源加载/导入，编辑器会报
+        //      "TLS Allocator ALLOC_TEMP_TLS ... has unfreed allocations"
+        //   2. 每一组 Begin*/End* 都要用 try/finally 包住。绘制中途抛异常时
+        //      Unity 不会自动帮你补 End，GUI 组栈和临时分配就泄漏了，同样报上面那条。
+        // ============================================================
+
+        private GUIStyle mRichLabelStyle;
+
+        private List<NewsTemplate_SO> mAllNewsCache;
+        private List<Tag_SO> mAllTagsCache;
+
+        private INewsSystem mCachedNewsSystem;
+        private ITagSystem mCachedTagSystem;
+
+        private string mLastGuiError;
 
         private void OnGUI()
         {
@@ -56,143 +75,276 @@ namespace TapTapFirst
             const float panelWidth = 400f;
             const float panelHeight = 360f;
 
+            EnsureDebugReferences();
+
             GUILayout.BeginArea(new Rect(mDebugUiOrigin.x, mDebugUiOrigin.y, panelWidth, panelHeight), GUI.skin.box);
 
-            GUILayout.Label("<b>临时测试：获得数据</b>", new GUIStyle(GUI.skin.label) { richText = true });
-
-            if (!string.IsNullOrEmpty(mDebugMessage))
+            try
             {
-                GUILayout.Label(mDebugMessage);
+                if (mRichLabelStyle == null)
+                {
+                    mRichLabelStyle = new GUIStyle(GUI.skin.label) { richText = true };
+                }
+
+                GUILayout.Label("<b>临时测试：获得数据</b>", mRichLabelStyle);
+
+                if (!string.IsNullOrEmpty(mDebugMessage))
+                {
+                    GUILayout.Label(mDebugMessage);
+                }
+
+                GUILayout.BeginHorizontal();
+
+                try
+                {
+                    DrawNewsBlock(panelWidth * 0.5f - 12f);
+                    DrawTagBlock(panelWidth * 0.5f - 12f);
+                }
+                finally
+                {
+                    GUILayout.EndHorizontal();
+                }
+            }
+            catch (System.Exception e)
+            {
+                ReportGuiError(e);
+            }
+            finally
+            {
+                GUILayout.EndArea();
+            }
+        }
+
+        private void EnsureDebugReferences()
+        {
+            if (mCachedNewsSystem == null)
+            {
+                mCachedNewsSystem = this.GetSystem<INewsSystem>();
             }
 
-            GUILayout.BeginHorizontal();
+            if (mCachedTagSystem == null)
+            {
+                mCachedTagSystem = this.GetSystem<ITagSystem>();
+            }
+        }
 
-            DrawNewsBlock(panelWidth * 0.5f - 12f);
-            DrawTagBlock(panelWidth * 0.5f - 12f);
+        /// <summary>同一条错误只往 Console 报一次，避免 OnGUI 每帧刷屏。</summary>
+        private void ReportGuiError(System.Exception e)
+        {
+            if (mLastGuiError == e.Message)
+            {
+                return;
+            }
 
-            GUILayout.EndHorizontal();
-
-            GUILayout.EndArea();
+            mLastGuiError = e.Message;
+            Debug.LogError($"[Test] 测试面板绘制出错（同一条只报一次）：{e.Message}\n{e.StackTrace}");
         }
 
         private void DrawNewsBlock(float width)
         {
             GUILayout.BeginVertical(GUILayout.Width(width));
-            GUILayout.Label($"新闻模板（{mNewsListResName}）");
 
-            if (GUILayout.Button("全部获得"))
+            try
             {
-                AcquireAllNews();
+                GUILayout.Label($"新闻模板（{mNewsListResName}）");
+
+                GUILayout.BeginHorizontal();
+
+                try
+                {
+                    if (GUILayout.Button("全部获得"))
+                    {
+                        AcquireAllNews();
+                    }
+
+                    if (GUILayout.Button("重读总表"))
+                    {
+                        mAllNewsCache = null;
+                    }
+                }
+                finally
+                {
+                    GUILayout.EndHorizontal();
+                }
+
+                List<NewsTemplate_SO> all = LoadAllNews();
+
+                mNewsScroll = GUILayout.BeginScrollView(mNewsScroll, GUI.skin.box,
+                    GUILayout.Height(240f), GUILayout.Width(width));
+
+                try
+                {
+                    DrawNewsList(all);
+                }
+                finally
+                {
+                    GUILayout.EndScrollView();
+                }
             }
+            finally
+            {
+                GUILayout.EndVertical();
+            }
+        }
 
-            List<NewsTemplate_SO> all = LoadAllNews();
-
-            mNewsScroll = GUILayout.BeginScrollView(mNewsScroll, GUI.skin.box,
-                GUILayout.Height(240f), GUILayout.Width(width));
-
+        private void DrawNewsList(List<NewsTemplate_SO> all)
+        {
             if (all == null || all.Count == 0)
             {
                 GUILayout.Label("取不到总表");
+                return;
             }
-            else
+
+            for (int i = 0; i < all.Count; i++)
             {
-                foreach (NewsTemplate_SO news in all)
+                NewsTemplate_SO news = all[i];
+
+                if (news == null)
                 {
-                    if (news == null)
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    GUILayout.BeginHorizontal();
+                GUILayout.BeginHorizontal();
 
-                    bool owned = NewsSystem != null && NewsSystem.IsAcquired(news.newsId);
+                try
+                {
+                    bool owned = mCachedNewsSystem != null && mCachedNewsSystem.IsAcquired(news.newsId);
+                    string label = owned ? $"✔ {news.newsTitle} ({news.newsId})" : $"{news.newsTitle} ({news.newsId})";
 
-                    if (GUILayout.Button(owned ? $"✔ {news.newsTitle} ({news.newsId})" : $"{news.newsTitle} ({news.newsId})"))
+                    if (GUILayout.Button(label))
                     {
                         this.SendCommand(new AddNewsCommand(news.newsId));
                         mDebugMessage = $"已获得新闻 {news.newsTitle}";
                     }
-
+                }
+                finally
+                {
                     GUILayout.EndHorizontal();
                 }
             }
-
-            GUILayout.EndScrollView();
-            GUILayout.EndVertical();
         }
 
         private void DrawTagBlock(float width)
         {
             GUILayout.BeginVertical(GUILayout.Width(width));
-            GUILayout.Label($"Tag（{mTagListResName}）");
 
-            if (GUILayout.Button("全部获得"))
+            try
             {
-                AcquireAllTags();
+                GUILayout.Label($"Tag（{mTagListResName}）");
+
+                GUILayout.BeginHorizontal();
+
+                try
+                {
+                    if (GUILayout.Button("全部获得"))
+                    {
+                        AcquireAllTags();
+                    }
+
+                    if (GUILayout.Button("重读总表"))
+                    {
+                        mAllTagsCache = null;
+                    }
+                }
+                finally
+                {
+                    GUILayout.EndHorizontal();
+                }
+
+                List<Tag_SO> all = LoadAllTags();
+
+                mTagScroll = GUILayout.BeginScrollView(mTagScroll, GUI.skin.box,
+                    GUILayout.Height(240f), GUILayout.Width(width));
+
+                try
+                {
+                    DrawTagList(all);
+                }
+                finally
+                {
+                    GUILayout.EndScrollView();
+                }
             }
+            finally
+            {
+                GUILayout.EndVertical();
+            }
+        }
 
-            List<Tag_SO> all = LoadAllTags();
-
-            mTagScroll = GUILayout.BeginScrollView(mTagScroll, GUI.skin.box,
-                GUILayout.Height(240f), GUILayout.Width(width));
-
+        private void DrawTagList(List<Tag_SO> all)
+        {
             if (all == null || all.Count == 0)
             {
                 GUILayout.Label("取不到总表");
+                return;
             }
-            else
+
+            for (int i = 0; i < all.Count; i++)
             {
-                foreach (Tag_SO tag in all)
+                Tag_SO tag = all[i];
+
+                if (tag == null)
                 {
-                    if (tag == null)
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    bool owned = TagSystem != null && TagSystem.IsAcquired(tag.tagId);
+                bool owned = mCachedTagSystem != null && mCachedTagSystem.IsAcquired(tag.tagId);
+                string label = owned ? $"✔ {tag.tagName} ({tag.tagId})" : $"{tag.tagName} ({tag.tagId})";
 
-                    if (GUILayout.Button(owned ? $"✔ {tag.tagName} ({tag.tagId})" : $"{tag.tagName} ({tag.tagId})"))
-                    {
-                        this.SendCommand(new AddTagCommand(tag.tagId));
-                        mDebugMessage = $"已获得 Tag {tag.tagName}";
-                    }
+                if (GUILayout.Button(label))
+                {
+                    this.SendCommand(new AddTagCommand(tag.tagId));
+                    mDebugMessage = $"已获得 Tag {tag.tagName}";
                 }
             }
-
-            GUILayout.EndScrollView();
-            GUILayout.EndVertical();
         }
 
         // ============================================================
         //  数据来源（测试用：直接读总表，方便把没获得的也列出来）
         // ============================================================
 
+        /// <summary>总表只读一次，缓存起来。OnGUI 里绝对不能每帧 LoadSync。</summary>
         private List<NewsTemplate_SO> LoadAllNews()
         {
+            if (mAllNewsCache != null)
+            {
+                return mAllNewsCache;
+            }
+
             try
             {
                 NewsTemplateList_SO list = mDebugResLoader.LoadSync<NewsTemplateList_SO>(mNewsListResName);
-                return list != null ? list.newsTemplateList : null;
+                mAllNewsCache = list != null ? list.newsTemplateList : new List<NewsTemplate_SO>();
             }
             catch (System.Exception e)
             {
                 Debug.LogError($"[Test] 加载新闻总表 {mNewsListResName} 失败：{e.Message}");
-                return null;
+                mAllNewsCache = new List<NewsTemplate_SO>();
             }
+
+            return mAllNewsCache;
         }
 
+        /// <summary>同上：缓存，避免每帧申请 ResKit 句柄。</summary>
         private List<Tag_SO> LoadAllTags()
         {
+            if (mAllTagsCache != null)
+            {
+                return mAllTagsCache;
+            }
+
             try
             {
                 TagList_SO list = mDebugResLoader.LoadSync<TagList_SO>(mTagListResName);
-                return list != null ? list.allTagList : null;
+                mAllTagsCache = list != null ? list.allTagList : new List<Tag_SO>();
             }
             catch (System.Exception e)
             {
                 Debug.LogError($"[Test] 加载 Tag 总表 {mTagListResName} 失败：{e.Message}");
-                return null;
+                mAllTagsCache = new List<Tag_SO>();
             }
+
+            return mAllTagsCache;
         }
 
         private void AcquireAllNews()

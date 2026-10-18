@@ -15,17 +15,17 @@ namespace TapTapFirst
         [SerializeField]
         private readonly List<GameObject> mybaLineListObject = new List<GameObject>();
         [SerializeField]
-        private Transform position;//λ��
+        private Transform position;//位置
         [SerializeField]
-        private GameObject mybaLinePrefab;//Ԥ����
-        private IMybaSystem mybaSystem;//mybaϵͳ
+        private GameObject mybaLinePrefab;//预制体
+        private IMybaSystem mybaSystem;//myba系统
 
 
         private void OnGUI()
         {
             if (GUI.Button(new Rect(100, 100, 100, 60), "mybaAdd"))
             {
-                TapTap.Interface.SendEvent(new mybaSendEvent { content = "����",data = 0 });
+                TapTap.Interface.SendEvent(new mybaSendEvent { content = "测试",data = 0 });
                 Debug.Log("123123");
 
             }
@@ -61,23 +61,67 @@ namespace TapTapFirst
         }
         public void updataMybaLenList()
         {
-            if (mybaSystem.GetMyBaLineContentList() == null)
+            if (mybaSystem == null)
+            {
+                mybaSystem = this.GetSystem<IMybaSystem>();
+            }
+
+            if (mybaSystem == null || mybaLinePrefab == null || position == null)
+            {
+                Debug.LogWarning("[MybaControl] 缺少 mybaSystem / mybaLinePrefab / position，贴吧列表不刷新");
                 return;
-            for(int i = 0;i<mybaSystem.GetMyBaLineContentList().Count;i++)
+            }
+
+            List<string> contents = mybaSystem.GetMyBaLineContentList();
+
+            if (contents == null)
+            {
+                return;
+            }
+
+            List<int> clicks = mybaSystem.GetClickList();
+            List<int> replies = mybaSystem.GetRepliseList();
+            List<int> datas = mybaSystem.GetdataList();
+
+            // 只补【新增】的条目。
+            // 原来是无条件从 0 开始把整张表重新 Instantiate 一遍（而且从不清旧物件）：
+            // 每提交一条新闻，就按当前总条数再造成 N 个物件 —— 越点越多，Console 还被
+            // 每个物件一条的 LogWarning 刷屏。
+            for (int i = mybaLineListObject.Count; i < contents.Count; i++)
             {
                 GameObject item = Instantiate(mybaLinePrefab, position);
+
+                if (item == null)
+                {
+                    continue;
+                }
+
                 mybaLineListObject.Add(item);
                 item.transform.SetSiblingIndex(3);
-                //������������д���������ʹ��SO
+
+                //根据玩家来进行创建，不能使用SO
                 baLineSingle mybaLineSingle = item.GetComponent<baLineSingle>();
-                mybaLineSingle.title.text = mybaSystem.GetMyBaLineContentList()[i];
-                mybaLineSingle.writter.text = "����";
-                mybaLineSingle.clicks.text = mybaSystem.GetClickList()[i].ToString();
-                mybaLineSingle.replies.text = mybaSystem.GetRepliseList()[i].ToString();
-                mybaLineSingle.data.text = mybaSystem.GetdataList()[i].ToString();
+
+                if (mybaLineSingle == null)
+                {
+                    Debug.LogWarning("[MybaControl] mybaLinePrefab 上没挂 baLineSingle");
+                    continue;
+                }
+
+                if (mybaLineSingle.title != null) mybaLineSingle.title.text = contents[i];
+                if (mybaLineSingle.writter != null) mybaLineSingle.writter.text = "名字";
+                if (mybaLineSingle.clicks != null) mybaLineSingle.clicks.text = GetAt(clicks, i).ToString();
+                if (mybaLineSingle.replies != null) mybaLineSingle.replies.text = GetAt(replies, i).ToString();
+                if (mybaLineSingle.data != null) mybaLineSingle.data.text = GetAt(datas, i).ToString();
+
                 mybaLineSingle.mybaWebID = i;
-                Debug.LogWarning("mybaWebID"+i);
             }
+        }
+
+        /// <summary>越界时返回 0，避免列表长度不一致直接抛 IndexOutOfRange。</summary>
+        private static int GetAt(List<int> list, int index)
+        {
+            return list != null && index >= 0 && index < list.Count ? list[index] : 0;
         }
 
 
