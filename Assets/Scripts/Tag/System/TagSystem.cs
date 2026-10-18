@@ -55,7 +55,7 @@ namespace TapTapFirst
         /// <summary>
         /// 总Tag列表，存储所有的tag数据
         /// <summary>
-        private TagList_SO allTaglist = new();
+        private TagList_SO allTaglist;
 
 
         /// <summary>

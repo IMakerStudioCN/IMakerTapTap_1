@@ -17,7 +17,7 @@ namespace TapTapFirst
             for(int i = 0; i < softwareList.Count; i++)
             {
                 GameObject item = Instantiate(softwareItemPrefab, this.transform);
-                item.transform.parent = this.transform;
+                item.transform.SetParent(this.transform, false);
                 SoftwareSingle single = item.GetComponent<SoftwareSingle>();
                 single.softwareData = softwareList[i];
             }
