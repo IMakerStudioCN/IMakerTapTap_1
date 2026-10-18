@@ -93,7 +93,15 @@ namespace TapTapFirst
 				return;
 			}
 			//设置对话样貌
-			mStanding.sprite = mSingle.Standing;
+			if (mSingle.Standing != null)
+			{
+				mStanding.color = new Color(255, 255, 255, 1);
+				mStanding.sprite = mSingle.Standing;
+			}
+			else
+			{
+				mStanding.color = new Color(0, 0, 0, 0);
+			}
 			
 			GameObject mObject =  Instantiate<GameObject>(mSingle.prefab,this.transform);
 			mObject.GetComponentInChildren<TextMeshProUGUI>().text = mSingle.Sentence;
