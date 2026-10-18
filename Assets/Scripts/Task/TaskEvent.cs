@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,5 +14,6 @@ namespace TapTapFirst
     public struct OnTaskEnd
     {
         public TaskSingle endTask;
+        public bool isExpired;
     }
 }

@@ -77,6 +77,12 @@ namespace TapTapFirst
                 this.transform.DetachChildren();
 				//隐藏地图图标
                 UIKit.GetPanel<Dialog>().Hide();
+				//添加Tag
+				foreach(int id in mDialogSO.TagID)
+				{
+					this.SendCommand(new AddTagCommand(id));
+					Debug.Log($"已经发送TagID{id}");
+				}
                 return;
             }
             DialogSOSingle mSingle = mDialogSO.dialog[index];
@@ -86,9 +92,17 @@ namespace TapTapFirst
 				Debug.LogWarning($"{mDialogSO.title}第{index}没有配置prefab");
 				return;
 			}
+			//设置对话样貌
 			mStanding.sprite = mSingle.Standing;
+			
 			GameObject mObject =  Instantiate<GameObject>(mSingle.prefab,this.transform);
 			mObject.GetComponentInChildren<TextMeshProUGUI>().text = mSingle.Sentence;
+            var profileRoot = mObject.transform.Find("ProfilePicture");
+			if (profileRoot != null && mSingle.head != null)
+			{
+                profileRoot.GetComponent<Image>().sprite = mSingle.head;
+
+            }
 			mScrollRect.verticalNormalizedPosition = 0;
 			
 		}

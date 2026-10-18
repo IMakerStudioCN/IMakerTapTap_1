@@ -51,6 +51,23 @@ namespace TapTapFirst
         }
     }
 
+    /// <summary>一条预设字体：Inspector 里配好「名字 + 字体」，再用索引选中。</summary>
+    [Serializable]
+    public class TagFontPreset
+    {
+        [Tooltip("在下拉里显示的名字")]
+        public string name;
+
+        [Tooltip("这个预设用的字体")]
+        public TMP_FontAsset font;
+    }
+
+    /// <summary>把 int 字段画成「预设字体」下拉（TagFontPresetIndexDrawer 用）。</summary>
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class TagFontPresetIndexAttribute : PropertyAttribute
+    {
+    }
+
     /// <summary>
     /// 【带空缺的文本模版】。
     ///
@@ -75,10 +92,30 @@ namespace TapTapFirst
         [Tooltip("玩家没有填的空缺在纯文本里显示成什么")]
         [SerializeField] private string mEmptyPlaceholder = "____";
 
+        [Header("生成的文字样式（Configure / CreateSlot 造出来的 TMP 用）")]
+        [Tooltip("预设字体列表：先在这里配好「名字 + 字体」，再用下面的下拉选择")]
+        [SerializeField] private List<TagFontPreset> mFontPresets = new List<TagFontPreset>();
+
+        [Tooltip("选中的预设序号；-1 表示不使用预设，直接落到 mFont")]
+        [TagFontPresetIndex]
+        [SerializeField] private int mFontPresetIndex = -1;
+
+        [Tooltip("兜底字体：没选预设、或选中预设没配字体时用它；留空则用 TMP 默认字体")]
+        [SerializeField] private TMP_FontAsset mFont;
+
+        [Tooltip("运行时生成的文字颜色")]
+        [SerializeField] private Color mTextColor = Color.black;
+
         [Header("日志")]
         [SerializeField] private bool mLog;
 
         private readonly List<TagTextSegment> mSegments = new List<TagTextSegment>();
+
+        /// <summary>是否已经收集过（哪怕收集到 0 段）。EnsureCollected 用它判断，不能再按 Count==0 判断。</summary>
+        private bool mCollected;
+
+        /// <summary>正在收集的重入锁。</summary>
+        private bool mCollecting;
 
         /// <summary>片段内容发生变化时触发（空缺填入/清空，或重新收集）。自适应排版靠它重排。</summary>
         public event Action SegmentsChanged;
@@ -88,8 +125,17 @@ namespace TapTapFirst
         /// <summary>按文本顺序排好的片段（只读）。</summary>
         public IReadOnlyList<TagTextSegment> Segments => mSegments;
 
-        /// <summary>是否已经收集过片段。</summary>
-        public bool IsCollected => mSegments.Count > 0;
+        /// <summary>是否已经收集过片段（收集到 0 段也算收集过）。</summary>
+        public bool IsCollected => mCollected;
+
+        /// <summary>当前生效的字体（只读：优先级 = 选中的预设 &gt; mFont &gt; TMP 默认字体）。</summary>
+        public TMP_FontAsset Font => ResolveFont();
+
+        /// <summary>配置好的预设字体列表（只读）。</summary>
+        public IReadOnlyList<TagFontPreset> FontPresets => mFontPresets;
+
+        /// <summary>当前选中的预设序号；-1 表示不使用预设。</summary>
+        public int FontPresetIndex => mFontPresetIndex;
 
         /// <summary>所有空缺是否都已填满。</summary>
         public bool IsAllSlotsFilled
@@ -151,19 +197,53 @@ namespace TapTapFirst
             }
         }
 
-        /// <summary>开始收集片段（会等一帧，保证 LayoutGroup 已经算完）。</summary>
+        /// <summary>
+        /// 重新收集片段。
+        ///
+        /// 注意：这里会发 SegmentsChanged，而订阅方（NewsController.RefreshUI）会反过来调
+        /// GetProgress() / IsAllSlotsFilled()，那些又都会走 EnsureCollected()。
+        /// 所以必须加防重入锁，否则一旦收集到 0 段就会无限递归（StackOverflowException）。
+        /// </summary>
         public void Collect()
         {
-            mSegments.Clear();
-            CollectInto(transform, mSegments);
-            Log($"收集到 {mSegments.Count} 个片段，其中空缺 {CountSlots()} 个");
-            SegmentsChanged?.Invoke();
+            if (mCollecting)
+            {
+                return;
+            }
+
+            mCollecting = true;
+
+            try
+            {
+                mSegments.Clear();
+                CollectInto(transform, mSegments);
+
+                // 先套字体再发事件：订阅方（自适应排版）要按新字体量尺寸
+                ApplyFontToTemplate();
+
+                mCollected = true;
+                Log($"收集到 {mSegments.Count} 个片段，其中空缺 {CountSlots()} 个");
+
+                // 事件也在锁里发：万一订阅方绕一圈又调 Collect()，直接忽略，不会继续递归
+                SegmentsChanged?.Invoke();
+            }
+            finally
+            {
+                mCollecting = false;
+            }
         }
 
-        /// <summary>确保已经收集过。</summary>
+        /// <summary>
+        /// 确保已经收集过片段。
+        ///
+        /// 判定条件必须是「从没收集过」，不能是 mSegments.Count == 0：
+        /// 内容本来就是空的时候（Configure(null, null) 清空后、或这条新闻没配片段），
+        /// 按 Count==0 判断会让每次调用都重新 Collect 并发 SegmentsChanged，
+        /// 而订阅方 RefreshUI 又会调回来 —— 直接栈溢出。
+        /// </summary>
         public void EnsureCollected()
         {
-            if (mSegments.Count == 0)
+            if (!mCollected)
             {
                 Collect();
             }
@@ -317,6 +397,9 @@ namespace TapTapFirst
                 }
             }
 
+            ApplyFontToTemplate();
+
+            mCollected = true;
             Log($"SetSegments -> {mSegments.Count} 个片段，其中空缺 {CountSlots()} 个");
             SegmentsChanged?.Invoke();
         }
@@ -350,8 +433,8 @@ namespace TapTapFirst
             TMPro.TextMeshProUGUI phText = placeholder.AddComponent<TMPro.TextMeshProUGUI>();
             phText.text = placeholderText;
             phText.alignment = TMPro.TextAlignmentOptions.Center;
-            phText.color = new Color(0.6f, 0.6f, 0.6f, 1f);
             phText.raycastTarget = false;
+            ApplyTextStyle(phText);
 
             TagKindSlot slot = go.AddComponent<TagKindSlot>();
             slot.ApplySetup(slotId, wordType, tagDisplayPrefab);
@@ -392,6 +475,7 @@ namespace TapTapFirst
                         tmp.text = text;
                         tmp.alignment = TMPro.TextAlignmentOptions.Center;
                         tmp.raycastTarget = false;
+                        ApplyTextStyle(tmp);
 
                         mSegments.Add(new TagTextSegment { TextObject = go, Text = text });
                     }
@@ -423,6 +507,9 @@ namespace TapTapFirst
                 segment.Slot.Changed += OnSlotChanged;
             }
 
+            ApplyFontToTemplate();
+
+            mCollected = true;
             Log($"Configure -> {mSegments.Count} 个片段，其中空缺 {CountSlots()} 个");
             SegmentsChanged?.Invoke();
         }
@@ -574,6 +661,9 @@ namespace TapTapFirst
 
         private void OnSlotChanged(TagKindSlot slot)
         {
+            // 刚填进去的 TagDisplay 是运行时实例化的，字体得补一次
+            ApplyFontToSlot(slot);
+
             TypeEventSystem.Global.Send(new TagSlotFilledEvent
             {
                 Template = this,
@@ -581,6 +671,132 @@ namespace TapTapFirst
             });
 
             SegmentsChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// 解析当前生效的字体。
+        ///
+        /// 优先级：选中的预设（Inspector 里显式挑的那个）&gt; mFont（兜底 / 老预制体里本来就有的）&gt; TMP 默认字体。
+        /// 预设越界（比如列表被删短了）、预设没配字体、mFontPresets 为 null 都安全退回，不会抛异常。
+        /// </summary>
+        public TMP_FontAsset ResolveFont()
+        {
+            if (mFontPresets != null &&
+                mFontPresetIndex >= 0 &&
+                mFontPresetIndex < mFontPresets.Count)
+            {
+                TagFontPreset preset = mFontPresets[mFontPresetIndex];
+
+                if (preset != null && preset.font != null)
+                {
+                    return preset.font;
+                }
+            }
+
+            return mFont;
+        }
+
+        /// <summary>
+        /// 把当前生效的字体套到整棵模版下的所有 TMP 文字：
+        /// 预制体里已有的固定文本、空缺的占位提示、以及运行时填进去的 TagDisplay。
+        ///
+        /// 这里只换字体与材质，不动颜色 —— 颜色仍由各节点自己 / ApplyTextStyle 决定。
+        /// </summary>
+        public void ApplyFontToTemplate()
+        {
+            ApplyFontToSubtree(transform);
+        }
+
+        /// <summary>只把字体套到某个空缺的子树（占位提示 + 已填入的显示件）。</summary>
+        public void ApplyFontToSlot(TagKindSlot slot)
+        {
+            if (slot == null)
+            {
+                return;
+            }
+
+            ApplyFontToSubtree(slot.transform);
+        }
+
+        private void ApplyFontToSubtree(Transform root)
+        {
+            if (root == null)
+            {
+                return;
+            }
+
+            TMP_FontAsset font = ResolveFont();
+
+            if (font == null)
+            {
+                return;
+            }
+
+            // true：占位提示这类隐藏节点也要换，否则填上内容再清空又会露出旧字体
+            foreach (TMP_Text text in root.GetComponentsInChildren<TMP_Text>(true))
+            {
+                ApplyFont(text, font);
+            }
+        }
+
+        /// <summary>
+        /// 把生效字体（预设优先）+ 纯黑套到运行时生成的文字上。
+        /// Configure / CreateSlot 现场造的 TMP 只能靠这里。
+        /// </summary>
+        private void ApplyTextStyle(TMP_Text text)
+        {
+            if (text == null)
+            {
+                return;
+            }
+
+            ApplyFont(text, ResolveFont());
+            text.color = mTextColor;
+        }
+
+        /// <summary>换字体并同步材质（材质还指着旧图集的话会显示成豆腐块）。</summary>
+        private static void ApplyFont(TMP_Text text, TMP_FontAsset font)
+        {
+            if (text == null || font == null)
+            {
+                return;
+            }
+
+            if (text.font != font)
+            {
+                text.font = font;
+            }
+
+            Material material = font.material;
+
+            if (material != null &&
+                (text.fontSharedMaterial == null || text.fontSharedMaterial.mainTexture != font.atlasTexture))
+            {
+                text.fontSharedMaterial = material;
+            }
+        }
+
+        /// <summary>编辑器里手动把预设字体刷进预制体（右键组件菜单），省得进 Play 才看得到。</summary>
+        [ContextMenu("把预设字体套到模版内文字")]
+        private void ApplyFontToTemplateInEditor()
+        {
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                TMP_Text[] texts = GetComponentsInChildren<TMP_Text>(true);
+                UnityEditor.Undo.RecordObjects(texts, "应用预设字体");
+                ApplyFontToTemplate();
+
+                foreach (TMP_Text text in texts)
+                {
+                    UnityEditor.EditorUtility.SetDirty(text);
+                }
+
+                UnityEditor.EditorUtility.SetDirty(this);
+                return;
+            }
+#endif
+            ApplyFontToTemplate();
         }
 
         private void Log(string message)

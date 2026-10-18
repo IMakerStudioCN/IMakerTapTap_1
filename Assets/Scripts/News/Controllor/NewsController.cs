@@ -47,9 +47,6 @@ namespace TapTapFirst
         // ============================================================
 
         [Header("资源名（ResKit）")]
-        [Tooltip("写作内容预制体资源名（根节点带 TagTextTemplate）")]
-        [SerializeField] private string mContentResName = "NewsContent";
-
         [Tooltip("模板卡片预制体资源名（根节点带 TemplateCardItem）")]
         [SerializeField] private string mTemplateCardResName = "TemplateCard";
 
@@ -91,7 +88,6 @@ namespace TapTapFirst
         [SerializeField] private bool mAutoSpawnTagOptions = true;
 
         [Tooltip("切换模板时销毁上一次实例化的内容")]
-        [SerializeField] private bool mDestroyOldContentOnSwitch = true;
 
         [Header("日志")]
         [SerializeField] private bool mLog;
@@ -99,6 +95,13 @@ namespace TapTapFirst
         private TagTextTemplate mContentInstance;
 
         private readonly List<TemplateCardItem> mCards = new List<TemplateCardItem>();
+
+        /// <summary>右侧 Tag 列表当前铺出来的选项（和 mCards 一样，便于增量更新）。</summary>
+        private readonly List<TagOption> mTagOptions = new List<TagOption>();
+
+        /// <summary>两个列表的动态更新订阅（OnEnable 注册 / OnDisable 注销）。</summary>
+        private IUnRegister mNewsAcquiredUnRegister;
+        private IUnRegister mTagAcquiredUnRegister;
 
         // ============================================================
         //  按钮
@@ -168,6 +171,8 @@ namespace TapTapFirst
 
         private void OnDestroy()
         {
+            UnregisterListEvents();
+
             if (mSubmitButton != null)
             {
                 mSubmitButton.onClick.RemoveListener(OnSubmitClicked);
@@ -193,6 +198,9 @@ namespace TapTapFirst
 
         private void OnEnable()
         {
+            // 面板一开就订阅：新获得新闻 / Tag 时两个列表动态更新
+            RegisterListEvents();
+
             // Start 只跑一次；Mini 隐藏后再打开会走这里（手册 §2.3 模板 B）
             ResolveTemplateListRoot();
             ResolveTagListRoot();
@@ -222,6 +230,8 @@ namespace TapTapFirst
 
         private void OnDisable()
         {
+            UnregisterListEvents();
+
             // 面板被隐藏 / 关掉时也留一份草稿（不只 Close() 那条路）
             if (!Application.isPlaying)
             {
@@ -283,41 +293,55 @@ namespace TapTapFirst
                     continue;
                 }
 
-                TemplateCardItem card = null;
-
-                GameObject cardPrefab = LoadPrefab(mTemplateCardResName);
-
-                if (cardPrefab != null)
-                {
-                    GameObject go = Instantiate(cardPrefab, mTemplateListRoot);
-                    go.name = $"Template_{news.newsId}_{news.newsTitle}";
-                    go.SetActive(true);
-                    card = go.GetComponent<TemplateCardItem>();
-
-                    if (card == null)
-                    {
-                        card = go.GetComponentInChildren<TemplateCardItem>(true);
-                    }
-
-                    if (card == null)
-                    {
-                        card = go.AddComponent<TemplateCardItem>();
-                    }
-                }
+                TemplateCardItem card = CreateCard(news);
 
                 if (card == null)
                 {
                     continue;
                 }
 
-                card.Setup(news);
-                card.OnSelected -= OnTemplateCardSelected;
-                card.OnSelected += OnTemplateCardSelected;
                 card.SetSelected(CurrentNews != null && CurrentNews.newsId == news.newsId);
                 mCards.Add(card);
             }
 
             Debug.Log($"[NewsController] 模板列表已铺：{mCards.Count} 张卡片");
+        }
+
+        /// <summary>实例化一张模板卡片并 Setup（含选中回调），失败返回 null。</summary>
+        private TemplateCardItem CreateCard(NewsTemplate_SO news)
+        {
+            if (news == null || mTemplateListRoot == null)
+            {
+                return null;
+            }
+
+            GameObject cardPrefab = LoadPrefab(mTemplateCardResName);
+
+            if (cardPrefab == null)
+            {
+                return null;
+            }
+
+            GameObject go = Instantiate(cardPrefab, mTemplateListRoot);
+            go.name = $"Template_{news.newsId}_{news.newsTitle}";
+            go.SetActive(true);
+
+            TemplateCardItem card = go.GetComponent<TemplateCardItem>();
+
+            if (card == null)
+            {
+                card = go.GetComponentInChildren<TemplateCardItem>(true);
+            }
+
+            if (card == null)
+            {
+                card = go.AddComponent<TemplateCardItem>();
+            }
+
+            card.Setup(news);
+            card.OnSelected -= OnTemplateCardSelected;
+            card.OnSelected += OnTemplateCardSelected;
+            return card;
         }
 
         private void OnTemplateCardSelected(int newsId)
@@ -401,22 +425,14 @@ namespace TapTapFirst
             }
         }
 
-        /// <summary>取这条新闻该用哪个内容预制体资源名：自己的优先，否则用默认的。</summary>
-        public string ResolveContentResName(NewsTemplate_SO news)
-        {
-            if (news != null && !string.IsNullOrEmpty(news.contentResName))
-            {
-                return news.contentResName;
-            }
-
-            return mContentResName;
-        }
-
         /// <summary>
-        /// 按 NewsTemplate_SO 的配置生成写作区：
-        ///   1. 按资源名（ResKit）实例化内容预制体到 mContentParent
-        ///   2. 按 contentSegments 生成「固定文本 + 空缺」
-        /// 没有配置片段时，只切换模版、不改内容。
+        /// 按 NewsTemplate_SO 的配置生成写作区。
+        ///
+        /// 不再实例化「完整模版预制体」：
+        ///   Content 节点（TagModel/Scroll View/Viewport/Content）自己就是 TagTextTemplate，
+        ///   生成的固定文本 / 空缺直接挂在 Content 下，
+        ///   于是写作区和模板列表 / Tag 列表共用同一套
+        ///   ScrollRect + Viewport(RectMask2D) + Content + 垂直滚动条 的滚动方案。
         /// </summary>
         public void ApplyContentFromConfig(NewsTemplate_SO news)
         {
@@ -425,27 +441,24 @@ namespace TapTapFirst
                 return;
             }
 
-            // 1) 换内容实例（强制用预制体）：优先用这条新闻自己的资源名，其次用 mContentResName
-            if (mContentInstance == null || mDestroyOldContentOnSwitch)
-            {
-                InstantiateContentInstance(ResolveContentResName(news));
-            }
-
-            TagTextTemplate target = mContentInstance;
+            TagTextTemplate target = EnsureContentTemplate();
 
             if (target == null)
             {
-                Debug.LogError($"[NewsController] 内容预制体没加载成功，无法生成写作区。请检查资源名 " +
-                               $"[{ResolveContentResName(news)}] 的预制体是否存在、是否打过 AssetBundle 标签");
                 return;
             }
 
             // 让 Controller 真正握住当前模版 —— 提交 / 清空 / 读档全靠它
             SetCurrentTemplate(target);
 
-            // 2) 按配置生成片段
             if (!news.HasContent)
             {
+                // 写作区空白最常见的原因就是这个：NewsTemplate_SO 的 contentSegments 是空的
+                Debug.LogWarning($"[NewsController] 新闻 {news.newsId}({news.newsTitle}) 没有配置 contentSegments，" +
+                                 "写作区会是空白。请在 NewsTemplate_SO 的 Content Segments 里加「固定文本 / 空缺」，" +
+                                 "或跑 Tools/WritePanel/生成测试新闻模板 重新生成。");
+
+                target.Configure(null, null);
                 return;
             }
 
@@ -479,68 +492,53 @@ namespace TapTapFirst
             }
         }
 
-        /// <summary>实例化内容预制体（换预制体时先销毁旧的）。</summary>
-        /// <summary>实例化内容预制体（走 ResKit；换预制体时先销毁旧的）。</summary>
-        private void InstantiateContentInstance(string resName)
+        /// <summary>
+        /// 保证 Content 节点上有 TagTextTemplate（+ TagTextAdaptiveLayout）。
+        /// 正常情况 prefab 里已经挂好；漏挂就运行时补上，避免整个写作区空白。
+        /// </summary>
+        private TagTextTemplate EnsureContentTemplate()
         {
-            GameObject source = LoadPrefab(resName);
+            Transform content = ResolveContentParent();
 
-            if (source == null)
+            if (content == null)
             {
-                return;
+                Debug.LogError("[NewsController] 找不到写作区内容节点（TagModel/Scroll View/Viewport/Content）");
+                return null;
             }
 
-            // 换预制体时先销毁旧的（先把 Controller 手里的引用摘掉，免得留着已销毁对象）
-            if (mContentInstance != null)
+            TagTextTemplate template = content.GetComponent<TagTextTemplate>();
+
+            if (template == null)
             {
-                SetCurrentTemplate(null);
-                Destroy(mContentInstance.gameObject);
-                mContentInstance = null;
+                template = content.gameObject.AddComponent<TagTextTemplate>();
+                Debug.LogWarning($"[NewsController] {content.name} 上没挂 TagTextTemplate，已运行时补上（建议直接配在 prefab 里）");
             }
 
-            Transform parent = ResolveContentParent();
-
-            if (parent == null)
+            if (content.GetComponent<TagTextAdaptiveLayout>() == null)
             {
-                Debug.LogError("[NewsController] 找不到内容父节点（TagModel/Scroll View/Viewport/Content）");
-                return;
+                content.gameObject.AddComponent<TagTextAdaptiveLayout>();
+                Debug.LogWarning($"[NewsController] {content.name} 上没挂 TagTextAdaptiveLayout，已运行时补上（建议直接配在 prefab 里）");
             }
 
-            GameObject go = Instantiate(source, parent);
-            go.name = source.name;
-            go.SetActive(true);
-
-            RectTransform rect = go.transform as RectTransform;
-
-            if (rect != null)
-            {
-                rect.anchorMin = Vector2.zero;
-                rect.anchorMax = Vector2.one;
-                rect.offsetMin = Vector2.zero;
-                rect.offsetMax = Vector2.zero;
-                rect.localScale = Vector3.one;
-            }
-
-            mContentInstance = go.GetComponent<TagTextTemplate>();
-
-            if (mContentInstance == null)
-            {
-                mContentInstance = go.GetComponentInChildren<TagTextTemplate>(true);
-            }
+            mContentInstance = template;
+            return template;
         }
 
-        /// <summary>销毁上一次实例化的内容。</summary>
+        /// <summary>
+        /// 清空写作区。
+        /// Content 节点是 prefab 自带的，不销毁节点本身，只清掉里面生成的文本 / 空缺。
+        /// </summary>
         public void DestroyContentInstance()
         {
+            TagTextTemplate template = CurrentTemplate != null ? CurrentTemplate : mContentInstance;
+
             SetCurrentTemplate(null);
-
-            if (mContentInstance == null)
-            {
-                return;
-            }
-
-            Destroy(mContentInstance.gameObject);
             mContentInstance = null;
+
+            if (template != null)
+            {
+                template.Configure(null, null);
+            }
         }
 
         /// <summary>找内容父节点：TagModel/Scroll View/Viewport/Content。</summary>
@@ -686,30 +684,17 @@ namespace TapTapFirst
         // ============================================================
 
 
-        /// <summary>关闭写作界面（先把当前内容存成草稿，再清掉实例化出来的模版）。</summary>
+        /// <summary>关闭写作界面（先把当前内容存成草稿，再清空写作区）。</summary>
         public void Close()
         {
             // 关之前留一份草稿，下次打开能接着写
             SaveDraft();
 
-            ClearContentInstance();
+            DestroyContentInstance();
 
             CurrentNews = null;
 
             RefreshUI();
-        }
-
-        private void ClearContentInstance()
-        {
-            TagTextTemplate template = CurrentTemplate != null ? CurrentTemplate : mContentInstance;
-
-            SetCurrentTemplate(null);
-            mContentInstance = null;
-
-            if (template != null)
-            {
-                Destroy(template.gameObject);
-            }
         }
 
         // ============================================================
@@ -732,6 +717,8 @@ namespace TapTapFirst
                 Destroy(mTagListRoot.GetChild(i).gameObject);
             }
 
+            mTagOptions.Clear();
+
             List<Tag_SO> acquiredTags = LoadTagOptions();
 
             if (acquiredTags == null || acquiredTags.Count == 0)
@@ -747,22 +734,41 @@ namespace TapTapFirst
                     continue;
                 }
 
-                GameObject go = Instantiate(optionPrefab, mTagListRoot);
-                go.name = $"Option_{tag.tagName}";
-                go.SetActive(true);
-
-                TagOption option = go.GetComponent<TagOption>();
-
-                if (option == null)
-                {
-                    option = go.GetComponentInChildren<TagOption>(true);
-                }
+                TagOption option = CreateTagOption(optionPrefab, tag);
 
                 if (option != null)
                 {
-                    option.Setup(tag);
+                    mTagOptions.Add(option);
                 }
             }
+        }
+
+        /// <summary>实例化一个 Tag 选项并 Setup，失败返回 null。</summary>
+        private TagOption CreateTagOption(GameObject optionPrefab, Tag_SO tag)
+        {
+            if (optionPrefab == null || tag == null || mTagListRoot == null)
+            {
+                return null;
+            }
+
+            GameObject go = Instantiate(optionPrefab, mTagListRoot);
+            go.name = $"Option_{tag.tagName}";
+            go.SetActive(true);
+
+            TagOption option = go.GetComponent<TagOption>();
+
+            if (option == null)
+            {
+                option = go.GetComponentInChildren<TagOption>(true);
+            }
+
+            if (option == null)
+            {
+                return null;
+            }
+
+            option.Setup(tag);
+            return option;
         }
 
         /// <summary>
@@ -780,6 +786,204 @@ namespace TapTapFirst
             }
 
             return tagSystem.GetAcquiredTagList();
+        }
+
+        // ============================================================
+        //  两个列表的动态更新
+        //   新获得新闻 -> 左侧模板列表补一张卡片
+        //   新获得 Tag -> 右侧 Tag 列表补一个选项
+        //   面板没开时不处理（下次 OnEnable 会全量重建）
+        // ============================================================
+
+        private void RegisterListEvents()
+        {
+            UnregisterListEvents();
+
+            mNewsAcquiredUnRegister = this.RegisterEvent<NewsAcquiredEvent>(OnNewsAcquired);
+            mTagAcquiredUnRegister = this.RegisterEvent<TagAcquiredEvent>(OnTagAcquired);
+        }
+
+        private void UnregisterListEvents()
+        {
+            mNewsAcquiredUnRegister?.UnRegister();
+            mNewsAcquiredUnRegister = null;
+
+            mTagAcquiredUnRegister?.UnRegister();
+            mTagAcquiredUnRegister = null;
+        }
+
+        private void OnNewsAcquired(NewsAcquiredEvent e)
+        {
+            AddTemplateCard(e.newsId);
+        }
+
+        private void OnTagAcquired(TagAcquiredEvent e)
+        {
+            AddTagOption(e.tagId);
+        }
+
+        /// <summary>两个列表一起全量重建（需要强制同步时用）。</summary>
+        public void RefreshLists()
+        {
+            RebuildTemplateList();
+            SpawnTagOptions();
+        }
+
+        /// <summary>
+        /// 往模板列表里补一张卡片（不动已有的，保留滚动位置和选中态）。
+        /// 已经有这张卡片就跳过，保证事件重复发也不会重复铺。
+        /// </summary>
+        public bool AddTemplateCard(int newsId)
+        {
+            if (!isActiveAndEnabled)
+            {
+                return false;
+            }
+
+            if (mTemplateListRoot == null)
+            {
+                ResolveTemplateListRoot();
+            }
+
+            if (mTemplateListRoot == null)
+            {
+                return false;
+            }
+
+            if (FindCard(newsId) != null)
+            {
+                return false;
+            }
+
+            // 自愈：列表还是空的，但系统里其实已经不止这一条 -> 之前没铺过，整体重建一次
+            List<NewsTemplate_SO> acquired = LoadTemplates();
+
+            if (mCards.Count == 0 && acquired != null && acquired.Count > 1)
+            {
+                RebuildTemplateList();
+
+                if (mSelectFirstTemplateOnOpen && CurrentNews == null && mCards.Count > 0)
+                {
+                    SelectTemplate(mCards[0].NewsId);
+                }
+
+                return FindCard(newsId) != null;
+            }
+
+            NewsTemplate_SO news = NewsSystem != null ? NewsSystem.GetConfig(newsId) : null;
+
+            if (news == null)
+            {
+                Debug.LogWarning($"[NewsController] 新获得的新闻 {newsId} 在配置里找不到，模板列表不更新");
+                return false;
+            }
+
+            TemplateCardItem card = CreateCard(news);
+
+            if (card == null)
+            {
+                Debug.LogError($"[NewsController] 模板卡片创建失败（资源名 {mTemplateCardResName}）");
+                return false;
+            }
+
+            card.SetSelected(CurrentNews != null && CurrentNews.newsId == newsId);
+            mCards.Add(card);
+
+            // 列表本来是空的，现在有了第一条 -> 按配置自动选中
+            if (mSelectFirstTemplateOnOpen && CurrentNews == null && mCards.Count == 1)
+            {
+                SelectTemplate(newsId);
+            }
+
+            Debug.Log($"[NewsController] 模板列表 +1：{news.newsTitle}({newsId})，共 {mCards.Count} 张");
+            return true;
+        }
+
+        /// <summary>
+        /// 往 Tag 列表里补一个选项（不动已有的，保留滚动位置和正在拖的那个）。
+        /// 已经有这个 Tag 就跳过。
+        /// </summary>
+        public bool AddTagOption(int tagId)
+        {
+            if (!isActiveAndEnabled)
+            {
+                return false;
+            }
+
+            if (mTagListRoot == null)
+            {
+                ResolveTagListRoot();
+            }
+
+            if (mTagListRoot == null)
+            {
+                return false;
+            }
+
+            if (FindTagOption(tagId) != null)
+            {
+                return false;
+            }
+
+            // 自愈：列表还是空的，但系统里其实已经不止这一个 Tag -> 之前没铺过，整体重建一次
+            List<Tag_SO> acquired = LoadTagOptions();
+
+            if (mTagOptions.Count == 0 && acquired != null && acquired.Count > 1)
+            {
+                SpawnTagOptions();
+                return FindTagOption(tagId) != null;
+            }
+
+            Tag_SO tag = TagSystem != null ? TagSystem.GetTagById(tagId) : null;
+
+            if (tag == null)
+            {
+                Debug.LogWarning($"[NewsController] 新获得的 Tag {tagId} 在配置里找不到，Tag 列表不更新");
+                return false;
+            }
+
+            TagOption option = CreateTagOption(LoadPrefab(mTagOptionResName), tag);
+
+            if (option == null)
+            {
+                Debug.LogError($"[NewsController] Tag 选项创建失败（资源名 {mTagOptionResName}）");
+                return false;
+            }
+
+            mTagOptions.Add(option);
+
+            Debug.Log($"[NewsController] Tag 列表 +1：{tag.tagName}({tagId})，共 {mTagOptions.Count} 个");
+            return true;
+        }
+
+        /// <summary>模板列表里找某个 newsId 的卡片；没有返回 null。</summary>
+        public TemplateCardItem FindCard(int newsId)
+        {
+            for (int i = 0; i < mCards.Count; i++)
+            {
+                if (mCards[i] != null && mCards[i].NewsId == newsId)
+                {
+                    return mCards[i];
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>Tag 列表里找某个 tagId 的选项；没有返回 null。</summary>
+        public TagOption FindTagOption(int tagId)
+        {
+            for (int i = 0; i < mTagOptions.Count; i++)
+            {
+                TagOption option = mTagOptions[i];
+
+                if (option != null && option.TagData != null && option.TagData.tagId == tagId)
+                {
+                    return option;
+                }
+            }
+
+            return null;
         }
 
         // ============================================================
