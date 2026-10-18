@@ -52,10 +52,11 @@ namespace TapTapFirst
     }
 
     /// <summary>
-    /// 一篇【写完的新闻】的结果，三样东西存在一起：
+    /// 一篇【写完的新闻】的结果，四样东西存在一起：
     ///   1. content          拼好的新闻正文（配 items 保留按文本顺序的片段）
     ///   2. tagValueTotals   这篇里用到的所有 Tag 的相应数值，按类型加起来的总值
     ///   3. effectType / effectValue   当前用的模版的类型（客观/正面/负面）及该类型对应的数值
+    ///   4. fundsChange / evilChange / credibilityChange   这篇新闻对主角数值（资金 / 邪恶 / 可信度）的改变
     ///
     /// 整体是纯 C# 类，JsonUtility 可直接序列化，丢进 NewsResultSaveData 或别的存档结构都行。
     /// </summary>
@@ -109,6 +110,23 @@ namespace TapTapFirst
         public float effectValue;
 
         public int pageViews;
+
+        // ---------------- 4. 对主角数值（资金 / 邪恶 / 可信度）的改变 ----------------
+
+        /// <summary>该新闻对主角【资金】的改变（= 浏览量 / 1000）。</summary>
+        public int fundsChange;
+
+        /// <summary>
+        /// 该新闻对主角【邪恶】的改变（带符号，直接喂给 EvilValueCommand）：
+        /// 消极（负面）模版为 +，客观 / 正面为 −；幅度 3~8，浏览量越大越接近上限。
+        /// </summary>
+        public int evilChange;
+
+        /// <summary>
+        /// 该新闻对主角【可信度】的改变（带符号，直接喂给 CredibilityValueCommand）：
+        /// 客观模版为 +，其余（正面 / 负面）为 −；幅度 3~8，胡扯 Tag 占比越高越接近上限。
+        /// </summary>
+        public int credibilityChange;
 
         // ============================================================
         //  获取：新闻内容
@@ -339,6 +357,59 @@ namespace TapTapFirst
         }
 
         // ============================================================
+        //  获取：对主角数值（资金 / 邪恶 / 可信度）的改变
+        //  （数值怎么算在 Calculate 里，这里只是记录 + 读取）
+        // ============================================================
+
+        /// <summary>资金变化（浏览量 / 1000）。</summary>
+        public int GetFundsChange()
+        {
+            return fundsChange;
+        }
+
+        /// <summary>邪恶变化（带符号：负面模版为正）。</summary>
+        public int GetEvilChange()
+        {
+            return evilChange;
+        }
+
+        /// <summary>可信度变化（带符号：客观模版为正）。</summary>
+        public int GetCredibilityChange()
+        {
+            return credibilityChange;
+        }
+
+        /// <summary>
+        /// 新闻用到的 Tag 里【胡扯（blbl）】的占比：0~1。
+        /// 按已填的空缺算（同一个 Tag 用了两次就算两次）——空缺的词性是「胡扯」，
+        /// 那么这一段读起来就是胡扯，可信度那一路的幅度就是按它算的。
+        /// </summary>
+        public float NonsenseRatio
+        {
+            get
+            {
+                if (tagDetails == null || tagDetails.Count == 0)
+                {
+                    return 0f;
+                }
+
+                int nonsenseCount = 0;
+
+                for (int i = 0; i < tagDetails.Count; i++)
+                {
+                    NewsTagValueEntry entry = tagDetails[i];
+
+                    if (entry != null && entry.wordType == TagOfWords.blbl)
+                    {
+                        nonsenseCount++;
+                    }
+                }
+
+                return Mathf.Clamp01((float)nonsenseCount / tagDetails.Count);
+            }
+        }
+
+        // ============================================================
         //  还原
         // ============================================================
 
@@ -426,7 +497,8 @@ namespace TapTapFirst
         public override string ToString()
         {
             return $"[NewsResult] newsId={newsId} 倾向={GetEffectTypeName()}({effectValue}) " +
-                   $"Tag数={tagCount} 浏览量合计={PageViewsTotal} 压力合计={PressureValueTotal}\n{GetContent()}";
+                   $"Tag数={tagCount} 浏览量合计={PageViewsTotal} 压力合计={PressureValueTotal} " +
+                   $"资金={fundsChange} 邪恶={evilChange} 可信度={credibilityChange}\n{GetContent()}";
         }
     }
 

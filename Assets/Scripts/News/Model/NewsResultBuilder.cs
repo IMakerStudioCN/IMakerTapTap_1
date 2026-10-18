@@ -55,7 +55,8 @@ namespace TapTapFirst
 
             NewsResultData result = new NewsResultData
             {
-                version = 1,
+                // 2 = 增加了对主角数值（资金 / 邪恶 / 可信度）的影响；读档时靠它判断要不要补算
+                version = 2,
                 newsId = template != null ? template.newsId : 0,
                 newsTitle = template != null ? template.newsTitle : string.Empty,
                 documentId = document.documentId,
@@ -77,7 +78,36 @@ namespace TapTapFirst
 
             result.pageViews = new Calculate().CalculatePageViews((int)result.GetTagValueTotal(TagValueType.PageViews), result.effectValue);
 
+            // 4) 这篇新闻对主角数值（资金 / 邪恶 / 可信度）的改变
+            ApplyPlayerStatChanges(result);
+
             return result;
+        }
+
+        /// <summary>
+        /// 结算这篇新闻对主角数值的影响（只记录，不直接改主角，UI/系统自己决定发不发 Command）：
+        ///   资金   = 浏览量 / 1000                            （恒为正）
+        ///   邪恶   = 负面模版 +，客观 / 正面 −                 （幅度 3~8，随浏览量）
+        ///   可信度 = 客观模版 +，正面 / 负面 −                 （幅度 3~8，随胡扯 Tag 占比）
+        /// 具体公式都在 Calculate 里，改规则只改那里。
+        ///
+        /// 想把它应用到主角身上：
+        ///   this.SendCommand(new FundsValueCommand(result.fundsChange));
+        ///   this.SendCommand(new EvilValueCommand(result.evilChange));
+        ///   this.SendCommand(new CredibilityValueCommand(result.credibilityChange));
+        /// </summary>
+        public static void ApplyPlayerStatChanges(NewsResultData result)
+        {
+            if (result == null)
+            {
+                return;
+            }
+
+            Calculate calculate = new Calculate();
+
+            result.fundsChange = calculate.CalculateFundsChange(result.pageViews);
+            result.evilChange = calculate.CalculateEvilChange(result.pageViews, result.effectType);
+            result.credibilityChange = calculate.CalculateCredibilityChange(result.NonsenseRatio, result.effectType);
         }
 
         /// <summary>

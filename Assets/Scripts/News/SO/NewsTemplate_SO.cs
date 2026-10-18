@@ -129,11 +129,34 @@ namespace TapTapFirst
         [SerializeField]
         public List<NewsEffectPair> effectValues = new List<NewsEffectPair>();
 
+        [Header("限时")]
+        [Tooltip("勾上 = 限时模版：获得后经过 Limit Days 个游戏日，就从可写列表里消失。" +
+                 "已经写好并发送到贴吧的新闻不受影响。")]
+        [SerializeField]
+        public bool isTimeLimited;
+
+        [Tooltip("限时天数：获得后经过这么多个游戏日消失。<= 0 视为不限时。")]
+        [SerializeField]
+        public int limitDays = 7;
+
         /// <summary>卡片显示文字。</summary>
         public string CardTitle => string.IsNullOrEmpty(cardTitleOverride) ? newsTitle : cardTitleOverride;
 
         /// <summary>这条配置里有没有可用的内容片段。</summary>
         public bool HasContent => contentSegments != null && contentSegments.Count > 0;
+
+        /// <summary>是不是限时模版（勾了限时且天数 > 0 才算）。</summary>
+        public bool IsTimeLimited => isTimeLimited && limitDays > 0;
+
+        /// <summary>
+        /// 限时模版的到期日 = 获得日 + 限时天数。
+        /// 到期当天（CurrentDay &gt;= 到期日）就算过期，也就是能写 limitDays 天。
+        /// 不限时返回 0。
+        /// </summary>
+        public int GetExpireDay(int acquireDay)
+        {
+            return IsTimeLimited ? acquireDay + limitDays : 0;
+        }
 
         /// <summary>空缺数量。</summary>
         public int SlotCount
