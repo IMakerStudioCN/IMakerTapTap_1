@@ -2,6 +2,7 @@ using QFramework;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using TapTapFirst.Audio;
 
 namespace TapTapFirst
 {
@@ -22,6 +23,54 @@ namespace TapTapFirst
         private ITimeModel timeModel;
         private IGlobalManagerModel globalModel;
 
+        private IJsonSaveUtility jsonSaveUtility;
+        private ITaskSystem taskSystem;
+
+        protected override void OnInit()
+        {
+            jsonSaveUtility = this.GetUtility<IJsonSaveUtility>();
+            taskSystem = this.GetSystem<ITaskSystem>();
+            playerModel = this.GetModel<IPlayerModel>();
+            timeModel = this.GetModel<ITimeModel>();
+            globalModel = this.GetModel<IGlobalManagerModel>();
+            //在这里注册监听者
+            this.RegisterEvent<OnDaysChangeEvent>(e =>
+            {
+                if (timeModel.days >= timeModel.endDays)
+                {
+                    Debug.Log("游戏结束");
+                    EndTheGame();
+                }
+
+
+            });
+            this.RegisterEvent<EvilValueChangeEvent>(e =>
+            {
+                if (playerModel.EvilValue <= 0)
+                {
+                    Debug.Log("游戏结束");
+                    EndTheGame();
+                }
+            });
+            this.RegisterEvent<CredibilityValueChangeEvent>(e =>
+            {
+                if (playerModel.CredibilityValue <= 0)
+                {
+                    Debug.Log("游戏结束");
+                    EndTheGame();
+                }
+            });
+            this.RegisterEvent<FundsValueChangeEvent>(e =>
+            {
+                if (timeModel.days >= timeModel.endDays
+                    && playerModel.FundsValue < playerModel.TargetFundsValue * 0.8)
+                {
+                    Debug.Log("游戏结束");
+                    EndTheGame();
+                }
+            });
+        }
+
         /// <summary>
         /// 返回结局的序号 
         /// 0为信任为0,1为道德为0,2为钱低于目标值,3为普通解决,4为NB结局
@@ -39,72 +88,69 @@ namespace TapTapFirst
             {
                 return 1;
             }
-            if (playerModel.FundsValue < target)
+            if(timeModel.days >= timeModel.endDays)
             {
-                return 2;
-            }
-            if(timeModel.days == timeModel.endDays)
-            {
-                if (playerModel.CredibilityValue >= 80
-                    && playerModel.EvilValue >= 80
+                if (playerModel.CredibilityValue >= 80&& playerModel.EvilValue >= 80
                     && playerModel.FundsValue > target * 1.8)
-                    return 4;
-                else
-                    return 3;
+                {
+                    bool hasExpiredTask = false;
+                    foreach(string task in jsonSaveUtility.Get<TaskModelData>("TaskModelData").ExpiredTask)
+                    {
+                        if (!taskSystem.CheckTaskIsDone(task))
+                        {
+                            hasExpiredTask = true;
+                            break;
+                        }
+                    }
+
+                    if (hasExpiredTask) return 4;
+                }
+
+                if (playerModel.FundsValue < target)
+                    return 2;
+
+                return 3;
             }
             return -1;        
         }
 
+
+        private bool mGameEnded;
 
         /// <summary>
         /// 结束游戏
         /// </summary>
         public void EndTheGame()
         {
-            //暂定1000为目标资金
-            Debug.LogWarning("触发结局：" + WhichEnd(1000));
-        }
-        protected override void OnInit()
-        {
-            playerModel = this.GetModel<IPlayerModel>();
-            timeModel = this.GetModel<ITimeModel>();
-            globalModel = this.GetModel<IGlobalManagerModel>();
-            //在这里注册监听者
-            this.RegisterEvent<OnDaysChangeEvent>(e =>
-            {
-                if(timeModel.days >=timeModel.endDays)
-                {
-                    Debug.Log("游戏结束");
-                    EndTheGame();
-                }
+            //目标资金改用玩家模型里的配置，避免和资金事件判定用两个值
+            var end = WhichEnd(playerModel.TargetFundsValue);
+            Debug.LogWarning("触发结局：" + end);
 
+            // 结局条件可能被多个数值变化事件重复触发，音频只响一次
+            if (mGameEnded || end < 0) return;
+            mGameEnded = true;
 
-            });
-            this.RegisterEvent<EvilValueChangeEvent>(e =>
+            if (end <= 2)                       // 0 信任 / 1 道德 / 2 资金：坏结局
             {
-                if(playerModel.EvilValue <= 0)
-                {
-                    Debug.Log("游戏结束");
-                    EndTheGame();
-                }
-            });
-            this.RegisterEvent<CredibilityValueChangeEvent>(e => 
+                GameAudio.PlaySfx(GameAudioId.SfxGameOver);
+                GameAudio.PlayBadEndingBgm();
+            }
+            else if (end == 4)                  // NB 结局
             {
-                if (playerModel.CredibilityValue <= 0)
-                {
-                    Debug.Log("游戏结束");
-                    EndTheGame();
-                }
-            });
-            this.RegisterEvent<FundsValueChangeEvent>(e =>
-            {
-                if(playerModel.FundsValue< playerModel.TargetFundsValue*0.8)
-                {
-                    Debug.Log("游戏结束");
-                    EndTheGame();
-                }
-            });
+                GameAudio.PlaySfx(GameAudioId.SfxEndingPerfect);
+            }
+
+            EndingId = end;
+            //交给 GameOverShow：0/1/2 碎屏、3 关机、4 去屏幕效果，然后图片 -> 文字 -> 制作人名单
+            TapTap.Interface.SendEvent(new GameOverEvent { EndingId = end });
         }
+
+        /// <summary>当前触发的结局编号，-1 表示还没结束</summary>
+        public int EndingId { get; private set; } = -1;
+
+        /// <summary>游戏是否已经结束</summary>
+        public bool IsEnded => mGameEnded;
+        
 
     }
 }

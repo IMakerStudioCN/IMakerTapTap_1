@@ -15,6 +15,8 @@ namespace TapTapFirst
         private TextMeshProUGUI buttonText;//软件名称
         [SerializeField]
         private GameObject haveNewMessage;//红点标记
+        [SerializeField]
+        public bool softwareIsLock;
 
         private ISoftwareSystem softwareSystem;
         private void Start()
@@ -31,14 +33,19 @@ namespace TapTapFirst
             //点击软件，然后发送command
             button.onClick.AddListener(() =>
             {
+                if (softwareIsLock)
+                    return;
                 softwareSystem.clickSoftware(softwareData.webID);
                 clickSoftware();
             });
 
+            
+
 
             this.RegisterEvent<HaveNewMessageEvent>(e =>
             {
-                if (e.webID != softwareData.webID)
+
+                if (e.webID != softwareData.webID || WindowKit.IsOpened(softwareData.softwareName))
                 {
                     return;
                 }
@@ -52,6 +59,8 @@ namespace TapTapFirst
             //这是真打开网页了，孩子们不要用
             //Application.OpenURL($"https://www.taptap.com/webview/{softwareData.webID}");
             WindowKit.Open(softwareData.softwareName);
+            
+
             //调用system
             this.softwareData.haveNewMessage = softwareSystem.updateSO(softwareData.webID);
             HaveOrNotNewMessage(false);
@@ -70,5 +79,9 @@ namespace TapTapFirst
             return TapTap.Interface;
         }
 
+        private void OnClosedWindow()
+        {
+
+        }
     }
 }

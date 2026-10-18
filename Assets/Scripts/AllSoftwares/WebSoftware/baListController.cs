@@ -1,7 +1,6 @@
 using QFramework;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.AnimatedValues;
 using UnityEngine;
 namespace TapTapFirst
 {
@@ -12,7 +11,10 @@ namespace TapTapFirst
         [SerializeField]
         GameObject baLineProject; //预制体
         //private IbaSystem baSystem;//系统
-        private IbaListSystem baListSystem;//系统
+        private IbaListSystem baListSystem;//全部吧的系统
+        private IMybaSystem mybaSystem;
+
+        private readonly List<GameObject> mBaLineItems = new List<GameObject>();//列表项实例，只清自己生成的
         private void OnGUI()
         {
             if(GUI.Button(new Rect(0, 0, 100, 60), "addba"))
@@ -22,56 +24,106 @@ namespace TapTapFirst
                
             }
         }
+        private void Awake()
+        {
+            baListSystem = this.GetSystem<IbaListSystem>();
+            mybaSystem = this.GetSystem<IMybaSystem>();
+        }
         private void Start()
         {
             //baSystem = this.GetSystem<IbaSystem>();
-            baListSystem = this.GetSystem<IbaListSystem>();
+
             UpdateBarList();
             //根据Line改变网页状态
             this.RegisterEvent<baLineClickEvent>(e => 
-
             {
-                if(!baListSystem.CheckbaLineListYouHave(e.baWebID))
+                if(e.baWebType == 0)
                 {
-                    return;
+                    if (!baListSystem.CheckbaLineListYouHave(e.baWebID)) return;
+
+                    GameObject baWeb = baWebList[e.baWebType];
+                    baWebController ctrl = baWeb.GetComponent<baWebController>();
+
+                    //  先把数据准备好
+                    baLineList_SO line = baListSystem.GetbaLineListByIDInYouHave(e.baWebID);
+                    ctrl.balist = line.baLineList;
+                    ctrl.getTagID = line.tagID;
+                    ctrl.getNewsTemplateID = line.NewsTemplateID;
+                    ctrl.getBranchID = line.BranchID;         
+                    ctrl.baWebType = e.baWebType;
+
+                    //  再显示
+                    baWeb.SetActive(true);
+
+                    //  如果它本来就是 active，SetActive 不会触发 OnEnable，这里兜一下
+                    ctrl.RebuildbaLineGOList();
                 }
-                //通过获取type种类来设置对应页面的显示
-                GameObject baWeb = baWebList[e.baWebID];
-                baWeb.SetActive(true);
-                baWebController baWebController = baWeb.GetComponent<baWebController>();
-                //设置对应ba的楼层
-                baWebController.balist = baListSystem.GetbaLineListByIDInYouHave(e.baWebID).baLineList;
-                //设置对应的ba楼的Tag和News
-                baWebController.getTagID = baListSystem.GetbaLineListByIDInYouHave(e.baWebID).tagID;
-                baWebController.getNewsTemplateID = baListSystem.GetbaLineListByIDInYouHave(e.baWebID).NewsTemplateID;
-                baWebController.baWebType = e.baWebType;
+                if(e.baWebType == 1)
+                {
+                    if (!mybaSystem.checkMyba(e.baWebID))
+                    {
+                        return;
+                    }
+
+                    GameObject baWeb = baWebList[e.baWebType];
+                    //设置第一层玩家的内容
+                    baWebController baWebController = baWeb.GetComponent<baWebController>();
+                    baWebController.content.text = mybaSystem.GetMyBaLineContent(e.baWebID);
+                    baWebController.data.text = mybaSystem.GetdataList()[e.baWebID].ToString();
+                    baWebController.witter.text = "名字";
+                    baWebController.balist = mybaSystem.GetmybaReplyesByID(e.baWebID);
+                    baWebController.baWebType = e.baWebType;
+
+                    baWeb.SetActive(true);
+                    baWebController.RebuildbaLineGOList();
+                }
+
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
             this.RegisterEvent<SendBaEvent>(e =>
             {
                 //Debug.Log(baSystem.GetBaLineSingleList()[0].title);
                 UpdateBarList();
-            });
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
+            
+
         }
+
+        //只销毁自己生成的列表项，常驻子物体（Heardbar / baImage / Myba）不动
+        private void ClearBaLineList()
+        {
+            for (int i = 0; i < mBaLineItems.Count; i++)
+            {
+                if (mBaLineItems[i] == null) continue;
+                mBaLineItems[i].transform.SetParent(null, false);
+                Destroy(mBaLineItems[i]);
+            }
+            mBaLineItems.Clear();
+        }
+
+        //全量重建：先清空自己生成的项，再按拥有列表重新生成，不会翻倍也不会重复
         public void UpdateBarList()
         {
-            if (baListSystem.GetbaLineListYouHave().Count <= this.transform.childCount - 3)
+            ClearBaLineList();
+
+            foreach (baLineList_SO line in baListSystem.GetbaLineListYouHave())
             {
-                Debug.Log("不更新");
-                return;
-            }
-            foreach (var i in baListSystem.GetbaLineListYouHave())
-            {
-                if (i == null) continue;
-                if(baListSystem.GetIsCheckbaList().Contains(i))
+                if (line == null) continue;
+                if (line.baLineList == null || line.baLineList.Count == 0) continue;
+
+                if (baListSystem.GetIsCheckbaList().Contains(line))
                 {
-                    i.isGetTag = true;
-                    i.isGetNewsTemp = true;
+                    line.isGetTag = true;
+                    line.isGetNewsTemp = true;
                 }
-                GameObject baLine = Instantiate(baLineProject, this.transform);
-                baLine.GetComponent<baLineSingle>().baLineSingleData = i.baLineList[0];
-                baLine.transform.SetSiblingIndex(3);
+
+                GameObject item = Instantiate(baLineProject, this.transform);
+                //后发先至
+                item.transform.SetSiblingIndex(3);
+                baLineSingle single = item.GetComponent<baLineSingle>();
+                single.baLineSingleData = line.baLineList[0];
+                single.baListID = line.listID;
+                mBaLineItems.Add(item);
             }
-            
         }
 
         public IArchitecture GetArchitecture()

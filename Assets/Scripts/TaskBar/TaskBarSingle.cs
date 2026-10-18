@@ -46,12 +46,6 @@ namespace TapTapFirst
             return this;
         }
 
-
-        public void CloseWindow()
-        {
-            Destroy(this.gameObject);
-        }
-
         public void RefreshStyle()
         {
             var window = WindowKit.Get(mWindowName);

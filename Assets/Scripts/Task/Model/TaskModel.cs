@@ -16,5 +16,6 @@ namespace TapTapFirst
     {
         public List<string> isDoneTask = new List<string>();
         public List<string> isDoingTask = new List<string>();
+        public List<string> ExpiredTask = new List<string>();
     }
 }

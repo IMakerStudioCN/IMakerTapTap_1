@@ -1,4 +1,4 @@
-﻿﻿using QFramework;
+using QFramework;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,7 +19,7 @@ namespace TapTapFirst
 
         public  List<Tag_SO> palyerAcquired = new List<Tag_SO>();
         
-        public  HashSet<int> palyerAcquiredIds = new HashSet<int>();
+        public  List<int> palyerAcquiredIds = new List<int>();
 
     }
 }
