@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace TapTapFirst
 {
@@ -15,6 +16,7 @@ namespace TapTapFirst
         public void TaskDone(string taskname);
         public void CheckEndDay(int days);
         public void CheckStartDay(int days);
+        public bool CheckTaskIsDone(string taskName);
     }
 
     public class TaskSystem : AbstractSystem, ITaskSystem
@@ -162,6 +164,16 @@ namespace TapTapFirst
             CheckEndDay(mTimeModel.days);
         }
 
-        
+        public bool CheckTaskIsDone(string taskName)
+        {
+            var task = from a in expiredRuntimeTask
+                              where a.ismain == true
+                              select a;
+            if (!task.Any())
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

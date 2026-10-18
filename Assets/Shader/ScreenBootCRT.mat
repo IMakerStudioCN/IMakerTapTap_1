@@ -26,14 +26,14 @@ Material:
     m_Ints: []
     m_Floats:
     - _BandGain: 0
-    - _BandHalf: 0
-    - _Blackout: 1
+    - _BandHalf: 1
+    - _Blackout: 0
     - _Flare: 0.3
     - _Flash: 0
     - _Intensity: 0
     - _Noise: 0
     - _ScanPeriod: 3
-    - _ScanReveal: 0
+    - _ScanReveal: 1
     - _ScanStrength: 0.65
     - _StarGain: 0
     - _StarRadius: 0
