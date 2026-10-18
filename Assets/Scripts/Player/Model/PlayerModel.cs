@@ -24,11 +24,11 @@ namespace TapTapFirst
 
 
             
-        public int FundsValue { get; set; } = 1;
-        public int EvilValue { get; set; } = 1;
-        public int CredibilityValue { get; set; } = 1;
+        public int FundsValue { get; set; } = 0;
+        public int EvilValue { get; set; } = 70;
+        public int CredibilityValue { get; set; } = 50;
 
-        public int TargetFundsValue { get; set; } = 1000;
+        public int TargetFundsValue { get; set; } = 65;
         public int PageViews { get; set; } = 30000;
         public int MoralityValue { get; set; } = 70;
         public int PressureValue { get; set; } = 400;
