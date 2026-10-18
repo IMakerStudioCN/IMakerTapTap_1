@@ -77,6 +77,12 @@ namespace TapTapFirst
                 this.transform.DetachChildren();
 				//隐藏地图图标
                 UIKit.GetPanel<Dialog>().Hide();
+				//添加Tag
+				foreach(int id in mDialogSO.TagID)
+				{
+					this.SendCommand(new AddTagCommand(id));
+					Debug.Log($"已经发送TagID{id}");
+				}
                 return;
             }
             DialogSOSingle mSingle = mDialogSO.dialog[index];
