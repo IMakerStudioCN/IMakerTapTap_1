@@ -19,8 +19,24 @@ namespace TapTapFirst
         /// <summary>首次获取新闻，重复获取会被忽略</summary>
         void Acquire(int newsId);
 
-        /// <summary>已获得的新闻模板列表（由存档中的 ID 反查得到）</summary>
+        /// <summary>已获得且【未过期】的新闻模板列表（限时模版到期后不再出现在这里）</summary>
         List<NewsTemplate_SO> GetAcquiredNewsList();
+
+        // ============================================================
+        //  限时模版
+        // ============================================================
+
+        /// <summary>当前游戏日（TimeModelData.days）。</summary>
+        int CurrentDay { get; }
+
+        /// <summary>这条限时模版是否已经过期；不限时的永远 false。</summary>
+        bool IsExpired(int newsId);
+
+        /// <summary>获得时的游戏日；没有记录返回 0。</summary>
+        int GetAcquireDay(int newsId);
+
+        /// <summary>限时模版剩余天数；不限时或没获得返回 -1。</summary>
+        int GetRemainingDays(int newsId);
 
         // ============================================================
         //  写好的新闻数据（真身在本系统里，存档只是它的镜像）
@@ -151,6 +167,9 @@ namespace TapTapFirst
         /// <summary>草稿的持久化载体。</summary>
         private TagFillSaveData mFillSave;
 
+        /// <summary>游戏日推进时重新筛一遍限时模版。</summary>
+        private IUnRegister mDaysChangeUnRegister;
+
         #endregion
 
         protected override void OnInit()
@@ -198,15 +217,37 @@ namespace TapTapFirst
                 Debug.LogError($"[NewsSystem] 没有找到新闻总表 {NewsListResName}，请检查 Assets/Config/News 下的资源以及它的 AssetBundle 配置");
             }
 
+            // 旧存档只有 id 没有获得日：补一条记录，把"现在"当成获得日，避免一进来就全过期
+            MigrateAcquireRecords();
+
+            mDaysChangeUnRegister = this.RegisterEvent<OnDaysChangeEvent>(OnDaysChanged);
+
             UpdateAcquiredNewsList();
         }
 
         protected override void OnDeinit()
         {
             base.OnDeinit();
+            mDaysChangeUnRegister?.UnRegister();
+            mDaysChangeUnRegister = null;
             mResLoader.Dispose();
             mAcquiredNews.Clear();
             mWrittenNews.Clear();
+        }
+
+        private void OnDaysChanged(OnDaysChangeEvent e)
+        {
+            // 重新筛：今天可能正好有过期的限时模版
+            int before = mAcquiredNews.Count;
+
+            UpdateAcquiredNewsList();
+
+            int after = mAcquiredNews.Count;
+
+            if (after < before)
+            {
+                Debug.Log($"[NewsSystem] 第 {CurrentDay} 天：{before - after} 条限时新闻已过期，从可写列表移除");
+            }
         }
 
         public NewsTemplate_SO GetConfig(int newsId) => GetNewsTemplateById(newsId);
@@ -214,7 +255,13 @@ namespace TapTapFirst
 
         public NewsTemplate_SO GetNewsTemplateById(int newsId)
         {
-            return newsList.newsTemplateList.Find(tag => tag.newsId == newsId);
+            if (newsList == null || newsList.newsTemplateList == null)
+            {
+                Debug.LogError($"[NewsSystem] 新闻总表 {NewsListResName} 没有加载成功，取不到 newsId={newsId}");
+                return null;
+            }
+
+            return newsList.newsTemplateList.Find(news => news != null && news.newsId == newsId);
         }
         public bool IsAcquired(int newsId)
         {
@@ -222,7 +269,169 @@ namespace TapTapFirst
             return save != null && save.playerAcquiredIds != null && save.playerAcquiredIds.Contains(newsId);
         }
 
-        public bool CanUse(int newsId) => IsAcquired(newsId);//是否可以使用，直接调用这个方法
+        public bool CanUse(int newsId) => IsAcquired(newsId) && !IsExpired(newsId);//已获得且没过期才可写
+
+        // ============================================================
+        //  限时模版
+        // ============================================================
+
+        public int CurrentDay
+        {
+            get
+            {
+                try
+                {
+                    ITimeModel time = this.GetModel<ITimeModel>();
+                    return time != null ? time.days : 1;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"[NewsSystem] 拿不到当前游戏日：{e.Message}");
+                    return 1;
+                }
+            }
+        }
+
+        public int GetAcquireDay(int newsId)
+        {
+            NewsAcquireRecord record = FindAcquireRecord(GetSaveData(), newsId);
+            return record != null ? record.acquireDay : 0;
+        }
+
+        public bool IsExpired(int newsId)
+        {
+            NewsTemplate_SO news = GetConfig(newsId);
+
+            if (news == null || !news.IsTimeLimited)
+            {
+                return false;
+            }
+
+            int acquireDay = GetAcquireDay(newsId);
+
+            if (acquireDay <= 0)
+            {
+                // 没有获得记录就判断不了，按不过期处理（迁移过的存档会有记录）
+                return false;
+            }
+
+            return CurrentDay >= news.GetExpireDay(acquireDay);
+        }
+
+        public int GetRemainingDays(int newsId)
+        {
+            NewsTemplate_SO news = GetConfig(newsId);
+
+            if (news == null || !news.IsTimeLimited)
+            {
+                return -1;
+            }
+
+            if (!IsAcquired(newsId))
+            {
+                return -1;
+            }
+
+            int acquireDay = GetAcquireDay(newsId);
+
+            if (acquireDay <= 0)
+            {
+                return news.limitDays;
+            }
+
+            return Mathf.Max(0, news.GetExpireDay(acquireDay) - CurrentDay);
+        }
+
+        private static NewsAcquireRecord FindAcquireRecord(NewsTemplateSaveData save, int newsId)
+        {
+            if (save == null || save.acquireRecords == null)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < save.acquireRecords.Count; i++)
+            {
+                NewsAcquireRecord record = save.acquireRecords[i];
+
+                if (record != null && record.newsId == newsId)
+                {
+                    return record;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>旧存档只有 id 没获得日：补一条，把"现在"当作获得日。</summary>
+        private void MigrateAcquireRecords()
+        {
+            NewsTemplateSaveData save = GetSaveData();
+
+            if (save == null || save.playerAcquiredIds == null)
+            {
+                return;
+            }
+
+            if (save.acquireRecords == null)
+            {
+                save.acquireRecords = new List<NewsAcquireRecord>();
+            }
+
+            int day = CurrentDay;
+            int added = 0;
+
+            foreach (int newsId in save.playerAcquiredIds)
+            {
+                if (FindAcquireRecord(save, newsId) == null)
+                {
+                    save.acquireRecords.Add(new NewsAcquireRecord(newsId, day));
+                    added++;
+                }
+            }
+
+            if (added > 0)
+            {
+                Debug.Log($"[NewsSystem] 旧存档补了 {added} 条获得记录（按第 {day} 天算）");
+
+                // 立刻落盘，否则每次启动都会重新按"今天"算，限时新闻永远不过期
+                if (saveUtility != null)
+                {
+                    saveUtility.Save();
+                }
+            }
+        }
+
+        /// <summary>记下获得时的游戏日，限时模版靠它算到期日。</summary>
+        private void RecordAcquire(NewsTemplateSaveData save, NewsTemplate_SO news)
+        {
+            if (save == null || news == null)
+            {
+                return;
+            }
+
+            if (save.acquireRecords == null)
+            {
+                save.acquireRecords = new List<NewsAcquireRecord>();
+            }
+
+            NewsAcquireRecord record = FindAcquireRecord(save, news.newsId);
+
+            if (record == null)
+            {
+                record = new NewsAcquireRecord(news.newsId, CurrentDay);
+                save.acquireRecords.Add(record);
+            }
+            else
+            {
+                record.acquireDay = CurrentDay;
+            }
+
+            if (news.IsTimeLimited)
+            {
+                Debug.Log($"[NewsSystem] 新闻 {news.newsId}({news.newsTitle}) 是限时模版：" +
+                          $"第 {record.acquireDay} 天获得，第 {news.GetExpireDay(record.acquireDay)} 天过期");
+            }
+        }
         //例子:if(CanUse(newsId))=>GetConfig(newsId)获取新闻模板配置
 
         public void Acquire(int newsId)
@@ -248,6 +457,10 @@ namespace TapTapFirst
             }
 
             save.playerAcquiredIds.Add(newsId);
+
+            // 记下获得日：限时模版靠它算到期
+            RecordAcquire(save, news);
+
             UpdateAcquiredNewsList();
             Debug.Log($"[NewsSystem] 首次获得新闻 {news.newsTitle}({newsId})");
         }
@@ -276,6 +489,13 @@ namespace TapTapFirst
                 if (news == null)
                 {
                     Debug.LogWarning($"[NewsSystem] 存档里的新闻 {newsId} 在 {NewsListResName} 中不存在，已跳过");
+                    continue;
+                }
+
+                // 限时模版过期了就不再进可写列表。
+                // 注意：已经写好放在 NewsResultSaveData / mWrittenNews 里的新闻完全不受影响。
+                if (IsExpired(newsId))
+                {
                     continue;
                 }
 
@@ -309,17 +529,39 @@ namespace TapTapFirst
 
             result.newsId = newsId;
 
-            if (!SaveWrittenNews(result))
+            // 写结果 + 删草稿一起改内存，最后只落一次盘。
+            // 之前是 SaveWrittenNews(result) 落一次、RemoveDraft() 又落一次，
+            // 一次提交要跑两遍全量 JsonUtility 序列化 + 两次文件写入。
+            if (!WriteResultToSave(result))
             {
                 return null;
             }
 
             // 提交之后草稿就没用了
-            RemoveDraft(newsId);
+            RemoveDraftInternal(newsId);
+            FlushSave();
+
+            Debug.Log($"[NewsSystem] 新闻 {result.newsId}({result.newsTitle}) 已提交：倾向 {result.GetEffectTypeName()}，" +
+                      $"用到 {result.tagCount} 个 Tag，浏览量合计 {result.PageViewsTotal}，压力合计 {result.PressureValueTotal}");
             return result;
         }
 
         public bool SaveWrittenNews(NewsResultData result)
+        {
+            if (!WriteResultToSave(result))
+            {
+                return false;
+            }
+
+            FlushSave();
+
+            Debug.Log($"[NewsSystem] 新闻 {result.newsId}({result.newsTitle}) 已保存：倾向 {result.GetEffectTypeName()}，" +
+                      $"用到 {result.tagCount} 个 Tag，浏览量合计 {result.PageViewsTotal}，压力合计 {result.PressureValueTotal}");
+            return true;
+        }
+
+        /// <summary>只更新内存 + 存档镜像，不落盘（多次改动合并成一次 Save）。</summary>
+        private bool WriteResultToSave(NewsResultData result)
         {
             if (result == null)
             {
@@ -330,7 +572,7 @@ namespace TapTapFirst
             // 1) 内存先更新（读取一律走这里）
             mWrittenNews[result.newsId] = result;
 
-            // 2) 镜像进存档并落盘
+            // 2) 镜像进存档
             if (mResultSave == null)
             {
                 mResultSave = saveUtility != null ? saveUtility.Get<NewsResultSaveData>(ResultSaveKey) : null;
@@ -343,11 +585,31 @@ namespace TapTapFirst
             }
 
             mResultSave.SetResult(result);
-            saveUtility.Save();
-
-            Debug.Log($"[NewsSystem] 新闻 {result.newsId}({result.newsTitle}) 已保存：倾向 {result.GetEffectTypeName()}，" +
-                      $"用到 {result.tagCount} 个 Tag，浏览量合计 {result.PageViewsTotal}，压力合计 {result.PressureValueTotal}");
             return true;
+        }
+
+        private void FlushSave()
+        {
+            if (saveUtility != null)
+            {
+                saveUtility.Save();
+            }
+        }
+
+        /// <summary>只改内存里的草稿表，不落盘。</summary>
+        private bool RemoveDraftInternal(int newsId)
+        {
+            if (mFillSave == null)
+            {
+                mFillSave = saveUtility != null ? saveUtility.Get<TagFillSaveData>(FillSaveKey) : null;
+            }
+
+            if (mFillSave == null)
+            {
+                return false;
+            }
+
+            return mFillSave.Remove(newsId.ToString());
         }
 
         public NewsResultData GetWrittenNews(int newsId)
@@ -549,6 +811,13 @@ namespace TapTapFirst
                     continue;
                 }
 
+                // 旧存档（version < 2）里还没有对主角数值的影响，这里按同样的规则补算一次
+                if (result.version < 2)
+                {
+                    NewsResultBuilder.ApplyPlayerStatChanges(result);
+                    result.version = 2;
+                }
+
                 mWrittenNews[result.newsId] = result;
                 loaded++;
             }
@@ -624,21 +893,11 @@ namespace TapTapFirst
 
         public bool RemoveDraft(int newsId)
         {
-            if (mFillSave == null)
-            {
-                mFillSave = saveUtility != null ? saveUtility.Get<TagFillSaveData>(FillSaveKey) : null;
-            }
-
-            if (mFillSave == null)
-            {
-                return false;
-            }
-
-            bool removed = mFillSave.Remove(newsId.ToString());
+            bool removed = RemoveDraftInternal(newsId);
 
             if (removed)
             {
-                saveUtility.Save();
+                FlushSave();
             }
 
             return removed;

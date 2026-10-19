@@ -1,5 +1,4 @@
-﻿using QFramework;
-using System.Diagnostics;
+using QFramework;
 using UnityEngine;
 
 namespace TapTapFirst
@@ -36,7 +35,12 @@ namespace TapTapFirst
                 return null;
             }
 
-            this.SendEvent(new NewsWrittenEvent { newsId = mNewsId, result = result });
+
+            this.SendEvent(new NewsWrittenEvent 
+            {   newsId = mNewsId,
+                result = result 
+            }
+            );
 
             this.SendEvent(new mybaSendEvent
             {
@@ -44,8 +48,13 @@ namespace TapTapFirst
                 click = result.pageViews
             }
             );
-            UnityEngine.Debug.Log($"向MyBa发送新闻：{result.content}{result.pageViews}");
-            
+
+            this.SendCommand(new FundsValueCommand(result.fundsChange));
+            this.SendCommand(new EvilValueCommand(result.evilChange));
+            this.SendCommand(new CredibilityValueCommand(result.credibilityChange));
+
+            Debug.Log($"向贴吧发送新闻：newsId={mNewsId}，浏览量={result.pageViews}");
+
             return result;
         }
     }

@@ -103,6 +103,9 @@ namespace TapTapFirst
         private IUnRegister mNewsAcquiredUnRegister;
         private IUnRegister mTagAcquiredUnRegister;
 
+        /// <summary>游戏日推进时刷新限时模版（过期的卡片要消失）。</summary>
+        private IUnRegister mDaysChangeUnRegister;
+
         // ============================================================
         //  按钮
         // ============================================================
@@ -801,6 +804,7 @@ namespace TapTapFirst
 
             mNewsAcquiredUnRegister = this.RegisterEvent<NewsAcquiredEvent>(OnNewsAcquired);
             mTagAcquiredUnRegister = this.RegisterEvent<TagAcquiredEvent>(OnTagAcquired);
+            mDaysChangeUnRegister = this.RegisterEvent<OnDaysChangeEvent>(OnDaysChanged);
         }
 
         private void UnregisterListEvents()
@@ -810,6 +814,9 @@ namespace TapTapFirst
 
             mTagAcquiredUnRegister?.UnRegister();
             mTagAcquiredUnRegister = null;
+
+            mDaysChangeUnRegister?.UnRegister();
+            mDaysChangeUnRegister = null;
         }
 
         private void OnNewsAcquired(NewsAcquiredEvent e)
@@ -820,6 +827,22 @@ namespace TapTapFirst
         private void OnTagAcquired(TagAcquiredEvent e)
         {
             AddTagOption(e.tagId);
+        }
+
+        /// <summary>
+        /// 游戏日推进：限时模版可能刚过期。
+        /// 当前打开的那条已经不可写了就先关掉（草稿会先存下来），再整表重建把过期卡片去掉。
+        /// </summary>
+        private void OnDaysChanged(OnDaysChangeEvent e)
+        {
+            if (CurrentNews != null && NewsSystem != null && !NewsSystem.CanUse(CurrentNews.newsId))
+            {
+                Debug.Log($"[NewsController] 新闻 {CurrentNews.newsId}({CurrentNews.newsTitle}) 已过期，从可写列表移除");
+                Close();
+            }
+
+            RebuildTemplateList();
+            RefreshUI();
         }
 
         /// <summary>两个列表一起全量重建（需要强制同步时用）。</summary>
@@ -996,6 +1019,7 @@ namespace TapTapFirst
             if (Submit())
             {
                 Debug.Log($"[NewsController] 提交成功：\n{GetResultContent(CurrentNews.newsId)}");
+                TapTap.Interface.SendEvent(new SoftWareLockEvent{ softWareID =0 });
             }
 
             RefreshUI();
@@ -1034,7 +1058,19 @@ namespace TapTapFirst
 
             // 只负责把当前排版交出去，存哪儿、怎么结算都是 NewsSystem 的事
             string json = CurrentTemplate.SaveToJson();
-            result = this.SendCommand(new SaveWrittenNewsCommand(CurrentNews.newsId, json));
+
+            try
+            {
+                result = this.SendCommand(new SaveWrittenNewsCommand(CurrentNews.newsId, json));
+            }
+            catch (System.Exception e)
+            {
+                // 事件派发是同步的：贴吧 / 存档等下游如果在处理里有异常，会一路冒到这里。
+                // 不兜住的话 Unity 只会给一句看不懂的编辑器报错，这里直接把真异常打出来。
+                Debug.LogError($"[NewsController] 提交新闻 {CurrentNews.newsId}({CurrentNews.newsTitle}) 时抛异常，" +
+                               $"下游（存档 / 贴吧 / 事件）可能有问题：\n{e}");
+                return false;
+            }
 
             if (result == null)
             {
