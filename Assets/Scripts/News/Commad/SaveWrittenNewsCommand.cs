@@ -17,7 +17,7 @@ namespace TapTapFirst
     {
         private readonly int mNewsId;
         private readonly string mDocumentJson;
-
+        
         public SaveWrittenNewsCommand(int newsId, string documentJson)
         {
             mNewsId = newsId;
@@ -45,7 +45,9 @@ namespace TapTapFirst
             this.SendEvent(new mybaSendEvent
             {
                 content = result.content,
-                click = result.pageViews
+                click = result.pageViews,
+              
+
             }
             );
 
@@ -55,6 +57,16 @@ namespace TapTapFirst
 
             Debug.Log($"向贴吧发送新闻：newsId={mNewsId}，浏览量={result.pageViews}");
 
+
+            this.SendEvent(new mybaReplySendEvent
+            {
+                NewsType = (int)result.effectType,
+                mybaID = mNewsId,
+                nums = 100,
+
+            });
+            UnityEngine.Debug.Log($"向MyBa发送新闻：{result.content}{result.pageViews}");
+            
             return result;
         }
     }

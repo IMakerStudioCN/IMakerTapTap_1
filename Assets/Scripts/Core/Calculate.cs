@@ -36,6 +36,12 @@ public  class Calculate
         return Mathf.Max(pageViews, 0); // 确保页面浏览量不为负数
     }
 
+    public int CalculateReply(int pageView, float radomCase)
+    {
+        int reply = pageView/1000+(int)(Random.Range(0, basePageViews)*radomCase);
+        return reply;
+    }
+
     /// <summary>资金变化 = 该新闻的浏览量 / 1000（四舍五入到整数）。</summary>
     public int CalculateFundsChange(int pageViews)
     {

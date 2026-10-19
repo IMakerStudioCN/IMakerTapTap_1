@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "E:\AAA\test\_tmp_extract.py", line 3, in <module>
+    z = zipfile.ZipFile('/tmp/docx1/doc.docx')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python312\Lib\zipfile\__init__.py", line 1336, in __init__
+    self.fp = io.open(file, filemode)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/docx1/doc.docx'

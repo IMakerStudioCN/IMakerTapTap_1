@@ -19,7 +19,10 @@ namespace TapTapFirst
         {
             if(GUI.Button(new Rect(0, 0, 100, 60), "addba"))
             {
-                TapTap.Interface.SendEvent(new SendBaEvent { baID = 0 });
+                for(int i = 0;i<22;i++)
+                {
+                    TapTap.Interface.SendEvent(new SendBaEvent { baID = i });
+                }
                 Debug.Log("123123");
                
             }

@@ -43,8 +43,9 @@ namespace TapTapFirst
             if (getTag != null)
             getTag.onClick.AddListener(() => 
             {
-                Debug.LogWarning("获取对应的"+getTagID);
-
+                Debug.LogWarning("获取对应的TagID"+getTagID);
+                this.SendCommand(new AddTagCommand(getTagID));
+                this.SendCommand(new AddNewsCommand(getNewsTemplateID));
             });
         }
         //测试
