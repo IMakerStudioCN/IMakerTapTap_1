@@ -29,7 +29,7 @@ namespace TapTapFirst
             this.buttonText.text = softwareData.softwareName;
             this.button.image.sprite = softwareData.softwareIcon;
             //this.haveNewMessage = GameObject.Find("HaveNewMessage").GetComponent<Image>();
-            
+
             //点击软件，然后发送command
             button.onClick.AddListener(() =>
             {
@@ -38,9 +38,6 @@ namespace TapTapFirst
                 softwareSystem.clickSoftware(softwareData.webID);
                 clickSoftware();
             });
-
-            
-
 
             this.RegisterEvent<HaveNewMessageEvent>(e =>
             {
@@ -52,6 +49,9 @@ namespace TapTapFirst
                 softwareSystem.setDicisTrue(softwareData.webID);
                 HaveOrNotNewMessage(true);
             }).UnRegisterWhenGameObjectDestroyed(this.gameObject);
+
+            HaveOrNotNewMessage(softwareSystem.IsUnread(softwareData.webID)
+                                && !WindowKit.IsOpened(softwareData.softwareName));
         }
 
         public void clickSoftware()
@@ -77,11 +77,6 @@ namespace TapTapFirst
         IArchitecture IBelongToArchitecture.GetArchitecture()
         {
             return TapTap.Interface;
-        }
-
-        private void OnClosedWindow()
-        {
-
         }
     }
 }

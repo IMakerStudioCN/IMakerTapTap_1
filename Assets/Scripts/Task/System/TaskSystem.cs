@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using UnityEngine;
 
 namespace TapTapFirst
 {
@@ -154,10 +155,11 @@ namespace TapTapFirst
                 else if (tasksInDoing.Contains(task.TaskName))
                 {
                     runTaskInDo.Add(task);
+                    this.GetSystem<ISoftwareSystem>().setDicisTrue(4);
                     this.SendEvent(new SendEmailEvent { EmailWebID = task.EmailId, Task = task });
                     continue;
                 }
-                daysTask.Add(task);
+                    daysTask.Add(task);
             }
             daysTask.Sort((a,b) => a.startDay.CompareTo(b.startDay));
             CheckStartDay(mTimeModel.days);
@@ -177,3 +179,4 @@ namespace TapTapFirst
         }
     }
 }
+

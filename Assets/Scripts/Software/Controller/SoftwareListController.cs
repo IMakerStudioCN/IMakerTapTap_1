@@ -1,4 +1,4 @@
-using QFramework;
+ï»¿using QFramework;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -16,6 +16,8 @@ namespace TapTapFirst
         private GameObject softwareItemPrefab;
         [SerializeField]
         private List<GameObject> softwareListObjList = new List<GameObject>();
+
+        private ISoftwareSystem softwareSystem;
         public IArchitecture GetArchitecture()
         {
             return TapTap.Interface;
@@ -23,6 +25,7 @@ namespace TapTapFirst
 
         private void Start()
         {
+            softwareSystem = this.GetSystem<ISoftwareSystem>();
             for(int i = 0; i < softwareList.Count; i++)
             {
                 GameObject item = Instantiate(softwareItemPrefab, this.transform);
@@ -31,6 +34,7 @@ namespace TapTapFirst
                 SoftwareSingle single = item.GetComponent<SoftwareSingle>();
                 single.softwareData = softwareList[i];
             }
+            softwareSystem.updateSO(4);
             this.RegisterEvent<SoftWareLockEvent>(e =>
             {
                 LockSoftware(e.softWareID);
@@ -47,7 +51,7 @@ namespace TapTapFirst
             {
                 if(i == null)
                 {
-                    Debug.LogWarning("Èí¼şÎª¿Õ£¬ÎŞ·¨ÉÏËø");
+                    Debug.LogWarning("è½¯ä»¶ä¸ºç©ºï¼Œæ— æ³•ä¸Šé”");
                     return;
                 }
                 item = i.GetComponent<SoftwareSingle>();
@@ -64,7 +68,7 @@ namespace TapTapFirst
             {
                 if (i == null)
                 {
-                    Debug.LogWarning("Èí¼şÎª¿Õ£¬ÎŞ·¨È«²¿½âËø");
+                    Debug.LogWarning("è½¯ä»¶ä¸ºç©ºï¼Œæ— æ³•å…¨éƒ¨è§£é”");
                     return ;
                 }
                 item = i.GetComponent<SoftwareSingle>();
