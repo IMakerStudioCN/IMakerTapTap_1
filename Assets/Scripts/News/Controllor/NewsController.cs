@@ -1,4 +1,4 @@
-using QFramework;
+﻿using QFramework;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -130,6 +130,8 @@ namespace TapTapFirst
         /// <summary>当前是否已经打开了一条新闻。</summary>
         public bool IsOpen => CurrentNews != null && CurrentTemplate != null;
 
+        public bool HasSubmitted = false;
+
         /// <summary>存档 key：每条新闻一份。</summary>
         public string SaveKey => CurrentNews != null ? CurrentNews.newsId.ToString() : null;
 
@@ -170,6 +172,11 @@ namespace TapTapFirst
             {
                 mCloseButton.onClick.AddListener(Close);
             }
+
+            this.RegisterEvent<OnDaysChangeEvent>(e =>
+            {
+                HasSubmitted = false;
+            });
         }
 
         private void OnDestroy()
@@ -1020,6 +1027,7 @@ namespace TapTapFirst
             {
                 Debug.Log($"[NewsController] 提交成功：\n{GetResultContent(CurrentNews.newsId)}");
                 TapTap.Interface.SendEvent(new SoftWareLockEvent{ softWareID =0 });
+                HasSubmitted = true;
             }
 
             RefreshUI();
@@ -1262,7 +1270,11 @@ namespace TapTapFirst
             }
 
             // 提交要求所有空缺都填满（没有空缺的模版不给提交）
-            bool canSubmit = open && progress != null && progress.total > 0 && progress.filled >= progress.total;
+            bool canSubmit = open 
+                            && progress != null 
+                            && progress.total > 0 
+                            && progress.filled >= progress.total
+                            && !HasSubmitted;
 
             if (mSubmitButton != null)
             {
