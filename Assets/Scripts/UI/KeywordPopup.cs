@@ -15,25 +15,17 @@ namespace TapTapFirst
     {
         private const float AutoHideDelay = 2.5f;
 
-        // 【修改点1】删除原来的常量，改为直接拖拽赋值的 AudioClip
+        // 拖拽赋值的音效 Clip
         public AudioClip PopupSoundClip;
 
         // 关键词文字
         public TextMeshProUGUI KeywordText;
 
         private Coroutine mAutoHideCoroutine;
-        private AudioSource mAudioSource; // 【修改点2】新增 AudioSource 组件引用
 
         protected override void OnInit(IUIData uiData = null)
         {
             mData = uiData as KeywordPopupData ?? new KeywordPopupData();
-
-            // 【修改点3】获取或自动添加 AudioSource 组件
-            mAudioSource = GetComponent<AudioSource>();
-            if (mAudioSource == null)
-            {
-                mAudioSource = gameObject.AddComponent<AudioSource>();
-            }
         }
 
         protected override void OnOpen(IUIData uiData = null)
@@ -47,10 +39,10 @@ namespace TapTapFirst
 
         protected override void OnShow()
         {
-            // 【修改点4】使用 AudioSource 播放拖拽好的音效
-            if (PopupSoundClip != null && mAudioSource != null)
+            // 使用 AudioKit 播放音效，自动受全局音效音量（SoundVolume）控制
+            if (PopupSoundClip != null)
             {
-                mAudioSource.PlayOneShot(PopupSoundClip);
+                AudioKit.PlaySound(PopupSoundClip);
             }
 
             StopAutoHide();
