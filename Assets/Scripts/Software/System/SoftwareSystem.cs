@@ -1,4 +1,4 @@
-using QFramework;
+﻿using QFramework;
 using System.Collections.Generic;
 
 namespace TapTapFirst
@@ -14,8 +14,9 @@ namespace TapTapFirst
         void setDicisTrue(int windowID);//将对应值设置为真
         void setDicisFalse(int windowID);//设置为假
         Dictionary<int, bool> getDic();//获取字典
+        public bool IsUnread(int windowID);
 
-        
+
 
     }
 
@@ -61,9 +62,12 @@ namespace TapTapFirst
             checkTheDic(windowID);
             haveNewMessage[windowID] = false;
         }
+
+        public bool IsUnread(int  windowID)
+            => haveNewMessage.TryGetValue(windowID, out var v) && v;
         protected override void OnInit()
         {
-            
+            this.RegisterEvent<HaveNewMessageEvent>(e => setDicisTrue(e.webID));
         }
     }
 }
