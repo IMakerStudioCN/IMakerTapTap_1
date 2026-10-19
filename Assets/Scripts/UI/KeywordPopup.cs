@@ -14,11 +14,10 @@ namespace TapTapFirst
 
     public partial class KeywordPopup : UIPanel
     {
-        // 弹窗停留时长（秒）
         private const float AutoHideDelay = 2.5f;
 
-        // 弹窗音效名（对应 Resources 里音频文件的名字，不含扩展名）
-        //private const string PopupSoundName = "keyword_popup";
+        // 拖拽赋值的音效 Clip
+        public AudioClip PopupSoundClip;
 
         // 关键词文字
         public TextMeshProUGUI KeywordText;
@@ -44,10 +43,12 @@ namespace TapTapFirst
 
         protected override void OnShow()
         {
-            // 显示时播放弹窗音效
-            // AudioKit.PlaySound(PopupSoundName);
+            // 使用 AudioKit 播放音效，自动受全局音效音量（SoundVolume）控制
+            if (PopupSoundClip != null)
+            {
+                AudioKit.PlaySound(PopupSoundClip);
+            }
 
-            // 每次显示都重新计时，避免残留上一个计时器
             StopAutoHide();
             mAutoHideCoroutine = StartCoroutine(AutoHideRoutine());
         }
@@ -71,9 +72,8 @@ namespace TapTapFirst
         private IEnumerator AutoHideRoutine()
         {
             yield return new WaitForSeconds(AutoHideDelay);
-
             mAutoHideCoroutine = null;
-            CloseSelf();   // 关闭并销毁面板
+            CloseSelf();
         }
 
         private void StopAutoHide()
