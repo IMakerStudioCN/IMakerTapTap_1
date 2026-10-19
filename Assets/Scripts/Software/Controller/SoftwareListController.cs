@@ -27,7 +27,8 @@ namespace TapTapFirst
             {
                 GameObject item = Instantiate(softwareItemPrefab, this.transform);
                 softwareListObjList.Add(item);
-                item.transform.parent = this.transform;
+                item.transform.SetParent(this.transform, false);
+                
                 SoftwareSingle single = item.GetComponent<SoftwareSingle>();
                 single.softwareData = softwareList[i];
             }
@@ -47,7 +48,7 @@ namespace TapTapFirst
             {
                 if(i == null)
                 {
-                    Debug.LogWarning("Èí¼şÎª¿Õ£¬ÎŞ·¨ÉÏËø");
+                    Debug.LogWarning("è½¯ä»¶ä¸ºç©ºï¼Œæ— æ³•ä¸Šé”");
                     return;
                 }
                 item = i.GetComponent<SoftwareSingle>();
@@ -64,7 +65,7 @@ namespace TapTapFirst
             {
                 if (i == null)
                 {
-                    Debug.LogWarning("Èí¼şÎª¿Õ£¬ÎŞ·¨È«²¿½âËø");
+                    Debug.LogWarning("è½¯ä»¶ä¸ºç©ºï¼Œæ— æ³•å…¨éƒ¨è§£é”");
                     return ;
                 }
                 item = i.GetComponent<SoftwareSingle>();
