@@ -37,11 +37,8 @@ namespace TapTapFirst
                 Debug.LogError("[AddTagCommand] 拿不到 ITagSystem，请检查 TapTap.Init() 是否注册了 TagSystem");
                 return;
             }
-
-            // 1) 先落数据（Acquire 内部会做重复检查 + 写存档 + 刷新已获得列表）
-            tagSystem.Acquire(tagId);
-
-            // 2) 再发事件通知（带上 tagId）
+            // 只发事件；Acquire 入库 + 弹窗统一由 TagSystem.OnTagAcquired 处理，
+            // 这样 OnTagAcquired 里 isNew 才是真正的"首次获得"
             this.SendEvent(new TagAcquiredEvent { tagId = tagId });
         }
     }

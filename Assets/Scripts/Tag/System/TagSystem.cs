@@ -53,7 +53,7 @@ namespace TapTapFirst
         /// <summary>
         /// 总Tag列表，存储所有的tag数据
         /// </summary>
-        private TagList_SO allTaglist = new();
+        private TagList_SO allTaglist;
 
         /// <summary>
         /// 用于存储已经获得的tag
@@ -190,15 +190,21 @@ namespace TapTapFirst
 
         private void OnTagAcquired(TagAcquiredEvent e)
         {
-            // AddTagCommand 已经先 Acquire 过一次了，这里再调一次会命中
-            // "已经获得过，忽略重复获取" 的警告 —— 每获得一个 Tag 就刷一条假警告。
-            // 这里只处理"别处只发了事件、没落数据"的情况。
-            if (IsAcquired(e.tagId))
-            {
-                return;
-            }
-
+            bool isNew = !IsAcquired(e.tagId);
             Acquire(e.tagId);
+            Debug.Log($"TagAcquiredEvent触发，tagId: {e.tagId}，已调用Acquire方法");
+
+            if (isNew)
+            {
+                var tag = GetConfig(e.tagId);
+                if (tag != null)
+                {
+                    UIKit.OpenPanel<KeywordPopup>(
+                        UILevel.PopUI,
+                        new KeywordPopupData { Keyword = tag.tagName },
+                        prefabName: "KeywordPopup");
+                }
+            }
         }
 
         /// <summary>
