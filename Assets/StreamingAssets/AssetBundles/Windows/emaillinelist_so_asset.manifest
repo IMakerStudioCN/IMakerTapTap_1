@@ -1,0 +1,47 @@
+ManifestFileVersion: 0
+CRC: 1208297637
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 1c36829e749ed76c09067e2b163ee540
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: cd42c09429e63a6a6281dd888f441f1e
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 1c36829e749ed76c09067e2b163ee540
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 7056fc3f614d63e479faeb79d130123a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: f44f8d2be2e7a3e43bdbc2419ee51e62, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/Email/EmailLineList_SO.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/emial00_asset
+- E:/AAA/test/AssetBundles/Windows/emial01_asset
+- E:/AAA/test/AssetBundles/Windows/emial02_asset
+- E:/AAA/test/AssetBundles/Windows/emial03_asset
+- E:/AAA/test/AssetBundles/Windows/emial04_asset
+- E:/AAA/test/AssetBundles/Windows/emial05_asset
+- E:/AAA/test/AssetBundles/Windows/emial06_asset
+- E:/AAA/test/AssetBundles/Windows/emial07_asset
+- E:/AAA/test/AssetBundles/Windows/emial08_asset
+- E:/AAA/test/AssetBundles/Windows/emial09_asset
+- E:/AAA/test/AssetBundles/Windows/emial10_asset
+- E:/AAA/test/AssetBundles/Windows/emial11_asset
+- E:/AAA/test/AssetBundles/Windows/emial12_asset
+- E:/AAA/test/AssetBundles/Windows/emial13_asset
+- E:/AAA/test/AssetBundles/Windows/emial14_asset
+- E:/AAA/test/AssetBundles/Windows/emial15_asset
+- E:/AAA/test/AssetBundles/Windows/emial16_asset
+- E:/AAA/test/AssetBundles/Windows/emial17_asset
+- E:/AAA/test/AssetBundles/Windows/emial18_asset
+- E:/AAA/test/AssetBundles/Windows/emial19_asset
+- E:/AAA/test/AssetBundles/Windows/emial20_asset
+- E:/AAA/test/AssetBundles/Windows/emial21_asset
+- E:/AAA/test/AssetBundles/Windows/emial22_asset

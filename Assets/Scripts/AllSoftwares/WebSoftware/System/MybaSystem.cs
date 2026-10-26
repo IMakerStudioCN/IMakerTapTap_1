@@ -1,8 +1,9 @@
 using QFramework;
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
 using UnityEngine;
+using static TapTapFirst.MybaSystem;
 
 namespace TapTapFirst
 {
@@ -30,7 +31,7 @@ namespace TapTapFirst
         public List<baLineSingleSO> GetmybaReplyesByID(int mybaID);
         public void AddmybaReply(int newsType, int mybaID, int nums);
         //获取不同种类的回复
-        public baLineSingleSO GetBaLineByType(int newsType);//0为胡扯 1为邪恶 2为公正 3正常 4其他
+        public baLineSingleSO GetBaLineByType(int newsType);//3为胡扯 2为邪恶 0为公正 1正常 4其他
         public baLineSingleSO GetbalaReply();
         public baLineSingleSO GetevilReply();
         public baLineSingleSO GetfairReply();
@@ -42,6 +43,7 @@ namespace TapTapFirst
     {
         public class MybaReplseList
         {
+            public int mybaReplyListID = 0;
             public List<baLineSingleSO> mybaReplse = new List<baLineSingleSO>();
         }
         #region 数据
@@ -62,6 +64,7 @@ namespace TapTapFirst
             dataList = this.GetUtility<IJsonSaveUtility>().Get<mybaSystemData>("mybaSystemData").dataList;
             repliseList = this.GetUtility<IJsonSaveUtility>().Get<mybaSystemData>("mybaSystemData").repliesList;
             clickList = this.GetUtility<IJsonSaveUtility>().Get<mybaSystemData>("mybaSystemData").clickList;
+            //mybaReplseLists = this.GetUtility<IJsonSaveUtility>().Get<mybaSystemData>("mybaReplseLists").mybaReplseLists;
             //获取mybaSendEvent
             this.RegisterEvent<mybaSendEvent>(e => 
             {
@@ -121,21 +124,32 @@ namespace TapTapFirst
         public void AddmybaReply(int newsType, int mybaID,int nums)
         {
             if (nums <= 0) return;
-            EnsureMybaReplySlot(mybaID);
+            //linQ方法查询对应的ID
+            var target = mybaReplseLists.FirstOrDefault(s => s.mybaReplyListID == mybaID);
+
+            if (target == null)
+            {
+                target = new MybaReplseList { mybaReplyListID = mybaID };
+                mybaReplseLists.Add(target);
+            }
+
+            //EnsureMybaReplySlot(mybaID);
 
             int mainCount = nums / 2;
 
             for(int i = 0;i<mainCount;i++)
             {
                 var so = GetBaLineByType(newsType);
-                if (so != null) 
-                    mybaReplseLists[mybaID].mybaReplse.Add(so);
+
+                if (so != null)
+
+                    target.mybaReplse.Add(so);
             }
             System.Random rand = new System.Random();
             for(int i = 0;i<(nums - mainCount);i++)
             {
-                mybaReplseLists[mybaID].mybaReplse.Add(GetBaLineByType(rand.Next(0,5)));
-                mybaReplseLists[mybaID].mybaReplse.Add(GetBaLineByType(rand.Next(0,5)));
+                target.mybaReplse.Add(GetBaLineByType(rand.Next(0,5)));
+                //target.mybaReplse.Add(GetBaLineByType(rand.Next(0,5)));
             }
             
             
@@ -146,18 +160,18 @@ namespace TapTapFirst
             return mybaReplseLists[mybaID].mybaReplse;
         }
 
-        //0为胡扯 1为邪恶 2为公正 3正常 4其他
+        //3为胡扯 2为邪恶 0为公正 1正常 4其他
         public baLineSingleSO GetBaLineByType(int newsType)
         {
             switch(newsType)
             {
-                case 0:
-                    return GetbalaReply();
-                case 1:
-                    return GetevilReply();
-                case 2:
-                    return GetfairReply();
                 case 3:
+                    return GetbalaReply();
+                case 2:
+                    return GetevilReply();
+                case 0:
+                    return GetfairReply();
+                case 1:
                     return GetnormalReply();
                 case 4:
                     return GetotherReply();
@@ -231,6 +245,6 @@ namespace TapTapFirst
         public List<int> dataList = new List<int>();
         public List<int> clickList = new List<int> ();
         public List<int> repliesList = new List<int> ();
-
+        //public List<MybaReplseList> mybaReplseLists = new List<MybaReplseList>();
     }
 }

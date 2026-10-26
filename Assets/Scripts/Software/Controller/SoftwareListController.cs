@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 namespace TapTapFirst
 {
 
@@ -39,11 +38,11 @@ namespace TapTapFirst
             this.RegisterEvent<SoftWareLockEvent>(e =>
             {
                 LockSoftware(e.softWareID);
-            });
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
             this.RegisterEvent<OnDaysChangeEvent>(e =>
             {
                 UnlockAllSoftware();
-            });
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
         }
         public void LockSoftware(int webID)
         {

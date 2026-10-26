@@ -1,0 +1,28 @@
+ManifestFileVersion: 0
+CRC: 1439524529
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 8250fbf4d4142c9876c7a2fb98e37531
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 7a263f2bf78bf0db4f1d759de1bd7f83
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 8250fbf4d4142c9876c7a2fb98e37531
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 3173d1b87d799d74bb16aa30779fe7c0, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: Assembly-CSharp
+  ClassName: TapTapFirst.NewsContentSegment
+- AssemblyName: Assembly-CSharp
+  ClassName: TapTapFirst.NewsEffectPair
+- AssemblyName: Assembly-CSharp
+  ClassName: TapTapFirst.NewsSlotPart
+Assets:
+- Assets/Config/News/MainNegative/Main03_Negative.asset
+Dependencies: []

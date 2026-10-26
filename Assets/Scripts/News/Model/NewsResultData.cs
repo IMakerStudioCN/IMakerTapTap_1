@@ -113,12 +113,12 @@ namespace TapTapFirst
 
         // ---------------- 4. 对主角数值（资金 / 邪恶 / 可信度）的改变 ----------------
 
-        /// <summary>该新闻对主角【资金】的改变（= 浏览量 / 1000）。</summary>
+        /// <summary>该新闻对主角【资金】的改变（= 每篇固定 +5）。</summary>
         public int fundsChange;
 
         /// <summary>
         /// 该新闻对主角【邪恶】的改变（带符号，直接喂给 EvilValueCommand）：
-        /// 消极（负面）模版为 +，客观 / 正面为 −；幅度 3~8，浏览量越大越接近上限。
+        /// 消极（负面）模版为 +，正面为 −，客观模版为 0；幅度 3~8，浏览量越大越接近上限。
         /// </summary>
         public int evilChange;
 

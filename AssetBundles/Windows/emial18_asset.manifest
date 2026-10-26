@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 833261689
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: eb63c7b3359d5a2e56dca1c34bf771f0
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: e14fcf40691800fd32c87a926f221f5e
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: eb63c7b3359d5a2e56dca1c34bf771f0
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 7056fc3f614d63e479faeb79d130123a, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/Email/Emial18.asset
+Dependencies: []

@@ -2,7 +2,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.PlayerSettings;
 namespace TapTapFirst
 {
     public class SoftwareSingle : MonoBehaviour, IController

@@ -1,0 +1,93 @@
+ManifestFileVersion: 0
+CRC: 759882608
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 92724c3b62344e7cc47a1e35edfa225f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 148f8f70bac678db9e2d72bb398f3415
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 92724c3b62344e7cc47a1e35edfa225f
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: de3193348a1fd4d49972b5ec2b3afb3e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3173d1b87d799d74bb16aa30779fe7c0, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/News/NewsTemplateList.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/branch00_asset
+- E:/AAA/test/AssetBundles/Windows/branch00_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch00_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch01_asset
+- E:/AAA/test/AssetBundles/Windows/branch01_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch01_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch02_asset
+- E:/AAA/test/AssetBundles/Windows/branch02_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch02_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch03_asset
+- E:/AAA/test/AssetBundles/Windows/branch03_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch03_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch05_asset
+- E:/AAA/test/AssetBundles/Windows/branch05_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch05_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch06_asset
+- E:/AAA/test/AssetBundles/Windows/branch06_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch06_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch07_asset
+- E:/AAA/test/AssetBundles/Windows/branch07_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch07_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch09_asset
+- E:/AAA/test/AssetBundles/Windows/branch09_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch09_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch10_asset
+- E:/AAA/test/AssetBundles/Windows/branch10_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch10_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch11_asset
+- E:/AAA/test/AssetBundles/Windows/branch11_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch11_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch12_asset
+- E:/AAA/test/AssetBundles/Windows/branch12_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch12_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch14_asset
+- E:/AAA/test/AssetBundles/Windows/branch14_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch14_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch15_asset
+- E:/AAA/test/AssetBundles/Windows/branch15_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch15_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch16_asset
+- E:/AAA/test/AssetBundles/Windows/branch16_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch16_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch17_asset
+- E:/AAA/test/AssetBundles/Windows/branch17_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch17_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch18_asset
+- E:/AAA/test/AssetBundles/Windows/branch18_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch18_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch19_asset
+- E:/AAA/test/AssetBundles/Windows/branch19_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch19_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch20_asset
+- E:/AAA/test/AssetBundles/Windows/branch20_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch20_objective_asset
+- E:/AAA/test/AssetBundles/Windows/branch21_asset
+- E:/AAA/test/AssetBundles/Windows/branch21_negative_asset
+- E:/AAA/test/AssetBundles/Windows/branch21_objective_asset
+- E:/AAA/test/AssetBundles/Windows/common_fair_asset
+- E:/AAA/test/AssetBundles/Windows/common_negative_asset
+- E:/AAA/test/AssetBundles/Windows/common_objective_asset
+- E:/AAA/test/AssetBundles/Windows/main01_asset
+- E:/AAA/test/AssetBundles/Windows/main01_negative_asset
+- E:/AAA/test/AssetBundles/Windows/main01_objective_asset
+- E:/AAA/test/AssetBundles/Windows/main02_asset
+- E:/AAA/test/AssetBundles/Windows/main02_negative_asset
+- E:/AAA/test/AssetBundles/Windows/main02_objective_asset
+- E:/AAA/test/AssetBundles/Windows/main03_asset
+- E:/AAA/test/AssetBundles/Windows/main03_negative_asset
+- E:/AAA/test/AssetBundles/Windows/main03_objective_asset

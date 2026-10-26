@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 556776657
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 85a7319b9bc0512c3e5e4e5a68d2d46a
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 4c4868e8b69eb66163c3a6e9223477f7
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 85a7319b9bc0512c3e5e4e5a68d2d46a
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 16eb37e654294b1408ed97f7cbbdb002, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/baLine/baLineL01/baLine01_2.asset
+Dependencies: []

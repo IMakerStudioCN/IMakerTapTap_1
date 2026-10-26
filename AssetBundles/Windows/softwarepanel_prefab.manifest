@@ -1,0 +1,44 @@
+ManifestFileVersion: 0
+CRC: 3411620954
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: f90b4ccf0c12133f367c285a113aa0cc
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 8ace7b79146b057f4bdd1e021b8107df
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: f90b4ccf0c12133f367c285a113aa0cc
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 720a7de4334600a48bf3e81a82c7f2ba, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 559ea39a69e29be4b8cf606cb92c2f97, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0d51f3a7c41ab0346b49ae50d456bece, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4ec38f7d0a404964197428368eb0283d, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.RectOffset
+Assets:
+- Assets/Art/ui/UIPrefab/softwarePanel.prefab
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/email_asset
+- E:/AAA/test/AssetBundles/Windows/map_asset
+- E:/AAA/test/AssetBundles/Windows/sleep_asset
+- E:/AAA/test/AssetBundles/Windows/software_prefab
+- E:/AAA/test/AssetBundles/Windows/web_asset
+- E:/AAA/test/AssetBundles/Windows/word_asset
