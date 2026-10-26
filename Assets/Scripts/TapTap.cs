@@ -53,6 +53,7 @@ namespace TapTapFirst
             save.Add<NewsTemplateSaveData>();
             save.Add<TagFillSaveData>();
             save.Add<NewsResultSaveData>();
+            save.Add<PlayerSaveData>();
             #endregion
 
 

@@ -1,0 +1,64 @@
+ManifestFileVersion: 0
+CRC: 454877435
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: d5370142d738cb7b80145d71f9bb7d69
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 027e916878653b1cbc4cbf5a36ff134f
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: d5370142d738cb7b80145d71f9bb7d69
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 60f494ad86718eb4b8317d0d202e3a2c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d5de6e5ed27343c47a6bbf4cc2195b56, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3ec1c08a95b9e7e4c9ad3f1997094f1f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 411e729afed24c62a04e2b99d9122e78, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3d65ee35bae9023408c2834cfcdca450, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.PersistentCallGroup
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.AnimationTriggers
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.Button/ButtonClickedEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.ColorBlock
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.MaskableGraphic/CullStateChangedEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.Navigation
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.SpriteState
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.Toggle/ToggleEvent
+Assets:
+- Assets/Art/ui/UIPrefab/Map.prefab
+Dependencies: []

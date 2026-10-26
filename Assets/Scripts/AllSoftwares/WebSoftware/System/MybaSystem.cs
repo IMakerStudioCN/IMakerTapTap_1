@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static TapTapFirst.MybaSystem;
 
 namespace TapTapFirst
 {
@@ -63,6 +64,7 @@ namespace TapTapFirst
             dataList = this.GetUtility<IJsonSaveUtility>().Get<mybaSystemData>("mybaSystemData").dataList;
             repliseList = this.GetUtility<IJsonSaveUtility>().Get<mybaSystemData>("mybaSystemData").repliesList;
             clickList = this.GetUtility<IJsonSaveUtility>().Get<mybaSystemData>("mybaSystemData").clickList;
+            //mybaReplseLists = this.GetUtility<IJsonSaveUtility>().Get<mybaSystemData>("mybaReplseLists").mybaReplseLists;
             //获取mybaSendEvent
             this.RegisterEvent<mybaSendEvent>(e => 
             {
@@ -243,6 +245,6 @@ namespace TapTapFirst
         public List<int> dataList = new List<int>();
         public List<int> clickList = new List<int> ();
         public List<int> repliesList = new List<int> ();
-
+        //public List<MybaReplseList> mybaReplseLists = new List<MybaReplseList>();
     }
 }

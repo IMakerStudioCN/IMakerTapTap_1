@@ -15,8 +15,8 @@ public  class Calculate
     //  新闻对主角数值（资金 / 邪恶 / 可信度）的影响
     // ============================================================
 
-    /// <summary>资金 = 浏览量 / 这个数。</summary>
-    public int fundsPerPageViews = 1000;
+    /// <summary>每篇新闻固定增加的资金（与浏览量脱钩）。</summary>
+    public int fundsPerNews = 5;
 
     /// <summary>邪恶 / 可信度单次变化的幅度下限（含）。</summary>
     public int statChangeMin = 3;
@@ -42,23 +42,23 @@ public  class Calculate
         return reply;
     }
 
-    /// <summary>资金变化 = 该新闻的浏览量 / 1000（四舍五入到整数）。</summary>
+    /// <summary>资金变化 = 每篇新闻固定 +fundsPerNews（默认 5），不再随浏览量变化。</summary>
     public int CalculateFundsChange(int pageViews)
     {
-        if (pageViews <= 0)
-        {
-            return 0;
-        }
-
-        return Mathf.RoundToInt((float)pageViews / Mathf.Max(1, fundsPerPageViews));
+        return Mathf.Max(0, fundsPerNews);
     }
 
     /// <summary>
-    /// 邪恶变化：消极（负面）模版加邪恶，其它模版减邪恶。
+    /// 邪恶变化：消极（负面）模版加邪恶，正面模版减邪恶，客观模版不改变邪恶值。
     /// 幅度稳定在 [statChangeMin, statChangeMax]，浏览量越大越接近上限。
     /// </summary>
     public int CalculateEvilChange(int pageViews, NewsEffectType effectType)
     {
+        if (effectType == NewsEffectType.Objective)
+        {
+            return 0;
+        }
+
         int magnitude = CalculateStatMagnitudeByPageViews(pageViews);
 
         return effectType == NewsEffectType.Negative ? magnitude : -magnitude;

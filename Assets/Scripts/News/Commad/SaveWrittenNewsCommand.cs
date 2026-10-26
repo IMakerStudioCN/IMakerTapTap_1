@@ -17,7 +17,6 @@ namespace TapTapFirst
     {
         private readonly int mNewsId;
         private readonly string mDocumentJson;
-        
         public SaveWrittenNewsCommand(int newsId, string documentJson)
         {
             mNewsId = newsId;
@@ -46,8 +45,7 @@ namespace TapTapFirst
             {
                 content = result.content,
                 click = result.pageViews,
-              
-
+                data = this.GetModel<ITimeModel>().days,
             }
             );
 
@@ -62,7 +60,8 @@ namespace TapTapFirst
             {
                 NewsType = (int)result.effectType,
                 mybaID = mNewsId,
-                nums = 100,
+                nums = (int)Random.Range(10,20),
+                
 
             });
             UnityEngine.Debug.Log($"向MyBa发送新闻：{result.content}{result.pageViews}");

@@ -21,15 +21,15 @@ namespace TapTapFirst
         private IMybaSystem mybaSystem;//myba系统
 
 
-        private void OnGUI()
-        {
-            if (GUI.Button(new Rect(100, 100, 100, 60), "mybaAdd"))
-            {
-                TapTap.Interface.SendEvent(new mybaSendEvent { content = "测试",data = 0 });
-                Debug.Log("123123");
+        //private void OnGUI()
+        //{
+        //    if (GUI.Button(new Rect(100, 100, 100, 60), "mybaAdd"))
+        //    {
+        //        TapTap.Interface.SendEvent(new mybaSendEvent { content = "测试",data = 0 });
+        //        Debug.Log("123123");
 
-            }
-        }
+        //    }
+        //}
         private void Awake()
         {
             mybaSystem = this.GetSystem<IMybaSystem>();
@@ -109,9 +109,10 @@ namespace TapTapFirst
                 }
 
                 if (mybaLineSingle.title != null) mybaLineSingle.title.text = contents[i];
-                if (mybaLineSingle.writter != null) mybaLineSingle.writter.text = "名字";
+                if (mybaLineSingle.writter != null) mybaLineSingle.writter.text = "温";
                 if (mybaLineSingle.clicks != null) mybaLineSingle.clicks.text = GetAt(clicks, i).ToString();
-                if (mybaLineSingle.replies != null) mybaLineSingle.replies.text = GetAt(replies, i).ToString();
+                if (mybaLineSingle.replies != null) mybaLineSingle.replies.text = mybaSystem.GetmybaReplyesByID(i).Count.ToString();
+                
                 if (mybaLineSingle.data != null) mybaLineSingle.data.text = GetAt(datas, i).ToString();
 
                 mybaLineSingle.mybaWebID = i;

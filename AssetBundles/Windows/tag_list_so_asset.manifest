@@ -1,0 +1,72 @@
+ManifestFileVersion: 0
+CRC: 4224541516
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 4e71ed5e05002fc6a1aa22e1b58cf950
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 5d224f9681b5abbb928575e9bb67fcbb
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 4e71ed5e05002fc6a1aa22e1b58cf950
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 091bb488a4ed9de429b25fa865cd9b8c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 88a30e3aa4a58df42adedfaa27e83538, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/Tag/Tag_List_SO.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/tag_01_asset
+- E:/AAA/test/AssetBundles/Windows/tag_02_asset
+- E:/AAA/test/AssetBundles/Windows/tag_03_asset
+- E:/AAA/test/AssetBundles/Windows/tag_04_asset
+- E:/AAA/test/AssetBundles/Windows/tag_06_asset
+- E:/AAA/test/AssetBundles/Windows/tag_07_asset
+- E:/AAA/test/AssetBundles/Windows/tag_08_asset
+- E:/AAA/test/AssetBundles/Windows/tag_10_asset
+- E:/AAA/test/AssetBundles/Windows/tag_11_asset
+- E:/AAA/test/AssetBundles/Windows/tag_12_asset
+- E:/AAA/test/AssetBundles/Windows/tag_13_asset
+- E:/AAA/test/AssetBundles/Windows/tag_15_asset
+- E:/AAA/test/AssetBundles/Windows/tag_16_asset
+- E:/AAA/test/AssetBundles/Windows/tag_17_asset
+- E:/AAA/test/AssetBundles/Windows/tag_18_asset
+- E:/AAA/test/AssetBundles/Windows/tag_19_asset
+- E:/AAA/test/AssetBundles/Windows/tag_20_asset
+- E:/AAA/test/AssetBundles/Windows/tag_21_asset
+- E:/AAA/test/AssetBundles/Windows/tag_22_asset
+- E:/AAA/test/AssetBundles/Windows/tag_23_asset
+- E:/AAA/test/AssetBundles/Windows/tag_24_asset
+- E:/AAA/test/AssetBundles/Windows/tag_25_asset
+- E:/AAA/test/AssetBundles/Windows/tag_26_asset
+- E:/AAA/test/AssetBundles/Windows/tag_27_asset
+- E:/AAA/test/AssetBundles/Windows/tag_28_asset
+- E:/AAA/test/AssetBundles/Windows/tag_29_asset
+- E:/AAA/test/AssetBundles/Windows/tag_30_asset
+- E:/AAA/test/AssetBundles/Windows/tag_31_asset
+- E:/AAA/test/AssetBundles/Windows/tag_32_asset
+- E:/AAA/test/AssetBundles/Windows/tag_33_asset
+- E:/AAA/test/AssetBundles/Windows/tag_34_asset
+- E:/AAA/test/AssetBundles/Windows/tag_35_asset
+- E:/AAA/test/AssetBundles/Windows/tag_36_asset
+- E:/AAA/test/AssetBundles/Windows/tag_37_asset
+- E:/AAA/test/AssetBundles/Windows/tag_38_asset
+- E:/AAA/test/AssetBundles/Windows/tag_39_asset
+- E:/AAA/test/AssetBundles/Windows/tag_40_asset
+- E:/AAA/test/AssetBundles/Windows/tag_41_asset
+- E:/AAA/test/AssetBundles/Windows/tag_42_asset
+- E:/AAA/test/AssetBundles/Windows/tag_43_asset
+- E:/AAA/test/AssetBundles/Windows/tag_44_asset
+- E:/AAA/test/AssetBundles/Windows/tag_45_asset
+- E:/AAA/test/AssetBundles/Windows/tag_46_asset
+- E:/AAA/test/AssetBundles/Windows/tag_47_asset
+- E:/AAA/test/AssetBundles/Windows/tag_48_asset
+- E:/AAA/test/AssetBundles/Windows/tag_49_asset
+- E:/AAA/test/AssetBundles/Windows/tag_50_asset
+- E:/AAA/test/AssetBundles/Windows/tag_51_asset

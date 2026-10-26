@@ -15,27 +15,57 @@ namespace TapTapFirst
         private IMybaSystem mybaSystem;
 
         private readonly List<GameObject> mBaLineItems = new List<GameObject>();//列表项实例，只清自己生成的
-        private void OnGUI()
-        {
-            if(GUI.Button(new Rect(0, 0, 100, 60), "addba"))
-            {
-                for(int i = 0;i<22;i++)
-                {
-                    TapTap.Interface.SendEvent(new SendBaEvent { baID = i });
-                }
-                Debug.Log("123123");
+        //private void OnGUI()
+        //{
+        //    if(GUI.Button(new Rect(0, 0, 100, 60), "addba"))
+        //    {
+        //        for(int i = 0;i<22;i++)
+        //        {
+        //            TapTap.Interface.SendEvent(new SendBaEvent { baID = i });
+        //        }
+        //        Debug.Log("123123");
                
-            }
-        }
+        //    }
+        //}
         private void Awake()
         {
             baListSystem = this.GetSystem<IbaListSystem>();
             mybaSystem = this.GetSystem<IMybaSystem>();
         }
+        private void OnEnable()
+        {
+            EnsureTodayLists();
+            UpdateBarList();
+        }
+
+        // 补齐“序章（第 0 天）~当天”应该拥有的帖子；顺便清掉读档反序列化出来的空壳条目
+        private void EnsureTodayLists()
+        {
+            if (baListSystem == null) return;
+
+            List<baLineList_SO> owned = baListSystem.GetbaLineListYouHave();
+
+            if (owned != null)
+            {
+                owned.RemoveAll(x => x == null || x.baLineList == null || x.baLineList.Count == 0);
+            }
+
+            int today = this.GetModel<ITimeModel>().days;
+
+            for (int day = 0; day <= today; day++)
+            {
+                baListSystem.AddbaLineList(day);
+            }
+        }
+
         private void Start()
         {
             //baSystem = this.GetSystem<IbaSystem>();
-
+            this.RegisterEvent<OnDaysChangeEvent>(e => 
+            {
+                TapTap.Interface.SendEvent(new SendBaEvent { baID = this.GetModel<ITimeModel>().days }); 
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
+            EnsureTodayLists();
             UpdateBarList();
             //根据Line改变网页状态
             this.RegisterEvent<baLineClickEvent>(e => 
@@ -73,7 +103,7 @@ namespace TapTapFirst
                     baWebController baWebController = baWeb.GetComponent<baWebController>();
                     baWebController.content.text = mybaSystem.GetMyBaLineContent(e.baWebID);
                     baWebController.data.text = mybaSystem.GetdataList()[e.baWebID].ToString();
-                    baWebController.witter.text = "名字";
+                    baWebController.witter.text = "温";
                     baWebController.balist = mybaSystem.GetmybaReplyesByID(e.baWebID);
                     baWebController.baWebType = e.baWebType;
 

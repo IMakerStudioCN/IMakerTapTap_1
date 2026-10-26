@@ -1,0 +1,36 @@
+ManifestFileVersion: 0
+CRC: 982627804
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: b4fb067c5baf589692f5319b5bb4cdca
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 0c629121bebe8d7bb309ff1146417e6d
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: b4fb067c5baf589692f5319b5bb4cdca
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: b3e86aa48ff767141a7c1d9a430266fe, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 16eb37e654294b1408ed97f7cbbdb002, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/baLine/mybaReply/list/evilReplyList.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/evilreply01_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply02_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply03_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply04_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply05_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply06_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply07_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply08_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply09_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply10_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply11_asset
+- E:/AAA/test/AssetBundles/Windows/evilreply12_asset

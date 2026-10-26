@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 667539930
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 86411c1c947bc910abb49dd414869d2f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 4c4868e8b69eb66163c3a6e9223477f7
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 86411c1c947bc910abb49dd414869d2f
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 16eb37e654294b1408ed97f7cbbdb002, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/baLine/mybaReply/balaReply09.asset
+Dependencies: []

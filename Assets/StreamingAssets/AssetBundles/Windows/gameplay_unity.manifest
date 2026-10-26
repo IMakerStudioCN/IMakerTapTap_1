@@ -1,0 +1,210 @@
+ManifestFileVersion: 0
+CRC: 2668700275
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 0115a8eccbba955605cc337b93e4357d
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 27dcbefbe9ccb7edacbc9b7d2f0be04b
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 0115a8eccbba955605cc337b93e4357d
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 20
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 81
+  Script: {instanceID: 0}
+- Class: 89
+  Script: {instanceID: 0}
+- Class: 104
+  Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5379eca8b7bed2242bbdff9ca87974b6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3df40e1f3d90023498b80cca5e64ea8f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 60f494ad86718eb4b8317d0d202e3a2c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 720a7de4334600a48bf3e81a82c7f2ba, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 559ea39a69e29be4b8cf606cb92c2f97, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5ffd7b707e5b1444aaa0940c9e0b36cc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2eb02bcd058541a419a98aeeba7779cb, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b6ac8a0c5c9b05a4ca9a9ee587659ec6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 81936539ae2d84665a86a2b3f531955f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d78e374f8dbe38648b3c6a8bc5cefc26, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0d51f3a7c41ab0346b49ae50d456bece, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d5de6e5ed27343c47a6bbf4cc2195b56, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 49652af4bf4bfeb45bf256ac9026309c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d353eeaec7e129240bf77a0e1aeaf64d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3ec1c08a95b9e7e4c9ad3f1997094f1f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 998462a644959df4c9d85f19bf6decc8, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe82313c442468c45ac06f57f3df8c6d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b1085eaa6000dc44c9fb5d66e7b50eb1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5dc84f25d84334e168bf64050b91e1fb, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4ec38f7d0a404964197428368eb0283d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ed7feb75f17f3774fbc104cb10aee34d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 91bfde9c65166ae46a9c55da578b452f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6eba024ea32574239b57b098f1dc6282, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 411e729afed24c62a04e2b99d9122e78, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2a4db7a114972834c8e4117be1d82ba3, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e63646de9c62674439394b96be357ba9, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b6b7a3e7dc894eaca1053ef166cdad33, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d2db7fffd623c478eba3d2cb84034d2f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3d65ee35bae9023408c2834cfcdca450, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 034ae3826e7d7bb41b447307cd93d296, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 124
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+- Class: 157
+  Script: {instanceID: 0}
+- Class: 196
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 223
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+- Class: 225
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Scenes/GamePlay.unity
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/computerdisplay_prefab
+- E:/AAA/test/AssetBundles/Windows/computermenupanel_prefab
+- E:/AAA/test/AssetBundles/Windows/dialog_prefab
+- E:/AAA/test/AssetBundles/Windows/dialogso01_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso02_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso03_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso04_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso05_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso06_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso07_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso08_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso09_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso10_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso11_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso12_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso13_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso14_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso15_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso16_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso17_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso18_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso19_asset
+- E:/AAA/test/AssetBundles/Windows/dialogso_asset
+- E:/AAA/test/AssetBundles/Windows/map_prefab
+- E:/AAA/test/AssetBundles/Windows/playstatusmenu_prefab
+- E:/AAA/test/AssetBundles/Windows/softwarepanel_prefab
+- E:/AAA/test/AssetBundles/Windows/taptap_screenstructurecrt_mat
+- E:/AAA/test/AssetBundles/Windows/task00_asset
+- E:/AAA/test/AssetBundles/Windows/task01_asset
+- E:/AAA/test/AssetBundles/Windows/task02_asset
+- E:/AAA/test/AssetBundles/Windows/task03_asset
+- E:/AAA/test/AssetBundles/Windows/task04_asset
+- E:/AAA/test/AssetBundles/Windows/task05_asset
+- E:/AAA/test/AssetBundles/Windows/task06_asset
+- E:/AAA/test/AssetBundles/Windows/task07_asset
+- E:/AAA/test/AssetBundles/Windows/task08_asset
+- E:/AAA/test/AssetBundles/Windows/task09_asset
+- E:/AAA/test/AssetBundles/Windows/task10_asset
+- E:/AAA/test/AssetBundles/Windows/task11_asset
+- E:/AAA/test/AssetBundles/Windows/task12_asset
+- E:/AAA/test/AssetBundles/Windows/task13_asset
+- E:/AAA/test/AssetBundles/Windows/task14_asset
+- E:/AAA/test/AssetBundles/Windows/task15_asset
+- E:/AAA/test/AssetBundles/Windows/task16_asset
+- E:/AAA/test/AssetBundles/Windows/task17_asset
+- E:/AAA/test/AssetBundles/Windows/task18_asset
+- E:/AAA/test/AssetBundles/Windows/task19_asset
+- E:/AAA/test/AssetBundles/Windows/task20_asset
+- E:/AAA/test/AssetBundles/Windows/task21_asset
+- E:/AAA/test/AssetBundles/Windows/task22_asset
+- E:/AAA/test/AssetBundles/Windows/testwindow_prefab
+- E:/AAA/test/AssetBundles/Windows/windowkit_prefab

@@ -1,0 +1,35 @@
+ManifestFileVersion: 0
+CRC: 3023771446
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: fb55ba82204dc36e92adb517612ba0b2
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 0c629121bebe8d7bb309ff1146417e6d
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: fb55ba82204dc36e92adb517612ba0b2
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: b3e86aa48ff767141a7c1d9a430266fe, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 16eb37e654294b1408ed97f7cbbdb002, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/baLine/mybaReply/list/normalReplyList.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/normalreply01_asset
+- E:/AAA/test/AssetBundles/Windows/normalreply02_asset
+- E:/AAA/test/AssetBundles/Windows/normalreply03_asset
+- E:/AAA/test/AssetBundles/Windows/normalreply04_asset
+- E:/AAA/test/AssetBundles/Windows/normalreply05_asset
+- E:/AAA/test/AssetBundles/Windows/normalreply06_asset
+- E:/AAA/test/AssetBundles/Windows/normalreply07_asset
+- E:/AAA/test/AssetBundles/Windows/normalreply08_asset
+- E:/AAA/test/AssetBundles/Windows/normalreply09_asset
+- E:/AAA/test/AssetBundles/Windows/normalreply10_asset
+- E:/AAA/test/AssetBundles/Windows/normalreply11_asset

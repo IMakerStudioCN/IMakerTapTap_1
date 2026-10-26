@@ -1,7 +1,6 @@
 ﻿using QFramework;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 namespace TapTapFirst
 {
@@ -19,7 +18,7 @@ namespace TapTapFirst
             //订阅事件
             WindowKit.OnOpened.Register(OnWindowOpened).UnRegisterWhenGameObjectDestroyed(gameObject);
             WindowKit.OnClosed.Register(OnWindowClosed).UnRegisterWhenGameObjectDestroyed(gameObject);
-            WindowKit.OnFocused.Register(OnFocusChanged);
+            WindowKit.OnFocused.Register(OnFocusChanged).UnRegisterWhenGameObjectDestroyed(gameObject);
             WindowKit.OnStateChanged.Register(OnFocusChanged).UnRegisterWhenGameObjectDestroyed(gameObject);
             
 

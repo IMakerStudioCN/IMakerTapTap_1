@@ -1,0 +1,33 @@
+ManifestFileVersion: 0
+CRC: 1979748303
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: a533d568f62c661eeac8aaec9dd83da5
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 40cd161fba42cc6fffcd00659341f39a
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: a533d568f62c661eeac8aaec9dd83da5
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 49652af4bf4bfeb45bf256ac9026309c, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: Assembly-CSharp
+  ClassName: TapTapFirst.DialogSOSingle
+Assets:
+- Assets/Config/Dialog/DialogSO16.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/single1_prefab
+- E:/AAA/test/AssetBundles/Windows/single2_prefab
+- E:/AAA/test/AssetBundles/Windows/single3_prefab

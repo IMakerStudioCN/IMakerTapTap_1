@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 1396403032
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: d888c79d71028cbe16d8a0e20a7e62cc
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 2612ac43db082a73502ee80f2eceb73f
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: d888c79d71028cbe16d8a0e20a7e62cc
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- "Assets/Art/Sound pack/\u7F72\u540D/\u80CC\u666F.png"
+- "Assets/Art/Sound pack/\u7F72\u540D/\u5B8C\u7F8E\u7ED3\u5C40.png"
+- "Assets/Art/Sound pack/\u7F72\u540D/\u574F\u7ED3\u5C40.png"
+Dependencies: []

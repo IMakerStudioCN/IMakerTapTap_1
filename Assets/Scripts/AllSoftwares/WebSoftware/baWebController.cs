@@ -26,7 +26,7 @@ namespace TapTapFirst
         [SerializeField]
         public int getTagID;
         [SerializeField]
-        public int getNewsTemplateID;
+        public int[] getNewsTemplateID;
         [SerializeField]
         public int getBranchID;
         [SerializeField]
@@ -45,20 +45,21 @@ namespace TapTapFirst
             {
                 Debug.LogWarning("获取对应的TagID"+getTagID);
                 this.SendCommand(new AddTagCommand(getTagID));
-                this.SendCommand(new AddNewsCommand(getNewsTemplateID));
+                foreach(int i in getNewsTemplateID)
+                    this.SendCommand(new AddNewsCommand(i));
             });
         }
         //测试
-        private void OnGUI()
-        {
-            if (GUI.Button(new Rect(200, 200, 100, 60), "addmybaReply"))
-            {
-                TapTap.Interface.SendEvent(new mybaReplySendEvent {NewsType = 0,mybaID = 0,nums = 3 });
+        //private void OnGUI()
+        //{
+        //    if (GUI.Button(new Rect(200, 200, 100, 60), "addmybaReply"))
+        //    {
+        //        TapTap.Interface.SendEvent(new mybaReplySendEvent {NewsType = 0,mybaID = 0,nums = 3 });
 
-                Debug.Log("130246");
+        //        Debug.Log("130246");
 
-            }
-        }
+        //    }
+        //}
 
         public void RebuildbaLineGOList()
         {

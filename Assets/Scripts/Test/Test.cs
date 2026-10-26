@@ -13,45 +13,45 @@ namespace TapTapFirst
         //  临时测试开关（测完把 mShowDebugUi 关掉或删掉本区块）
         // ============================================================
 
-        [Header("临时测试 UI（动态生成）")]
-        [Tooltip("显示获得 Tag / 新闻模板的测试按钮")]
-        [SerializeField] private bool mShowDebugUi = true;
+        //[Header("临时测试 UI（动态生成）")]
+        //[Tooltip("显示获得 Tag / 新闻模板的测试按钮")]
+        //[SerializeField] private bool mShowDebugUi = true;
 
-        [Tooltip("测试面板左上角位置")]
-        [SerializeField] private Vector2 mDebugUiOrigin = new Vector2(20f, 20f);
+        //[Tooltip("测试面板左上角位置")]
+        //[SerializeField] private Vector2 mDebugUiOrigin = new Vector2(20f, 20f);
 
-        [Header("资源名（与 NewsController 保持一致）")]
-        [SerializeField] private string mNewsListResName = "NewsTemplateList";
-        [SerializeField] private string mTagListResName = "Tag_List_SO";
+        //[Header("资源名（与 NewsController 保持一致）")]
+        //[SerializeField] private string mNewsListResName = "NewsTemplateList";
+        //[SerializeField] private string mTagListResName = "Tag_List_SO";
 
         // ============================================================
         //  结局测试（右上角，只用于测试，不影响游戏逻辑）
         // ============================================================
 
-        [Header("结局测试 UI（右上角，动态生成）")]
-        [Tooltip("显示结局判定 / 结局表现的测试按钮")]
-        [SerializeField] private bool mShowGameOverTestUi = true;
+        //[Header("结局测试 UI（右上角，动态生成）")]
+        //[Tooltip("显示结局判定 / 结局表现的测试按钮")]
+        //[SerializeField] private bool mShowGameOverTestUi = true;
 
-        [Tooltip("右上角结局测试面板宽度")]
-        [SerializeField] private float mGameOverTestPanelWidth = 380f;
+        //[Tooltip("右上角结局测试面板宽度")]
+        //[SerializeField] private float mGameOverTestPanelWidth = 380f;
 
-        private Vector2 mGameOverTestScroll;
-        private string mGameOverTestMessage = "";
+        //private Vector2 mGameOverTestScroll;
+        //private string mGameOverTestMessage = "";
 
-        private readonly ResLoader mDebugResLoader = ResLoader.Allocate();
+        //private readonly ResLoader mDebugResLoader = ResLoader.Allocate();
 
-        private INewsSystem NewsSystem => this.GetSystem<INewsSystem>();
-        private ITagSystem TagSystem => this.GetSystem<ITagSystem>();
+        //private INewsSystem NewsSystem => this.GetSystem<INewsSystem>();
+        //private ITagSystem TagSystem => this.GetSystem<ITagSystem>();
 
-        private IPlayerModel PlayerModelRef => this.GetModel<IPlayerModel>();
-        private ITimeModel TimeModelRef => this.GetModel<ITimeModel>();
-        private IGlobalManagerSystem GlobalSystemRef => this.GetSystem<IGlobalManagerSystem>();
-        private GlobalManagerSystem GlobalSystemConcrete =>
-            TapTap.Interface.GetSystem<IGlobalManagerSystem>() as GlobalManagerSystem;
+        //private IPlayerModel PlayerModelRef => this.GetModel<IPlayerModel>();
+        //private ITimeModel TimeModelRef => this.GetModel<ITimeModel>();
+        //private IGlobalManagerSystem GlobalSystemRef => this.GetSystem<IGlobalManagerSystem>();
+        //private GlobalManagerSystem GlobalSystemConcrete =>
+        //    TapTap.Interface.GetSystem<IGlobalManagerSystem>() as GlobalManagerSystem;
 
-        private Vector2 mNewsScroll;
-        private Vector2 mTagScroll;
-        private string mDebugMessage = "";
+        //private Vector2 mNewsScroll;
+        //private Vector2 mTagScroll;
+        //private string mDebugMessage = "";
 
         void Start()
         {
@@ -62,10 +62,10 @@ namespace TapTapFirst
             //UIKit.OpenPanel<WindowsSample>();
         }
 
-        private void OnDestroy()
-        {
-            mDebugResLoader.Dispose();
-        }
+        //private void OnDestroy()
+        //{
+        //    mDebugResLoader.Dispose();
+        //}
 
         // ============================================================
         //  临时测试 UI
@@ -80,584 +80,585 @@ namespace TapTapFirst
         //      Unity 不会自动帮你补 End，GUI 组栈和临时分配就泄漏了，同样报上面那条。
         // ============================================================
 
-        private GUIStyle mRichLabelStyle;
+        //private GUIStyle mRichLabelStyle;
 
-        private List<NewsTemplate_SO> mAllNewsCache;
-        private List<Tag_SO> mAllTagsCache;
+        //private List<NewsTemplate_SO> mAllNewsCache;
+        //private List<Tag_SO> mAllTagsCache;
 
-        private INewsSystem mCachedNewsSystem;
-        private ITagSystem mCachedTagSystem;
+        //private INewsSystem mCachedNewsSystem;
+        //private ITagSystem mCachedTagSystem;
 
-        private string mLastGuiError;
+        //private string mLastGuiError;
 
-        private void OnGUI()
-        {
-            if (mShowDebugUi)
-            {
-                DrawDataTestPanel();
-            }
+        //private void OnGUI()
+        //{
+        //    if (mShowDebugUi)
+        //    {
+        //        DrawDataTestPanel();
+        //    }
 
-            if (mShowGameOverTestUi)
-            {
-                DrawGameOverTestPanel();
-            }
-        }
+        //    if (mShowGameOverTestUi)
+        //    {
+        //        DrawGameOverTestPanel();
+        //    }
+        //}
 
-        private void DrawDataTestPanel()
-        {
-            const float panelWidth = 400f;
-            const float panelHeight = 360f;
+        //private void DrawDataTestPanel()
+        //{
+        //    const float panelWidth = 400f;
+        //    const float panelHeight = 360f;
 
-            EnsureDebugReferences();
+        //    EnsureDebugReferences();
 
-            GUILayout.BeginArea(new Rect(mDebugUiOrigin.x, mDebugUiOrigin.y, panelWidth, panelHeight), GUI.skin.box);
+        //    GUILayout.BeginArea(new Rect(mDebugUiOrigin.x, mDebugUiOrigin.y, panelWidth, panelHeight), GUI.skin.box);
 
-            try
-            {
-                if (mRichLabelStyle == null)
-                {
-                    mRichLabelStyle = new GUIStyle(GUI.skin.label) { richText = true };
-                }
+        //    try
+        //    {
+        //        if (mRichLabelStyle == null)
+        //        {
+        //            mRichLabelStyle = new GUIStyle(GUI.skin.label) { richText = true };
+        //        }
 
-                GUILayout.Label("<b>临时测试：获得数据</b>", mRichLabelStyle);
+        //        GUILayout.Label("<b>临时测试：获得数据</b>", mRichLabelStyle);
 
-                if (!string.IsNullOrEmpty(mDebugMessage))
-                {
-                    GUILayout.Label(mDebugMessage);
-                }
+        //        if (!string.IsNullOrEmpty(mDebugMessage))
+        //        {
+        //            GUILayout.Label(mDebugMessage);
+        //        }
 
-                GUILayout.BeginHorizontal();
+        //        GUILayout.BeginHorizontal();
 
-                try
-                {
-                    DrawNewsBlock(panelWidth * 0.5f - 12f);
-                    DrawTagBlock(panelWidth * 0.5f - 12f);
-                }
-                finally
-                {
-                    GUILayout.EndHorizontal();
-                }
-            }
-            catch (System.Exception e)
-            {
-                ReportGuiError(e);
-            }
-            finally
-            {
-                GUILayout.EndArea();
-            }
-        }
+        //        try
+        //        {
+        //            DrawNewsBlock(panelWidth * 0.5f - 12f);
+        //            DrawTagBlock(panelWidth * 0.5f - 12f);
+        //        }
+        //        finally
+        //        {
+        //            GUILayout.EndHorizontal();
+        //        }
+        //    }
+        //    catch (System.Exception e)
+        //    {
+        //        ReportGuiError(e);
+        //    }
+        //    finally
+        //    {
+        //        GUILayout.EndArea();
+        //    }
+        //}
 
-        private void EnsureDebugReferences()
-        {
-            if (mCachedNewsSystem == null)
-            {
-                mCachedNewsSystem = this.GetSystem<INewsSystem>();
-            }
+        //private void EnsureDebugReferences()
+        //{
+        //    if (mCachedNewsSystem == null)
+        //    {
+        //        mCachedNewsSystem = this.GetSystem<INewsSystem>();
+        //    }
 
-            if (mCachedTagSystem == null)
-            {
-                mCachedTagSystem = this.GetSystem<ITagSystem>();
-            }
-        }
+        //    if (mCachedTagSystem == null)
+        //    {
+        //        mCachedTagSystem = this.GetSystem<ITagSystem>();
+        //    }
+        //}
 
-        /// <summary>同一条错误只往 Console 报一次，避免 OnGUI 每帧刷屏。</summary>
-        private void ReportGuiError(System.Exception e)
-        {
-            if (mLastGuiError == e.Message)
-            {
-                return;
-            }
+        ///// <summary>同一条错误只往 Console 报一次，避免 OnGUI 每帧刷屏。</summary>
+        //private void ReportGuiError(System.Exception e)
+        //{
+        //    if (mLastGuiError == e.Message)
+        //    {
+        //        return;
+        //    }
 
-            mLastGuiError = e.Message;
-            Debug.LogError($"[Test] 测试面板绘制出错（同一条只报一次）：{e.Message}\n{e.StackTrace}");
-        }
+        //    mLastGuiError = e.Message;
+        //    Debug.LogError($"[Test] 测试面板绘制出错（同一条只报一次）：{e.Message}\n{e.StackTrace}");
+        //}
 
-        private void DrawNewsBlock(float width)
-        {
-            GUILayout.BeginVertical(GUILayout.Width(width));
+        //private void DrawNewsBlock(float width)
+        //{
+        //    GUILayout.BeginVertical(GUILayout.Width(width));
 
-            try
-            {
-                GUILayout.Label($"新闻模板（{mNewsListResName}）");
+        //    try
+        //    {
+        //        GUILayout.Label($"新闻模板（{mNewsListResName}）");
 
-                GUILayout.BeginHorizontal();
+        //        GUILayout.BeginHorizontal();
 
-                try
-                {
-                    if (GUILayout.Button("全部获得"))
-                    {
-                        AcquireAllNews();
-                    }
+        //        try
+        //        {
+        //            if (GUILayout.Button("全部获得"))
+        //            {
+        //                AcquireAllNews();
+        //            }
 
-                    if (GUILayout.Button("重读总表"))
-                    {
-                        mAllNewsCache = null;
-                    }
-                }
-                finally
-                {
-                    GUILayout.EndHorizontal();
-                }
+        //            if (GUILayout.Button("重读总表"))
+        //            {
+        //                mAllNewsCache = null;
+        //            }
+        //        }
+        //        finally
+        //        {
+        //            GUILayout.EndHorizontal();
+        //        }
 
-                List<NewsTemplate_SO> all = LoadAllNews();
+        //        List<NewsTemplate_SO> all = LoadAllNews();
 
-                mNewsScroll = GUILayout.BeginScrollView(mNewsScroll, GUI.skin.box,
-                    GUILayout.Height(240f), GUILayout.Width(width));
+        //        mNewsScroll = GUILayout.BeginScrollView(mNewsScroll, GUI.skin.box,
+        //            GUILayout.Height(240f), GUILayout.Width(width));
 
-                try
-                {
-                    DrawNewsList(all);
-                }
-                finally
-                {
-                    GUILayout.EndScrollView();
-                }
-            }
-            finally
-            {
-                GUILayout.EndVertical();
-            }
-        }
+        //        try
+        //        {
+        //            DrawNewsList(all);
+        //        }
+        //        finally
+        //        {
+        //            GUILayout.EndScrollView();
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        GUILayout.EndVertical();
+        //    }
+        //}
 
-        private void DrawNewsList(List<NewsTemplate_SO> all)
-        {
-            if (all == null || all.Count == 0)
-            {
-                GUILayout.Label("取不到总表");
-                return;
-            }
+        //private void DrawNewsList(List<NewsTemplate_SO> all)
+        //{
+        //    if (all == null || all.Count == 0)
+        //    {
+        //        GUILayout.Label("取不到总表");
+        //        return;
+        //    }
 
-            for (int i = 0; i < all.Count; i++)
-            {
-                NewsTemplate_SO news = all[i];
+        //    for (int i = 0; i < all.Count; i++)
+        //    {
+        //        NewsTemplate_SO news = all[i];
 
-                if (news == null)
-                {
-                    continue;
-                }
+        //        if (news == null)
+        //        {
+        //            continue;
+        //        }
 
-                GUILayout.BeginHorizontal();
+        //        GUILayout.BeginHorizontal();
 
-                try
-                {
-                    bool owned = mCachedNewsSystem != null && mCachedNewsSystem.IsAcquired(news.newsId);
-                    string label = owned ? $"✔ {news.newsTitle} ({news.newsId})" : $"{news.newsTitle} ({news.newsId})";
+        //        try
+        //        {
+        //            bool owned = mCachedNewsSystem != null && mCachedNewsSystem.IsAcquired(news.newsId);
+        //            string label = owned ? $"✔ {news.newsTitle} ({news.newsId})" : $"{news.newsTitle} ({news.newsId})";
 
-                    if (GUILayout.Button(label))
-                    {
-                        this.SendCommand(new AddNewsCommand(news.newsId));
-                        mDebugMessage = $"已获得新闻 {news.newsTitle}";
-                    }
-                }
-                finally
-                {
-                    GUILayout.EndHorizontal();
-                }
-            }
-        }
+        //            if (GUILayout.Button(label))
+        //            {
+        //                this.SendCommand(new AddNewsCommand(news.newsId));
+        //                mDebugMessage = $"已获得新闻 {news.newsTitle}";
+        //            }
+        //        }
+        //        finally
+        //        {
+        //            GUILayout.EndHorizontal();
+        //        }
+        //    }
+        //}
 
-        private void DrawTagBlock(float width)
-        {
-            GUILayout.BeginVertical(GUILayout.Width(width));
+        //private void DrawTagBlock(float width)
+        //{
+        //    GUILayout.BeginVertical(GUILayout.Width(width));
 
-            try
-            {
-                GUILayout.Label($"Tag（{mTagListResName}）");
+        //    try
+        //    {
+        //        GUILayout.Label($"Tag（{mTagListResName}）");
 
-                GUILayout.BeginHorizontal();
+        //        GUILayout.BeginHorizontal();
 
-                try
-                {
-                    if (GUILayout.Button("全部获得"))
-                    {
-                        AcquireAllTags();
-                    }
+        //        try
+        //        {
+        //            if (GUILayout.Button("全部获得"))
+        //            {
+        //                AcquireAllTags();
+        //            }
 
-                    if (GUILayout.Button("重读总表"))
-                    {
-                        mAllTagsCache = null;
-                    }
-                }
-                finally
-                {
-                    GUILayout.EndHorizontal();
-                }
+        //            if (GUILayout.Button("重读总表"))
+        //            {
+        //                mAllTagsCache = null;
+        //            }
+        //        }
+        //        finally
+        //        {
+        //            GUILayout.EndHorizontal();
+        //        }
 
-                List<Tag_SO> all = LoadAllTags();
+        //        List<Tag_SO> all = LoadAllTags();
 
-                mTagScroll = GUILayout.BeginScrollView(mTagScroll, GUI.skin.box,
-                    GUILayout.Height(240f), GUILayout.Width(width));
+        //        mTagScroll = GUILayout.BeginScrollView(mTagScroll, GUI.skin.box,
+        //            GUILayout.Height(240f), GUILayout.Width(width));
 
-                try
-                {
-                    DrawTagList(all);
-                }
-                finally
-                {
-                    GUILayout.EndScrollView();
-                }
-            }
-            finally
-            {
-                GUILayout.EndVertical();
-            }
-        }
+        //        try
+        //        {
+        //            DrawTagList(all);
+        //        }
+        //        finally
+        //        {
+        //            GUILayout.EndScrollView();
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        GUILayout.EndVertical();
+        //    }
+        //}
 
-        private void DrawTagList(List<Tag_SO> all)
-        {
-            if (all == null || all.Count == 0)
-            {
-                GUILayout.Label("取不到总表");
-                return;
-            }
+        //private void DrawTagList(List<Tag_SO> all)
+        //{
+        //    if (all == null || all.Count == 0)
+        //    {
+        //        GUILayout.Label("取不到总表");
+        //        return;
+        //    }
 
-            for (int i = 0; i < all.Count; i++)
-            {
-                Tag_SO tag = all[i];
+        //    for (int i = 0; i < all.Count; i++)
+        //    {
+        //        Tag_SO tag = all[i];
 
-                if (tag == null)
-                {
-                    continue;
-                }
+        //        if (tag == null)
+        //        {
+        //            continue;
+        //        }
 
-                bool owned = mCachedTagSystem != null && mCachedTagSystem.IsAcquired(tag.tagId);
-                string label = owned ? $"✔ {tag.tagName} ({tag.tagId})" : $"{tag.tagName} ({tag.tagId})";
+        //        bool owned = mCachedTagSystem != null && mCachedTagSystem.IsAcquired(tag.tagId);
+        //        string label = owned ? $"✔ {tag.tagName} ({tag.tagId})" : $"{tag.tagName} ({tag.tagId})";
 
-                if (GUILayout.Button(label))
-                {
-                    this.SendCommand(new AddTagCommand(tag.tagId));
-                    mDebugMessage = $"已获得 Tag {tag.tagName}";
-                }
-            }
-        }
+        //        if (GUILayout.Button(label))
+        //        {
+        //            this.SendCommand(new AddTagCommand(tag.tagId));
+        //            mDebugMessage = $"已获得 Tag {tag.tagName}";
+        //        }
+        //    }
+        //}
 
         // ============================================================
         //  结局测试面板（右上角）
         // ============================================================
 
-        private void DrawGameOverTestPanel()
-        {
-            const float margin = 20f;
+        //    private void DrawGameOverTestPanel()
+        //    {
+        //        const float margin = 20f;
 
-            float width = Mathf.Max(300f, mGameOverTestPanelWidth);
-            float height = Mathf.Min(620f, Screen.height - margin * 2f);
-            var rect = new Rect(Screen.width - width - margin, margin, width, height);
-            var labelStyle = new GUIStyle(GUI.skin.label) { richText = true, wordWrap = true };
+        //        float width = Mathf.Max(300f, mGameOverTestPanelWidth);
+        //        float height = Mathf.Min(620f, Screen.height - margin * 2f);
+        //        var rect = new Rect(Screen.width - width - margin, margin, width, height);
+        //        var labelStyle = new GUIStyle(GUI.skin.label) { richText = true, wordWrap = true };
 
-            GUILayout.BeginArea(rect, GUI.skin.box);
-            mGameOverTestScroll = GUILayout.BeginScrollView(mGameOverTestScroll);
+        //        GUILayout.BeginArea(rect, GUI.skin.box);
+        //        mGameOverTestScroll = GUILayout.BeginScrollView(mGameOverTestScroll);
 
-            GUILayout.Label("<b>结局测试（GlobalManager 判定）</b>", labelStyle);
+        //        GUILayout.Label("<b>结局测试（GlobalManager 判定）</b>", labelStyle);
 
-            var player = PlayerModelRef;
-            var time = TimeModelRef;
-            var global = GlobalSystemRef;
-            var concrete = GlobalSystemConcrete;
+        //        var player = PlayerModelRef;
+        //        var time = TimeModelRef;
+        //        var global = GlobalSystemRef;
+        //        var concrete = GlobalSystemConcrete;
 
-            int which = global != null ? global.WhichEnd(player.TargetFundsValue) : -99;
+        //        int which = global != null ? global.WhichEnd(player.TargetFundsValue) : -99;
 
-            GUILayout.Label($"信任 {player.CredibilityValue}    道德(Evil) {player.EvilValue}", labelStyle);
-            GUILayout.Label($"资金 {player.FundsValue}/{player.TargetFundsValue}    天数 {time.days}/{time.endDays}", labelStyle);
-            GUILayout.Label($"WhichEnd = {which}（{EndingName(which)}）", labelStyle);
-            GUILayout.Label(
-                $"IsEnded = {(concrete != null && concrete.IsEnded)}    EndingId = {(concrete != null ? concrete.EndingId : -99)}",
-                labelStyle);
+        //        GUILayout.Label($"信任 {player.CredibilityValue}    道德(Evil) {player.EvilValue}", labelStyle);
+        //        GUILayout.Label($"资金 {player.FundsValue}/{player.TargetFundsValue}    天数 {time.days}/{time.endDays}", labelStyle);
+        //        GUILayout.Label($"WhichEnd = {which}（{EndingName(which)}）", labelStyle);
+        //        GUILayout.Label(
+        //            $"IsEnded = {(concrete != null && concrete.IsEnded)}    EndingId = {(concrete != null ? concrete.EndingId : -99)}",
+        //            labelStyle);
 
-            GUILayout.Space(4f);
-            GUILayout.Label("<b>① 只测表现</b>：直接发 GameOverEvent", labelStyle);
-            GUILayout.BeginHorizontal();
-            for (int id = 0; id <= 4; id++)
-            {
-                if (GUILayout.Button(id.ToString(), GUILayout.Width(52f)))
-                {
-                    PreviewEnding(id);
-                }
-            }
+        //        GUILayout.Space(4f);
+        //        GUILayout.Label("<b>① 只测表现</b>：直接发 GameOverEvent", labelStyle);
+        //        GUILayout.BeginHorizontal();
+        //        for (int id = 0; id <= 4; id++)
+        //        {
+        //            if (GUILayout.Button(id.ToString(), GUILayout.Width(52f)))
+        //            {
+        //                PreviewEnding(id);
+        //            }
+        //        }
 
-            GUILayout.EndHorizontal();
+        //        GUILayout.EndHorizontal();
 
-            GUILayout.Space(4f);
-            GUILayout.Label("<b>② 测真实判定</b>：改内存数值 + 发真实事件", labelStyle);
+        //        GUILayout.Space(4f);
+        //        GUILayout.Label("<b>② 测真实判定</b>：改内存数值 + 发真实事件", labelStyle);
 
-            if (GUILayout.Button("信任归零 → 期望 0")) SimulateTrustZero();
-            if (GUILayout.Button("道德归零 → 期望 1")) SimulateEvilZero();
-            if (GUILayout.Button("最后一天 + 资金不足 → 期望 2")) SimulateFundsLow();
-            if (GUILayout.Button("最后一天 + 资金够 → 期望 3")) SimulateNormal();
-            if (GUILayout.Button("最后一天 + NB数值 → 4（需有过期主线任务，否则 3）")) SimulateNb();
-            if (GUILayout.Button("按当前数值直接结算 EndTheGame()")) TriggerEndTheGame();
+        //        if (GUILayout.Button("信任归零 → 期望 0")) SimulateTrustZero();
+        //        if (GUILayout.Button("道德归零 → 期望 1")) SimulateEvilZero();
+        //        if (GUILayout.Button("最后一天 + 资金不足 → 期望 2")) SimulateFundsLow();
+        //        if (GUILayout.Button("最后一天 + 资金够 → 期望 3")) SimulateNormal();
+        //        if (GUILayout.Button("最后一天 + NB数值 → 4（需有过期主线任务，否则 3）")) SimulateNb();
+        //        if (GUILayout.Button("按当前数值直接结算 EndTheGame()")) TriggerEndTheGame();
 
-            GUILayout.Space(4f);
-            GUILayout.Label("<b>③ 工具</b>", labelStyle);
+        //        GUILayout.Space(4f);
+        //        GUILayout.Label("<b>③ 工具</b>", labelStyle);
 
-            if (GUILayout.Button("跳过当前演出（两段式，等同按键）")) SkipCurrentEnding();
-            if (GUILayout.Button("重置结算标记 + 重建表现 Director")) ResetEndingTestState();
-            if (GUILayout.Button("恢复默认数值（只改内存）")) ResetPlayerValues();
+        //        if (GUILayout.Button("跳过当前演出（两段式，等同按键）")) SkipCurrentEnding();
+        //        if (GUILayout.Button("重置结算标记 + 重建表现 Director")) ResetEndingTestState();
+        //        if (GUILayout.Button("恢复默认数值（只改内存）")) ResetPlayerValues();
 
-            if (!string.IsNullOrEmpty(mGameOverTestMessage))
-            {
-                GUILayout.Space(4f);
-                GUILayout.Label(mGameOverTestMessage, labelStyle);
-            }
+        //        if (!string.IsNullOrEmpty(mGameOverTestMessage))
+        //        {
+        //            GUILayout.Space(4f);
+        //            GUILayout.Label(mGameOverTestMessage, labelStyle);
+        //        }
 
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
-        }
+        //        GUILayout.EndScrollView();
+        //        GUILayout.EndArea();
+        //    }
 
-        private static string EndingName(int endingId)
-        {
-            switch (endingId)
-            {
-                case 0: return "信任归零";
-                case 1: return "道德归零";
-                case 2: return "资金不足";
-                case 3: return "普通结局";
-                case 4: return "NB结局";
-                default: return "未触发";
-            }
-        }
+        //    private static string EndingName(int endingId)
+        //    {
+        //        switch (endingId)
+        //        {
+        //            case 0: return "信任归零";
+        //            case 1: return "道德归零";
+        //            case 2: return "资金不足";
+        //            case 3: return "普通结局";
+        //            case 4: return "NB结局";
+        //            default: return "未触发";
+        //        }
+        //    }
 
-        private void PreviewEnding(int endingId)
-        {
-            TapTap.Interface.SendEvent(new GameOverEvent { EndingId = endingId });
-            mGameOverTestMessage = $"已发送结局表现事件：EndingId = {endingId}（{EndingName(endingId)}）\n" +
-                                   "若没有反应，说明上一次表现还没结束，先点③里的重置。";
-        }
+        //    private void PreviewEnding(int endingId)
+        //    {
+        //        TapTap.Interface.SendEvent(new GameOverEvent { EndingId = endingId });
+        //        mGameOverTestMessage = $"已发送结局表现事件：EndingId = {endingId}（{EndingName(endingId)}）\n" +
+        //                               "若没有反应，说明上一次表现还没结束，先点③里的重置。";
+        //    }
 
-        private void SimulateTrustZero()
-        {
-            SetPlayerValues(credibility: 0);
-            this.SendCommand(new CredibilityValueCommand(0));
-            ReportSimulation("信任归零");
-        }
+        //    private void SimulateTrustZero()
+        //    {
+        //        SetPlayerValues(credibility: 0);
+        //        this.SendCommand(new CredibilityValueCommand(0));
+        //        ReportSimulation("信任归零");
+        //    }
 
-        private void SimulateEvilZero()
-        {
-            SetPlayerValues(evil: 0);
-            this.SendCommand(new EvilValueCommand(0));
-            ReportSimulation("道德归零");
-        }
+        //    private void SimulateEvilZero()
+        //    {
+        //        SetPlayerValues(evil: 0);
+        //        this.SendCommand(new EvilValueCommand(0));
+        //        ReportSimulation("道德归零");
+        //    }
 
-        private void SimulateFundsLow()
-        {
-            SetPlayerValues(credibility: 50, evil: 70, funds: Mathf.Max(0, PlayerModelRef.TargetFundsValue - 1));
-            EnterLastDay();
-            ReportSimulation("最后一天资金不足");
-        }
+        //    private void SimulateFundsLow()
+        //    {
+        //        SetPlayerValues(credibility: 50, evil: 70, funds: Mathf.Max(0, PlayerModelRef.TargetFundsValue - 1));
+        //        EnterLastDay();
+        //        ReportSimulation("最后一天资金不足");
+        //    }
 
-        private void SimulateNormal()
-        {
-            SetPlayerValues(credibility: 50, evil: 70, funds: PlayerModelRef.TargetFundsValue);
-            EnterLastDay();
-            ReportSimulation("最后一天资金够");
-        }
+        //    private void SimulateNormal()
+        //    {
+        //        SetPlayerValues(credibility: 50, evil: 70, funds: PlayerModelRef.TargetFundsValue);
+        //        EnterLastDay();
+        //        ReportSimulation("最后一天资金够");
+        //    }
 
-        private void SimulateNb()
-        {
-            int target = PlayerModelRef.TargetFundsValue;
-            SetPlayerValues(credibility: 90, evil: 90, funds: Mathf.CeilToInt(target * 1.8f) + 1);
-            EnterLastDay();
-            ReportSimulation("最后一天NB数值");
-        }
+        //    private void SimulateNb()
+        //    {
+        //        int target = PlayerModelRef.TargetFundsValue;
+        //        SetPlayerValues(credibility: 90, evil: 90, funds: Mathf.CeilToInt(target * 1.8f) + 1);
+        //        EnterLastDay();
+        //        ReportSimulation("最后一天NB数值");
+        //    }
 
-        private void TriggerEndTheGame()
-        {
-            GlobalSystemRef.EndTheGame();
-            ReportSimulation("EndTheGame()");
-        }
+        //    private void TriggerEndTheGame()
+        //    {
+        //        GlobalSystemRef.EndTheGame();
+        //        ReportSimulation("EndTheGame()");
+        //    }
 
-        private void SetPlayerValues(int credibility = -1, int evil = -1, int funds = -1)
-        {
-            var player = PlayerModelRef;
+        //    private void SetPlayerValues(int credibility = -1, int evil = -1, int funds = -1)
+        //    {
+        //        var player = PlayerModelRef;
 
-            if (credibility >= 0) player.CredibilityValue = credibility;
-            if (evil >= 0) player.EvilValue = evil;
-            if (funds >= 0) player.FundsValue = funds;
-        }
+        //        if (credibility >= 0) player.CredibilityValue = credibility;
+        //        if (evil >= 0) player.EvilValue = evil;
+        //        if (funds >= 0) player.FundsValue = funds;
+        //    }
 
-        private void EnterLastDay()
-        {
-            var time = TimeModelRef;
-            time.days = Mathf.Max(time.days, time.endDays);
-            TapTap.Interface.SendEvent(new OnDaysChangeEvent());
-        }
+        //    private void EnterLastDay()
+        //    {
+        //        var time = TimeModelRef;
+        //        time.days = Mathf.Max(time.days, time.endDays);
+        //        TapTap.Interface.SendEvent(new OnDaysChangeEvent());
+        //    }
 
-        private void ReportSimulation(string title)
-        {
-            var concrete = GlobalSystemConcrete;
-            int which = GlobalSystemRef != null ? GlobalSystemRef.WhichEnd(PlayerModelRef.TargetFundsValue) : -99;
+        //    private void ReportSimulation(string title)
+        //    {
+        //        var concrete = GlobalSystemConcrete;
+        //        int which = GlobalSystemRef != null ? GlobalSystemRef.WhichEnd(PlayerModelRef.TargetFundsValue) : -99;
 
-            mGameOverTestMessage =
-                $"[{title}] WhichEnd = {which}（{EndingName(which)}），" +
-                $"IsEnded = {(concrete != null && concrete.IsEnded)}，" +
-                $"EndingId = {(concrete != null ? concrete.EndingId : -99)}\n" +
-                "提示：一次 Play 只有第一次能真正结算，重复测试先点③里的重置。";
-        }
+        //        mGameOverTestMessage =
+        //            $"[{title}] WhichEnd = {which}（{EndingName(which)}），" +
+        //            $"IsEnded = {(concrete != null && concrete.IsEnded)}，" +
+        //            $"EndingId = {(concrete != null ? concrete.EndingId : -99)}\n" +
+        //            "提示：一次 Play 只有第一次能真正结算，重复测试先点③里的重置。";
+        //    }
 
-        private void SkipCurrentEnding()
-        {
-            var director = GameOverDirector.Instance;
+        //    private void SkipCurrentEnding()
+        //    {
+        //        var director = GameOverDirector.Instance;
 
-            if (director == null)
-            {
-                mGameOverTestMessage = "当前没有结局在播放（GameOverDirector 不存在）。";
-                return;
-            }
+        //        if (director == null)
+        //        {
+        //            mGameOverTestMessage = "当前没有结局在播放（GameOverDirector 不存在）。";
+        //            return;
+        //        }
 
-            director.RequestSkip();
-            mGameOverTestMessage = "已请求跳过：第一段跳到名单，名单里再跳一次出结束按钮。";
-        }
+        //        director.RequestSkip();
+        //        mGameOverTestMessage = "已请求跳过：第一段跳到名单，名单里再跳一次出结束按钮。";
+        //    }
 
-        private void ResetEndingTestState()
-        {
-            var concrete = GlobalSystemConcrete;
+        //    private void ResetEndingTestState()
+        //    {
+        //        var concrete = GlobalSystemConcrete;
 
-            if (concrete != null)
-            {
-                var endedField = typeof(GlobalManagerSystem).GetField("mGameEnded",
-                    BindingFlags.Instance | BindingFlags.NonPublic);
-                if (endedField != null) endedField.SetValue(concrete, false);
+        //        if (concrete != null)
+        //        {
+        //            var endedField = typeof(GlobalManagerSystem).GetField("mGameEnded",
+        //                BindingFlags.Instance | BindingFlags.NonPublic);
+        //            if (endedField != null) endedField.SetValue(concrete, false);
 
-                var endingProperty = typeof(GlobalManagerSystem).GetProperty("EndingId",
-                    BindingFlags.Instance | BindingFlags.Public);
-                if (endingProperty != null) endingProperty.SetValue(concrete, -1);
-            }
+        //            var endingProperty = typeof(GlobalManagerSystem).GetProperty("EndingId",
+        //                BindingFlags.Instance | BindingFlags.Public);
+        //            if (endingProperty != null) endingProperty.SetValue(concrete, -1);
+        //        }
 
-            var directors = FindObjectsOfType<GameOverDirector>();
-            for (int i = 0; i < directors.Length; i++)
-            {
-                if (directors[i] != null) Destroy(directors[i].gameObject);
-            }
+        //        var directors = FindObjectsOfType<GameOverDirector>();
+        //        for (int i = 0; i < directors.Length; i++)
+        //        {
+        //            if (directors[i] != null) Destroy(directors[i].gameObject);
+        //        }
 
-            var instanceProperty = typeof(GameOverDirector).GetProperty("Instance",
-                BindingFlags.Static | BindingFlags.Public);
-            if (instanceProperty != null) instanceProperty.SetValue(null, null);
+        //        var instanceProperty = typeof(GameOverDirector).GetProperty("Instance",
+        //            BindingFlags.Static | BindingFlags.Public);
+        //        if (instanceProperty != null) instanceProperty.SetValue(null, null);
 
-            var oldCanvas = GameObject.Find("[GameOverCanvas]");
-            if (oldCanvas != null) Destroy(oldCanvas);
+        //        var oldCanvas = GameObject.Find("[GameOverCanvas]");
+        //        if (oldCanvas != null) Destroy(oldCanvas);
 
-            var go = new GameObject("[GameOverDirector]");
-            DontDestroyOnLoad(go);
-            go.AddComponent<GameOverDirector>();
+        //        var go = new GameObject("[GameOverDirector]");
+        //        DontDestroyOnLoad(go);
+        //        go.AddComponent<GameOverDirector>();
 
-            mGameOverTestMessage = "已重置 mGameEnded / EndingId，并重建 GameOverDirector，可以重复测试。";
-        }
+        //        mGameOverTestMessage = "已重置 mGameEnded / EndingId，并重建 GameOverDirector，可以重复测试。";
+        //    }
 
-        private void ResetPlayerValues()
-        {
-            var defaults = new PlayerModel();
-            var player = PlayerModelRef;
+        //    private void ResetPlayerValues()
+        //    {
+        //        var defaults = new PlayerModel();
+        //        var player = PlayerModelRef;
 
-            player.FundsValue = defaults.FundsValue;
-            player.EvilValue = defaults.EvilValue;
-            player.CredibilityValue = defaults.CredibilityValue;
-            player.TargetFundsValue = defaults.TargetFundsValue;
+        //        player.FundsValue = defaults.FundsValue;
+        //        player.EvilValue = defaults.EvilValue;
+        //        player.CredibilityValue = defaults.CredibilityValue;
+        //        player.TargetFundsValue = defaults.TargetFundsValue;
 
-            TimeModelRef.days = 1;
-            mGameOverTestMessage = "已恢复默认数值（只改内存，不写存档）。";
-        }
+        //        TimeModelRef.days = 1;
+        //        mGameOverTestMessage = "已恢复默认数值（只改内存，不写存档）。";
+        //    }
 
-        // ============================================================
-        //  数据来源（测试用：直接读总表，方便把没获得的也列出来）
-        // ============================================================
+        //    // ============================================================
+        //    //  数据来源（测试用：直接读总表，方便把没获得的也列出来）
+        //    // ============================================================
 
-        /// <summary>总表只读一次，缓存起来。OnGUI 里绝对不能每帧 LoadSync。</summary>
-        private List<NewsTemplate_SO> LoadAllNews()
-        {
-            if (mAllNewsCache != null)
-            {
-                return mAllNewsCache;
-            }
+        //    /// <summary>总表只读一次，缓存起来。OnGUI 里绝对不能每帧 LoadSync。</summary>
+        //    private List<NewsTemplate_SO> LoadAllNews()
+        //    {
+        //        if (mAllNewsCache != null)
+        //        {
+        //            return mAllNewsCache;
+        //        }
 
-            try
-            {
-                NewsTemplateList_SO list = mDebugResLoader.LoadSync<NewsTemplateList_SO>(mNewsListResName);
-                mAllNewsCache = list != null ? list.newsTemplateList : new List<NewsTemplate_SO>();
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"[Test] 加载新闻总表 {mNewsListResName} 失败：{e.Message}");
-                mAllNewsCache = new List<NewsTemplate_SO>();
-            }
+        //        try
+        //        {
+        //            NewsTemplateList_SO list = mDebugResLoader.LoadSync<NewsTemplateList_SO>(mNewsListResName);
+        //            mAllNewsCache = list != null ? list.newsTemplateList : new List<NewsTemplate_SO>();
+        //        }
+        //        catch (System.Exception e)
+        //        {
+        //            Debug.LogError($"[Test] 加载新闻总表 {mNewsListResName} 失败：{e.Message}");
+        //            mAllNewsCache = new List<NewsTemplate_SO>();
+        //        }
 
-            return mAllNewsCache;
-        }
+        //        return mAllNewsCache;
+        //    }
 
-        /// <summary>同上：缓存，避免每帧申请 ResKit 句柄。</summary>
-        private List<Tag_SO> LoadAllTags()
-        {
-            if (mAllTagsCache != null)
-            {
-                return mAllTagsCache;
-            }
+        //    /// <summary>同上：缓存，避免每帧申请 ResKit 句柄。</summary>
+        //    private List<Tag_SO> LoadAllTags()
+        //    {
+        //        if (mAllTagsCache != null)
+        //        {
+        //            return mAllTagsCache;
+        //        }
 
-            try
-            {
-                TagList_SO list = mDebugResLoader.LoadSync<TagList_SO>(mTagListResName);
-                mAllTagsCache = list != null ? list.allTagList : new List<Tag_SO>();
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"[Test] 加载 Tag 总表 {mTagListResName} 失败：{e.Message}");
-                mAllTagsCache = new List<Tag_SO>();
-            }
+        //        try
+        //        {
+        //            TagList_SO list = mDebugResLoader.LoadSync<TagList_SO>(mTagListResName);
+        //            mAllTagsCache = list != null ? list.allTagList : new List<Tag_SO>();
+        //        }
+        //        catch (System.Exception e)
+        //        {
+        //            Debug.LogError($"[Test] 加载 Tag 总表 {mTagListResName} 失败：{e.Message}");
+        //            mAllTagsCache = new List<Tag_SO>();
+        //        }
 
-            return mAllTagsCache;
-        }
+        //        return mAllTagsCache;
+        //    }
 
-        private void AcquireAllNews()
-        {
-            List<NewsTemplate_SO> all = LoadAllNews();
+        //    private void AcquireAllNews()
+        //    {
+        //        List<NewsTemplate_SO> all = LoadAllNews();
 
-            if (all == null)
-            {
-                return;
-            }
+        //        if (all == null)
+        //        {
+        //            return;
+        //        }
 
-            int count = 0;
+        //        int count = 0;
 
-            foreach (NewsTemplate_SO news in all)
-            {
-                if (news == null || (NewsSystem != null && NewsSystem.IsAcquired(news.newsId)))
-                {
-                    continue;
-                }
+        //        foreach (NewsTemplate_SO news in all)
+        //        {
+        //            if (news == null || (NewsSystem != null && NewsSystem.IsAcquired(news.newsId)))
+        //            {
+        //                continue;
+        //            }
 
-                this.SendCommand(new AddNewsCommand(news.newsId));
-                count++;
-            }
+        //            this.SendCommand(new AddNewsCommand(news.newsId));
+        //            count++;
+        //        }
 
-            mDebugMessage = $"已获得 {count} 条新闻";
-        }
+        //        mDebugMessage = $"已获得 {count} 条新闻";
+        //    }
 
-        private void AcquireAllTags()
-        {
-            List<Tag_SO> all = LoadAllTags();
+        //    private void AcquireAllTags()
+        //    {
+        //        List<Tag_SO> all = LoadAllTags();
 
-            if (all == null)
-            {
-                return;
-            }
+        //        if (all == null)
+        //        {
+        //            return;
+        //        }
 
-            int count = 0;
+        //        int count = 0;
 
-            foreach (Tag_SO tag in all)
-            {
-                if (tag == null || (TagSystem != null && TagSystem.IsAcquired(tag.tagId)))
-                {
-                    continue;
-                }
+        //        foreach (Tag_SO tag in all)
+        //        {
+        //            if (tag == null || (TagSystem != null && TagSystem.IsAcquired(tag.tagId)))
+        //            {
+        //                continue;
+        //            }
 
-                this.SendCommand(new AddTagCommand(tag.tagId));
-                count++;
-            }
+        //            this.SendCommand(new AddTagCommand(tag.tagId));
+        //            count++;
+        //        }
 
-            mDebugMessage = $"已获得 {count} 个 Tag";
-        }
+        //        mDebugMessage = $"已获得 {count} 个 Tag";
+        //    }
 
         public IArchitecture GetArchitecture()
         {
             return TapTap.Interface;
         }
     }
+    
 }

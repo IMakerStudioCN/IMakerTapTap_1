@@ -1,0 +1,30 @@
+ManifestFileVersion: 0
+CRC: 2166552106
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 28f2661c41ffb360fc30ed402b92825c
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 0c629121bebe8d7bb309ff1146417e6d
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 28f2661c41ffb360fc30ed402b92825c
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: b3e86aa48ff767141a7c1d9a430266fe, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 16eb37e654294b1408ed97f7cbbdb002, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/baLine/baLineList10.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/baline10_1_asset
+- E:/AAA/test/AssetBundles/Windows/baline10_2_asset
+- E:/AAA/test/AssetBundles/Windows/baline10_3_asset
+- E:/AAA/test/AssetBundles/Windows/baline10_4_asset
+- E:/AAA/test/AssetBundles/Windows/baline10_5_asset
+- E:/AAA/test/AssetBundles/Windows/baline10_6_asset

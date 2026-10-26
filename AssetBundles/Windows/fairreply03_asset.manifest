@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 1288177135
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: a2a1b081d0878f558a1c265e87bfe1b9
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 4c4868e8b69eb66163c3a6e9223477f7
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: a2a1b081d0878f558a1c265e87bfe1b9
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 16eb37e654294b1408ed97f7cbbdb002, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/baLine/mybaReply/fairReply03.asset
+Dependencies: []

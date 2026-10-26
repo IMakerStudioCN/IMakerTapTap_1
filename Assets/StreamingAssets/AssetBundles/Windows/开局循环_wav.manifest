@@ -1,0 +1,20 @@
+ManifestFileVersion: 0
+CRC: 4129748003
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 8b300d0681e17c6ad0ee3149a97f0817
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 9a2ca7bdbd1871f7131daf57de908e0c
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 8b300d0681e17c6ad0ee3149a97f0817
+HashAppended: 0
+ClassTypes:
+- Class: 83
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- "Assets/Art/Sound pack/\u5F00\u5C40\u5FAA\u73AF.wav"
+Dependencies: []

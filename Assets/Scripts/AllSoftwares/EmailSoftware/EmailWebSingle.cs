@@ -1,6 +1,5 @@
 ﻿using QFramework;
 using TMPro;
-using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 using UnityEngine.UI;
 namespace TapTapFirst
@@ -52,7 +51,7 @@ namespace TapTapFirst
                 return;
             }
 
-            whenSend.text = currentSO.WhoSend;
+            whoSend.text = currentSO.WhoSend;
             sendContent.text = currentSO.SendContent;
             whenSend.text = currentSO.WhenSend;
 
