@@ -13,6 +13,7 @@ namespace TapTapFirst
         // TODO: 在这里声明模块对外 API（属性/方法）
         int WhichEnd(int target);
         void EndTheGame();
+        void ResetEndState();
 
     }
 
@@ -90,20 +91,12 @@ namespace TapTapFirst
             }
             if(timeModel.days >= timeModel.endDays)
             {
-                if (playerModel.CredibilityValue >= 80&& playerModel.EvilValue >= 80
+                // 邪恶值每次固定 ±3、从 70 起步，80 只有极端流派才够得到；这里放宽到“不低于开局值”
+                if (playerModel.CredibilityValue >= 80 && playerModel.EvilValue >= 70
                     && playerModel.FundsValue > target * 1.8)
                 {
-                    bool hasExpiredTask = false;
-                    foreach(string task in jsonSaveUtility.Get<TaskModelData>("TaskModelData").ExpiredTask)
-                    {
-                        if (!taskSystem.CheckTaskIsDone(task))
-                        {
-                            hasExpiredTask = true;
-                            break;
-                        }
-                    }
-
-                    if (hasExpiredTask) return 4;
+                    // 主线任务有过期又没完成就算没做到，不给完美结局（支线不影响）
+                    if (!HasUnfinishedExpiredMainTask()) return 4;
                 }
 
                 if (playerModel.FundsValue < target)
@@ -114,6 +107,12 @@ namespace TapTapFirst
             return -1;        
         }
 
+
+        /// <summary>是否存在“已过期但没有完成”的主线任务（只统计 ismain == true 的）。</summary>
+        private bool HasUnfinishedExpiredMainTask()
+        {
+            return taskSystem != null && taskSystem.HasUnfinishedExpiredMainTask();
+        }
 
         private bool mGameEnded;
 
@@ -143,6 +142,16 @@ namespace TapTapFirst
             EndingId = end;
             //交给 GameOverShow：0/1/2 碎屏、3 关机、4 去屏幕效果，然后图片 -> 文字 -> 制作人名单
             TapTap.Interface.SendEvent(new GameOverEvent { EndingId = end });
+        }
+
+        /// <summary>
+        /// 重开一局前复位结局状态。
+        /// mGameEnded 挂在架构单例上，场景重载不会重建，不复位的话第二局永远结算不了结局。
+        /// </summary>
+        public void ResetEndState()
+        {
+            mGameEnded = false;
+            EndingId = -1;
         }
 
         /// <summary>当前触发的结局编号，-1 表示还没结束</summary>

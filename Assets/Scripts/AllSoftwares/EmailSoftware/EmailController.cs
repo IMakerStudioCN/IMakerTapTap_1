@@ -52,12 +52,15 @@ namespace TapTapFirst
                 //接受发送的邮件ID事件，更新邮件列表
                 UpdateEmailList();
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
-            //测试的按钮
-            SendEmailbutton.onClick.AddListener(() => 
+            //测试的按钮（Inspector 里没挂就跳过，别让它把 Start 后面的初始化打断）
+            if (SendEmailbutton != null)
             {
-                TapTap.Interface.SendEvent(new SendEmailEvent { EmailWebID = 0});
-                Debug.Log("发送邮件");
-            });
+                SendEmailbutton.onClick.AddListener(() =>
+                {
+                    TapTap.Interface.SendEvent(new SendEmailEvent { EmailWebID = 0});
+                    Debug.Log("发送邮件");
+                });
+            }
 
         }
 

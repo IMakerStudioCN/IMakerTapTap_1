@@ -1,0 +1,34 @@
+ManifestFileVersion: 0
+CRC: 1576501650
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 348c589665ea60d14384f04d6057c9f9
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 0c629121bebe8d7bb309ff1146417e6d
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 348c589665ea60d14384f04d6057c9f9
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: b3e86aa48ff767141a7c1d9a430266fe, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 16eb37e654294b1408ed97f7cbbdb002, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/baLine/mybaReply/list/otherReplyList.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/otherreply01_asset
+- E:/AAA/test/AssetBundles/Windows/otherreply02_asset
+- E:/AAA/test/AssetBundles/Windows/otherreply03_asset
+- E:/AAA/test/AssetBundles/Windows/otherreply04_asset
+- E:/AAA/test/AssetBundles/Windows/otherreply05_asset
+- E:/AAA/test/AssetBundles/Windows/otherreply06_asset
+- E:/AAA/test/AssetBundles/Windows/otherreply07_asset
+- E:/AAA/test/AssetBundles/Windows/otherreply08_asset
+- E:/AAA/test/AssetBundles/Windows/otherreply09 1_asset
+- E:/AAA/test/AssetBundles/Windows/otherreply09_asset

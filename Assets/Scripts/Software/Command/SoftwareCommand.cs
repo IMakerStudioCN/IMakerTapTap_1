@@ -1,6 +1,5 @@
 ﻿using QFramework;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 namespace TapTapFirst
 {

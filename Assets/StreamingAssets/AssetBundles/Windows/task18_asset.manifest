@@ -1,0 +1,23 @@
+ManifestFileVersion: 0
+CRC: 3362331141
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 4db87c33307bfe947eeefe25f417233d
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 7fcc6c0069c53c2390dd81e7ea0611e7
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 4db87c33307bfe947eeefe25f417233d
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: d353eeaec7e129240bf77a0e1aeaf64d, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/Task/Task18.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/task16_asset

@@ -26,10 +26,21 @@ namespace TapTapFirst
             playerModel = this.GetModel<IPlayerModel>();
             //tagModel = this.GetModel<TagModel>();
 
-            fundsSlider = GameObject.Find("FundsValue").GetComponent<Slider>();
-            evilSlider = GameObject.Find("EvilValue").GetComponent<Slider>();
-            credibilitySlider = GameObject.Find("CredibilityValue").GetComponent<Slider>();
-            plusButton = GameObject.Find("3ValuePuls").GetComponent<Button>();
+            Slider foundFundsSlider = GameObject.Find("FundsValue")?.GetComponent<Slider>();
+            if (foundFundsSlider != null) fundsSlider = foundFundsSlider;
+
+            Slider foundEvilSlider = GameObject.Find("EvilValue")?.GetComponent<Slider>();
+            if (foundEvilSlider != null) evilSlider = foundEvilSlider;
+
+            Slider foundCredibilitySlider = GameObject.Find("CredibilityValue")?.GetComponent<Slider>();
+            if (foundCredibilitySlider != null) credibilitySlider = foundCredibilitySlider;
+
+            //plusButton = GameObject.Find("3ValuePuls").GetComponent<Button>();
+
+            if (plusButton == null)
+            {
+                return;
+            }
 
             plusButton.onClick.AddListener(() =>
             {
@@ -46,9 +57,19 @@ namespace TapTapFirst
 
         public void UpdatePlayerStats()
         {
-            fundsSlider.value = playerModel.FundsValue;
-            evilSlider.value = playerModel.EvilValue;
-            credibilitySlider.value =  playerModel.CredibilityValue;
+            if (playerModel == null)
+            {
+                playerModel = this.GetModel<IPlayerModel>();
+            }
+
+            if (playerModel == null)
+            {
+                return;
+            }
+
+            if (fundsSlider != null) fundsSlider.value = playerModel.FundsValue;
+            if (evilSlider != null) evilSlider.value = playerModel.EvilValue;
+            if (credibilitySlider != null) credibilitySlider.value = playerModel.CredibilityValue;
             //Debug .Log("Acquired Tags: " + string.Join(", ", tagModel.AcquriedTags[0].tagName));
         }
 

@@ -13,5 +13,7 @@ namespace TapTapFirst
         public GameObject prefab;
         [Header("单句")]
         public string Sentence;
+        [Header("头像")]
+        public Sprite head;
     }
 }

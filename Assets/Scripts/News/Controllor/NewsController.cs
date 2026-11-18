@@ -176,7 +176,7 @@ namespace TapTapFirst
             this.RegisterEvent<OnDaysChangeEvent>(e =>
             {
                 HasSubmitted = false;
-            });
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
         }
 
         private void OnDestroy()

@@ -92,9 +92,25 @@ namespace TapTapFirst
 				Debug.LogWarning($"{mDialogSO.title}第{index}没有配置prefab");
 				return;
 			}
-			mStanding.sprite = mSingle.Standing;
+			//设置对话样貌
+			if (mSingle.Standing != null)
+			{
+				mStanding.color = new Color(255, 255, 255, 1);
+				mStanding.sprite = mSingle.Standing;
+			}
+			else
+			{
+				mStanding.color = new Color(0, 0, 0, 0);
+			}
+			
 			GameObject mObject =  Instantiate<GameObject>(mSingle.prefab,this.transform);
 			mObject.GetComponentInChildren<TextMeshProUGUI>().text = mSingle.Sentence;
+            var profileRoot = mObject.transform.Find("ProfilePicture");
+			if (profileRoot != null && mSingle.head != null)
+			{
+                profileRoot.GetComponent<Image>().sprite = mSingle.head;
+
+            }
 			mScrollRect.verticalNormalizedPosition = 0;
 			
 		}

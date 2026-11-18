@@ -27,19 +27,19 @@ Material:
     m_Floats:
     - _BorderSoftness: 3
     - _CornerRadius: 0
-    - _Curvature: 0
+    - _Curvature: 0.07
     - _DarkAreaStructure: 0.01
-    - _Intensity: 0
+    - _Intensity: 1
     - _LuminanceModulation: 1
     - _ScanlinePeriod: 2.5
-    - _ScanlineStrength: 0
-    - _ScreenScale: 0.99999946
+    - _ScanlineStrength: 0.1
+    - _ScreenScale: 0.97
     - _StructureGain: 1.7
     - _StructureMode: 3
     - _StructurePeriod: 3
-    - _StructureStrength: 0
+    - _StructureStrength: 0.31
     - _SubpixelBlur: 0
-    - _Vignette: 0
+    - _Vignette: 0.7
     m_Colors:
     - _BorderColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

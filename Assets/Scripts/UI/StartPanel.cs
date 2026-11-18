@@ -19,6 +19,26 @@ namespace TapTapFirst
         private ResLoader mResLoader;
         private bool mInitialized;
 
+        // 加载场景用的 ResLoader 必须活到进程结束。
+        // 一旦回收，ResKit 会对场景的依赖包执行 AssetBundle.Unload(true)，
+        // 场景里直接引用到的跨包资产（TaskSingle / DialogSO / 材质…）会被销毁成 Missing，
+        // 于是 TaskControl.config、DialogConfig.DialogConfigs 全变空 —— 任务、对话在真机包里全失效。
+        // （模拟模式下资源来自 AssetDatabase，不会复现这个问题，所以容易被漏掉。）
+        private static ResLoader sSceneResLoader;
+
+        private static ResLoader SceneResLoader
+        {
+            get
+            {
+                if (sSceneResLoader == null)
+                {
+                    sSceneResLoader = ResLoader.Allocate();
+                }
+
+                return sSceneResLoader;
+            }
+        }
+
         private void Start()
         {
             // StartPanel 目前直接放在 Start 场景中，因此在 Unity Start 生命周期中初始化。
@@ -32,7 +52,7 @@ namespace TapTapFirst
 
             ResKit.Init();
             UIKit.Config.PanelLoaderPool = new ResKitPanelLoaderPool();
-            mResLoader = ResLoader.Allocate();
+            mResLoader = SceneResLoader;
             Btn_Start.onClick.AddListener(StartGame);
             Btn_Archive.onClick.AddListener(OpenSaveSlots);
             Btn_Setting.onClick.AddListener(OpenSettings);
@@ -82,6 +102,13 @@ namespace TapTapFirst
 
         private void LoadGameScene()
         {
+            IGlobalManagerSystem globalManagerSystem = TapTap.Interface.GetSystem<IGlobalManagerSystem>();
+
+            if (globalManagerSystem != null)
+            {
+                globalManagerSystem.ResetEndState();
+            }
+
             if (!Application.CanStreamedLevelBeLoaded(GameSceneName))
             {
                 Debug.LogError($"[StartPanel] 场景 {GameSceneName} 尚未加入 Build Settings");
@@ -115,7 +142,8 @@ namespace TapTapFirst
                 Btn_Archive?.onClick.RemoveListener(OpenSaveSlots);
                 Btn_Setting?.onClick.RemoveListener(OpenSettings);
                 Btn_Exit?.onClick.RemoveListener(GameApplication.Quit);
-                mResLoader?.Recycle2Cache();
+                // 这里不能 Recycle2Cache()：回收会连带 AssetBundle.Unload(true) 掉场景的依赖包，
+                // 场景里的跨包引用会立刻变成 Missing。loader 由 sSceneResLoader 持有，随进程存活。
                 mResLoader = null;
             }
 

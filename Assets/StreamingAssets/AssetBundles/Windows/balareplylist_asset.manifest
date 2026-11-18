@@ -1,0 +1,37 @@
+ManifestFileVersion: 0
+CRC: 1896166519
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: bacda8e0aa081722d5e9f4fdf5b64415
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 0c629121bebe8d7bb309ff1146417e6d
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: bacda8e0aa081722d5e9f4fdf5b64415
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: b3e86aa48ff767141a7c1d9a430266fe, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 16eb37e654294b1408ed97f7cbbdb002, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/baLine/mybaReply/list/balaReplyList.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/balareply01_asset
+- E:/AAA/test/AssetBundles/Windows/balareply02_asset
+- E:/AAA/test/AssetBundles/Windows/balareply03_asset
+- E:/AAA/test/AssetBundles/Windows/balareply04_asset
+- E:/AAA/test/AssetBundles/Windows/balareply05_asset
+- E:/AAA/test/AssetBundles/Windows/balareply06_asset
+- E:/AAA/test/AssetBundles/Windows/balareply07_asset
+- E:/AAA/test/AssetBundles/Windows/balareply08_asset
+- E:/AAA/test/AssetBundles/Windows/balareply09_asset
+- E:/AAA/test/AssetBundles/Windows/balareply10_asset
+- E:/AAA/test/AssetBundles/Windows/balareply11_asset
+- E:/AAA/test/AssetBundles/Windows/balareply12_asset
+- E:/AAA/test/AssetBundles/Windows/balareply13_asset

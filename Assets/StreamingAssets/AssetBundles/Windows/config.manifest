@@ -1,0 +1,40 @@
+ManifestFileVersion: 0
+CRC: 1299586167
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: acc290dbb2cc067e6c5ada8ef89fa195
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: c9fe51fc18f240e6293be74e28fd3dff
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: acc290dbb2cc067e6c5ada8ef89fa195
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7056fc3f614d63e479faeb79d130123a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 49652af4bf4bfeb45bf256ac9026309c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d353eeaec7e129240bf77a0e1aeaf64d, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: Assembly-CSharp
+  ClassName: TapTapFirst.DialogSOSingle
+Assets:
+- Assets/Config/Task/11.asset
+- Assets/Config/Email/EmailLine_SO.asset
+- Assets/Config/Dialog/DialogSO 1.asset
+- Assets/Config/Task/222.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/single1_prefab
+- E:/AAA/test/AssetBundles/Windows/single2_prefab
+- E:/AAA/test/AssetBundles/Windows/single3_prefab

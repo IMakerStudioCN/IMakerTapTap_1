@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 1556171548
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 8af9113e7386250fc86ce2d2c99f9c39
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 7fcc6c0069c53c2390dd81e7ea0611e7
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 8af9113e7386250fc86ce2d2c99f9c39
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: d353eeaec7e129240bf77a0e1aeaf64d, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/Task/Task00.asset
+Dependencies: []

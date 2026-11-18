@@ -1,0 +1,35 @@
+ManifestFileVersion: 0
+CRC: 2771370396
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 1bcbe7675efbdea5a0f17c664a2e8a48
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 0c629121bebe8d7bb309ff1146417e6d
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 1bcbe7675efbdea5a0f17c664a2e8a48
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: b3e86aa48ff767141a7c1d9a430266fe, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 16eb37e654294b1408ed97f7cbbdb002, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/baLine/mybaReply/list/fairReplyList.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/fairreply01_asset
+- E:/AAA/test/AssetBundles/Windows/fairreply02_asset
+- E:/AAA/test/AssetBundles/Windows/fairreply03_asset
+- E:/AAA/test/AssetBundles/Windows/fairreply04_asset
+- E:/AAA/test/AssetBundles/Windows/fairreply05_asset
+- E:/AAA/test/AssetBundles/Windows/fairreply06_asset
+- E:/AAA/test/AssetBundles/Windows/fairreply07_asset
+- E:/AAA/test/AssetBundles/Windows/fairreply08_asset
+- E:/AAA/test/AssetBundles/Windows/fairreply09_asset
+- E:/AAA/test/AssetBundles/Windows/fairreply10_asset
+- E:/AAA/test/AssetBundles/Windows/fairreply11_asset

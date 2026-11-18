@@ -1,0 +1,185 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49652af4bf4bfeb45bf256ac9026309c, type: 3}
+  m_Name: DialogSO
+  m_EditorClassIdentifier: 
+  BackGround: {fileID: 21300000, guid: 30799fcb4ed09184e909f18d1949e183, type: 3}
+  title: "\u5BF9\u8BDD\u4E00"
+  dialog:
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 714776282053958920, guid: 808dea167fff68c479e935d88368a810, type: 3}
+    Sentence: "\u4F60\u4E00\u8FDB\u95E8\uFF0C\u5C31\u770B\u5230\u4E86\u4E00\u4E2A\u5411\u4F60\u62DB\u624B\u7684\u5C11\u5973"
+    head: {fileID: 21300000, guid: e66b767630686594fa80c11659bedd80, type: 3}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u59D0\u59D0\uFF0C\u8FD9\u91CC\uFF01"
+    head: {fileID: 21300000, guid: e66b767630686594fa80c11659bedd80, type: 3}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\uFF08\uFF3E\uFF35\uFF3E\uFF09\u30CE~"
+    head: {fileID: 21300000, guid: e66b767630686594fa80c11659bedd80, type: 3}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u6211\u8FD8\u62C5\u5FC3\u5468\u672B\u4F1A\u6CA1\u6709\u4F4D\u7F6E\u5462"
+    head: {fileID: 21300000, guid: e66b767630686594fa80c11659bedd80, type: 3}
+  - Standing: {fileID: 0}
+    prefab: {fileID: 8100689168290063961, guid: 5657f57895378f44dabc63277ad44aaf,
+      type: 3}
+    Sentence: "\u4E5F\u7B97\u9EBB\u70E6\u4F60\u4E86\uFF0C\u6709\u4EC0\u4E48\u60F3\u5403\u7684\u968F\u4FBF\u70B9\u5C31\u884C\u4E86"
+    head: {fileID: 21300000, guid: 9697d7570f4d5a14f96b28063a119f7b, type: 3}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u90A3\u6211\u4E0D\u5BA2\u6C14\u5566"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 714776282053958920, guid: 808dea167fff68c479e935d88368a810, type: 3}
+    Sentence: "\u4F3C\u4E4E\u5979\u7ECF\u5E38\u6765\uFF0C\u4F60\u4E5F\u5C31\u8DDF\u7740\u70B9\u4E86\u51E0\u6837\u5403\u7684"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 714776282053958920, guid: 808dea167fff68c479e935d88368a810, type: 3}
+    Sentence: "\u968F\u4E4B\u670D\u52A1\u5458\u5C06\u98DF\u7269\u7AEF\u4E0A\uFF0C\u4F60\u4FBF\u5F00\u59CB\u4E86\u6B63\u9898"
+    head: {fileID: 0}
+  - Standing: {fileID: 0}
+    prefab: {fileID: 8100689168290063961, guid: 5657f57895378f44dabc63277ad44aaf,
+      type: 3}
+    Sentence: "\u5173\u4E8E\u90A3\u4E2A\u5973\u751F\u2026\u6E05\u8587\u5979\u5931\u8E2A\u90A3\u5929\u665A\u4E0A\uFF0C\u9EBB\u70E6\u4F60\u548C\u6211\u8BF4\u8BF4\u5F53\u5929\u770B\u5230\u7684\u5177\u4F53\u60C5\u51B5\u5427\uFF0C\u8D8A\u8BE6\u7EC6\u8D8A\u597D"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u55EF\u2026\u2026\u600E\u4E48\u8BF4\u5462\uFF0C\u8C01\u80FD\u60F3\u5230\u4F1A\u53D1\u751F\u8FD9\u79CD\u4E8B\u5462"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u5979\u5C31\u548C\u4E4B\u524D\u4E00\u6837\uFF0C\u603B\u662F\u852B\u852B\u7684\uFF0C\u4E70\u7684\u4E1C\u897F\u4E5F\u8DDF\u5F80\u5E38\u5DEE\u4E0D\u591A\u3002\u7136\u540E\u52A0\u70ED\u7684\u65F6\u5019\uFF0C\u6211\u95EE\u5979\u662F\u4E0D\u662F\u53C8\u9879\u76EE\u8D76\u8FDB\u5EA6\u52A0\u73ED\u4E86\uFF0C\u6700\u8FD1\u7ECF\u5E38\u665A\u4E0A\u89C1\u5979"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u7136\u540E\u5979\u8BF4\u662F\uFF0C\u6211\u4E5F\u5C31\u6CA1\u591A\u95EE\u4E86"
+    head: {fileID: 0}
+  - Standing: {fileID: 0}
+    prefab: {fileID: 8100689168290063961, guid: 5657f57895378f44dabc63277ad44aaf,
+      type: 3}
+    Sentence: "\u7ECF\u5E38\uFF1F"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u54E6\uFF0C\u6211\u5C0F\u59E8\u6CA1\u8BF4\u8DDF\u4F60\u8BF4\u660E\u767D\uFF0C\u6211\u662F\u5728\u90A3\u4E2A\u516C\u53F8\u697C\u4E0B\u7684\u4FBF\u5229\u5E97\u4E0A\u591C\u73ED\u5462"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u6E05\u59D0\u59D0\u4E00\u52A0\u73ED\uFF0C\u5C31\u8001\u6765\u4E70\u5403\u7684\u3002"
+    head: {fileID: 0}
+  - Standing: {fileID: 0}
+    prefab: {fileID: 8100689168290063961, guid: 5657f57895378f44dabc63277ad44aaf,
+      type: 3}
+    Sentence: "\u4F60\u8BF4\u5979\u603B\u662F\u852B\u852B\u7684\uFF1F\u4F60\u89C9\u5F97\u5979\u662F\u4E00\u4E2A\u600E\u6837\u7684\u4EBA\uFF1F"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u55EF\u2026\u2026\u6E05\u59D0\u59D0\u5979\u554A\uFF0C\u662F\u4E2A\u4E0D\u600E\u4E48\u7231\u8BF4\u8BDD\u7684\u4EBA"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u5F88\u523B\u677F\u5370\u8C61\u91CC\u7684\u6587\u9759\u7406\u79D1\u751F\u5427"
+    head: {fileID: 0}
+  - Standing: {fileID: 0}
+    prefab: {fileID: 8100689168290063961, guid: 5657f57895378f44dabc63277ad44aaf,
+      type: 3}
+    Sentence: "\u8FD9\u6837\u554A\u2026\u2026\u4F60\u4EEC\u7B97\u719F\u5417\uFF1F"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u5176\u5B9E\u786C\u8981\u8BF4\u2026\u2026\u5C31\u662F\u90A3\u79CD\u4F60\u8BA4\u8BC6\u5979\uFF0C\u5979\u8BA4\u8BC6\u4F60\u7684\u5173\u7CFB\u5427"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u719F\u6089\u7684\u964C\u751F\u4EBA\uFF1F\u5927\u6982\u662F\u8FD9\u6837\u5427"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u8BF4\u5B9E\u8BDD\uFF0C\u4F60\u786C\u60F3\u4ECE\u6211\u8FD9\u513F\u62A0\u7EBF\u7D22\uFF0C\u771F\u62A0\u4E0D\u51FA\u6765\uFF0C\u540E\u6765\u8B66\u5BDF\u4E5F\u6765\u95EE\u8FC7\u6211\uFF0C\u95EE\u4E86\u4E00\u4E0B\u5348\uFF0C\u6211\u80FD\u8BF4\u7684\u4E5F\u5C31\u662F\u8FD9\u4E9B"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u4F46\u662F\uFF01\u6211\u6709\u5BF9\u4F60\u4EEC\u8BB0\u8005\u6765\u8BF4\u7279\u522B\u91CD\u8981\u7684\u7EBF\u7D22\u3002"
+    head: {fileID: 0}
+  - Standing: {fileID: 0}
+    prefab: {fileID: 8100689168290063961, guid: 5657f57895378f44dabc63277ad44aaf,
+      type: 3}
+    Sentence: "\u5BF9\u6211\u4EEC\u8BB0\u8005\u6765\u8BF4\uFF1F"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u55EF\uFF0C\u59D0\u59D0\u4F60\u4EEC\u505A\u65B0\u95FB\u7684\uFF0C\u6BD4\u8D77\u6316\u771F\u76F8\uFF0C\u4E0D\u5C31\u66F4\u559C\u6B22\u4E8B\u4EF6\u5468\u8FB9\u90A3\u4E9B\u4E8B\u561B\u3002"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u90A3\u6B63\u5DE7\uFF01\u6E05\u59D0\u59D0\u7684\u5F1F\u5F1F\u6B63\u597D\u662F\u6211\u7684\u540C\u73ED\u540C\u5B66\u3002\u800C\u4E14\uFF0C\u5979\u90A3\u4E2A\u62A5\u8B66\u7684\u5BA4\u53CB\u59D0\u59D0\u6211\u4E5F\u8BA4\u8BC6"
+    head: {fileID: 0}
+  - Standing: {fileID: 0}
+    prefab: {fileID: 8100689168290063961, guid: 5657f57895378f44dabc63277ad44aaf,
+      type: 3}
+    Sentence: "\u90A3\u8FD9\u771F\u662F\u592A\u5DE7\u4E86"
+    head: {fileID: 0}
+  - Standing: {fileID: 0}
+    prefab: {fileID: 8100689168290063961, guid: 5657f57895378f44dabc63277ad44aaf,
+      type: 3}
+    Sentence: "\u4F60\u7B80\u76F4\u662F\u5929\u9009\u7684\u7EBF\u4EBA"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u5BF9\u5427\u5BF9\u5427\uFF0C\u4F60\u4E5F\u662F\u8FD9\u4E48\u89C9\u5F97\u5427"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\uFF08\u2267\u25BD\u2266\uFF09"
+    head: {fileID: 0}
+  - Standing: {fileID: 0}
+    prefab: {fileID: 8100689168290063961, guid: 5657f57895378f44dabc63277ad44aaf,
+      type: 3}
+    Sentence: "\u90A3\u5C31\u9EBB\u70E6\u4F60\u4E86\uFF0C\u5C0F\u5B87"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u6CA1\u4E8B\u7684\uFF0C\u4E50\u4E8E\u52A9\u4EBA\u662F\u7F8E\u5FB7\u561B"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\u8981\u662F\u80FD\u5FEB\u70B9\u627E\u5230\u6E05\u59D0\u59D0\u6211\u4E5F\u5F88\u5F00\u5FC3\u554A"
+    head: {fileID: 0}
+  - Standing: {fileID: 21300000, guid: 916c3fc653c7c214bbcca51d6e40fcfa, type: 3}
+    prefab: {fileID: 4047467385812387857, guid: 5b3bc45ee3ebe6c4f9a7f7db0ef17cc5,
+      type: 3}
+    Sentence: "\uFF08\u25CF\xB4\u2200\uFF40\u25CF\uFF09"
+    head: {fileID: 0}
+  TagID: 410000004200000043000000

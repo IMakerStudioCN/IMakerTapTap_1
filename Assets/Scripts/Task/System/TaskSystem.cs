@@ -18,6 +18,9 @@ namespace TapTapFirst
         public void CheckEndDay(int days);
         public void CheckStartDay(int days);
         public bool CheckTaskIsDone(string taskName);
+
+        /// <summary>是否存在“已过期但没有完成”的主线任务（ismain == true）。</summary>
+        bool HasUnfinishedExpiredMainTask();
     }
 
     public class TaskSystem : AbstractSystem, ITaskSystem
@@ -166,15 +169,42 @@ namespace TapTapFirst
             CheckEndDay(mTimeModel.days);
         }
 
+        /// <summary>该任务是否已经完成（完成记录写进存档的 isDoneTask）。</summary>
         public bool CheckTaskIsDone(string taskName)
         {
-            var task = from a in expiredRuntimeTask
-                              where a.ismain == true
-                              select a;
-            if (!task.Any())
+            if (string.IsNullOrEmpty(taskName))
             {
-                return true;
+                return false;
             }
+
+            TaskModelData data = JsonSaveUtility.Get<TaskModelData>("TaskModelData");
+
+            if (data == null || data.isDoneTask == null)
+            {
+                return false;
+            }
+
+            return data.isDoneTask.Contains(taskName);
+        }
+
+        /// <summary>是否存在“已过期但没有完成”的主线任务（只统计 ismain == true 的）。</summary>
+        public bool HasUnfinishedExpiredMainTask()
+        {
+            for (int i = 0; i < expiredRuntimeTask.Count; i++)
+            {
+                TaskSingle task = expiredRuntimeTask[i];
+
+                if (task == null || !task.ismain)
+                {
+                    continue;
+                }
+
+                if (!CheckTaskIsDone(task.TaskName))
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
     }

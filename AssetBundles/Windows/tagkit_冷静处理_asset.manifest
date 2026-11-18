@@ -1,0 +1,24 @@
+ManifestFileVersion: 0
+CRC: 1613745955
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 1137cc7b4a3ac490b9ba321fd9f823ba
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 42643a5d85d6ea2b2f086fb085c69b5a
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 1137cc7b4a3ac490b9ba321fd9f823ba
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 091bb488a4ed9de429b25fa865cd9b8c, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: Assembly-CSharp
+  ClassName: TapTapFirst.TagValue
+Assets:
+- "Assets/Config/Tag/TagKit_\u51B7\u9759\u5904\u7406.asset"
+Dependencies: []

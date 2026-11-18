@@ -12,7 +12,7 @@ namespace TapTapFirst
 
     public class TimeModel : AbstractModel, ITimeModel
     {
-        public int endDays { get; set; } = 30;
+        public int endDays { get; set; } = 20;
         public int days
         {
             get => this.GetUtility<IJsonSaveUtility>().Get<TimeModelData>("TimeModelData").days;

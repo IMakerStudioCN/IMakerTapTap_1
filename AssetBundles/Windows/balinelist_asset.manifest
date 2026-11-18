@@ -1,0 +1,37 @@
+ManifestFileVersion: 0
+CRC: 2731303498
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 2b5a6543441047a91257c74e9536f29b
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 0c629121bebe8d7bb309ff1146417e6d
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 2b5a6543441047a91257c74e9536f29b
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: b3e86aa48ff767141a7c1d9a430266fe, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 16eb37e654294b1408ed97f7cbbdb002, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/baLine/baLineList.asset
+Dependencies:
+- E:/AAA/test/AssetBundles/Windows/baline00_10_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_11_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_12_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_13_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_1_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_2_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_3_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_4_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_5_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_6_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_7_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_8_asset
+- E:/AAA/test/AssetBundles/Windows/baline00_9_asset

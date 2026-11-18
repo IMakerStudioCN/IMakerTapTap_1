@@ -1,0 +1,26 @@
+ManifestFileVersion: 0
+CRC: 3946898595
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 521ec381ed240e008c28ec05939f91ae
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 5e75b5646f6c44323f4aafd02a9a6fe2
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 521ec381ed240e008c28ec05939f91ae
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 559ea39a69e29be4b8cf606cb92c2f97, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Config/SoftWare/Map.asset
+Dependencies: []

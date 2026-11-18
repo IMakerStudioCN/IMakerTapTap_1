@@ -20,7 +20,7 @@ namespace TapTapFirst
                    Debug.Log("游戏结束");
                 }
                 UpdateShow();
-            });
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
         }
 
         public void UpdateShow()

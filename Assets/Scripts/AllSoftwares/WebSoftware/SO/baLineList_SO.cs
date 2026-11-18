@@ -15,7 +15,7 @@ namespace TapTapFirst
         [Header("可以获取的tag种类")]
         public int tagID;
         [Header("可以获得的NewsTemplate种类")]
-        public int NewsTemplateID;
+        public int[] NewsTemplateID;
         [Header("可以获得的BranchID")]
         public int BranchID;
         [Header("获取了tag")]
